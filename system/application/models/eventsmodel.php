@@ -19,8 +19,9 @@
 			$query = $this->db->get('events');
 			return $query->result();
 		}*/
-		function events_limit($count,$from){
+		function events_limit($uid,$count,$from){
 		
+			$this->db->where('evnt_uid',$uid);
 			$this->db->limit($count,$from);
 			$this->db->order_by('evnt_date desc,evnt_id desc');
 			$query = $this->db->get('events');

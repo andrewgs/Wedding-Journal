@@ -31,6 +31,22 @@
 			return NULL;
 		}
 		
+		function active_user($login){
+		
+			$this->db->set('ulastlogindate',date("Y-m-d"));
+			$this->db->set('uactive',TRUE);
+			$this->db->where('ulogin',$login);
+			$this->db->update('users');
+		} /*end function active_user */
+		
+		function deactive_user($login){
+		
+			$this->db->set('ulastlogindate',date("Y-m-d"));
+			$this->db->set('uactive',FALSE);
+			$this->db->where('ulogin',$login);
+			$this->db->update('users');
+		} /*end function active_user */
+		
 		function auth_user($login,$password){
 		
 			$this->db->where('ulogin',$login);

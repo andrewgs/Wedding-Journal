@@ -20,6 +20,10 @@ class General extends Controller{
 	
 		parent::Controller();
 		$this->load->model('eventsmodel');
+		$this->load->model('albummodel');
+		$this->load->model('friendsmodel');
+		$this->load->model('socialmodel');
+		$this->load->model('commentsmodel');
 		$login 		= $this->session->userdata('login');
 		$password 	= $this->session->userdata('password');
 		if($this->session->userdata('login_id') == md5(crypt($login,$password))):
@@ -47,13 +51,12 @@ class General extends Controller{
 					'keywords' 		=> '',
 					'title'			=> 'Свадебный сайт',
 					'baseurl' 		=> base_url(),
-					'themeurl' 		=> base_url().$cfg['cfgthemepath'],
+					'themeurl' 		=> $cfg['cfgthemepath'],
 					'admin'			=> $this->usrinfo['status'],
 					'usite'			=> $usersite,
 					'events'		=> array()
 					);
-		$this->nsession->set_userdata('backpage',$pagevar['baseurl']);
-		
+		$this->nsession->set_userdata('backpage',$pagevar['usite']);
 		$pagevar['events'] = $this->eventsmodel->new_events($userid,3);
 		for($i = 0;$i < count($pagevar['events']); $i++):
 			$pagevar['events'][$i]['evnt_date'] = $this->operation_date($pagevar['events'][$i]['evnt_date']);
@@ -65,8 +68,201 @@ class General extends Controller{
 				$pagevar['events'][$i]['evnt_text'] =$text.' ...';
 			endif;
 		endfor;
-		$this->parser->parse('general/index',$pagevar);
+		$this->load->view($pagevar['themeurl'].'/index',$pagevar);
 	} /* end function index */
+	
+	function albums(){
+	
+		$usersite = $this->uri->segment(1);
+		if(!$this->usersmodel->user_exist('usite',$usersite)):
+			redirect('page404');
+		else:
+			$userid = $this->usersmodel->user_id('usite',$usersite);
+			$cfg = $this->configmodel->read_record($userid);
+		endif;
+		$pagevar = array(
+					'description'	=> '',
+					'keywords' 		=> '',
+					'title'			=> 'Свадебный сайт',
+					'baseurl' 		=> base_url(),
+					'themeurl' 		=> $cfg['cfgthemepath'],
+					'admin'			=> $this->usrinfo['status'],
+					'usite'			=> $usersite,
+					'albums'		=> array()
+					);
+		$this->session->set_userdata('backpage',$pagevar['usite'].'/photo-albums');
+		$pagevar['albums'] = $this->albummodel->albums_records($userid);	 
+		$this->load->view($pagevar['themeurl'].'/albums',$pagevar);
+	} /* end function albums */
+	
+	function events(){
+	
+		$usersite = $this->uri->segment(1);
+		if(!$this->usersmodel->user_exist('usite',$usersite)):
+			redirect('page404');
+		else:
+			$userid = $this->usersmodel->user_id('usite',$usersite);
+			$cfg = $this->configmodel->read_record($userid);
+		endif;
+		$pagevar = array(
+					'description'	=> '',
+					'keywords' 		=> '',
+					'title'			=> 'Свадебный сайт',
+					'baseurl' 		=> base_url(),
+					'themeurl' 		=> $cfg['cfgthemepath'],
+					'admin'			=> $this->usrinfo['status'],
+					'usite'			=> $usersite,
+					'events'		=> array(),
+					'pages'			=> '',
+					'count'			=> 0
+					);
+		$this->session->set_userdata('backpage',$pagevar['usite'].'/events');
+		$pagevar['count'] = $this->eventsmodel->count_records();			
+		$config['base_url'] 		= $pagevar['baseurl'].$pagevar['usite'].'/events';
+        $config['total_rows'] 		= $pagevar['count']; 
+        $config['per_page'] 		= 5;
+        $config['num_links'] 		= 2;
+        $config['uri_segment'] 		= 2;
+		$config['first_link']		= 'В начало';
+		$config['last_link'] 		= 'В конец';
+		$config['next_link'] 		= 'Далее &raquo;';
+		$config['prev_link'] 		= '&laquo; Назад';
+		$config['cur_tag_open']		= '<b>';
+		$config['cur_tag_close'] 	= '</b>';
+		$from = intval($this->uri->segment(2));
+		if(isset($from) and !empty($from)):
+			$this->session->set_userdata('backpage',$pagevar['usite'].'/events/'.$from);
+		endif;			
+		$pagevar['events'] = $this->eventsmodel->events_limit($userid,5,$from);
+		for($i = 0;$i < count($pagevar['events']);$i++):
+			$pagevar['events'][$i]['evnt_date'] = $this->operation_date($pagevar['events'][$i]['evnt_date']);
+		endfor;
+		$this->pagination->initialize($config);
+		$pagevar['pages'] = $this->pagination->create_links();
+		$this->load->view($pagevar['themeurl'].'/events',$pagevar);
+	} /* end function events */
+	
+	function event($event_id = 0){
+		
+		$usersite = $this->uri->segment(1);
+		if(!$this->usersmodel->user_exist('usite',$usersite)):
+			redirect('page404');
+		else:
+			$userid = $this->usersmodel->user_id('usite',$usersite);
+			$cfg = $this->configmodel->read_record($userid);
+		endif;
+		$pagevar = array(
+					'description'	=> '',
+					'keywords' 		=> '',
+					'title'			=> 'Свадебный сайт',
+					'baseurl' 		=> base_url(),
+					'themeurl' 		=> $cfg['cfgthemepath'],
+					'admin'			=> $this->usrinfo['status'],
+					'basepath' 		=> getcwd(),
+					'backpath' 		=> $this->session->userdata('backpage'),
+					'formaction' 	=> $this->uri->uri_string(),
+					'usite'			=> $usersite,
+					'event'			=> array(),
+					'comments'		=> array(),
+					'count'			=> 0
+					);
+		if($event_id == 0 or empty($event_id))
+			$event_id = $this->uri->segment(3);
+		if($this->input->post('commit')):
+			$this->form_validation->set_rules('user_name','"Ваше имя"','required|trim');
+			$this->form_validation->set_rules('user_email','"E-mail"','required|valid_email|trim');
+			$this->form_validation->set_rules('cmnt_text','"Комментарий"','required|trim');
+			$this->form_validation->set_rules('homepage','"Веб-сайт"','trim');
+			$this->form_validation->set_error_delimiters('<div class="message">','</div>');
+			if(!$this->form_validation->run()):
+				$_POST['commit'] = NULL;
+				$this->event($_POST['event_id'],TRUE);
+				return FALSE;
+			else:
+				if(isset($_POST['homepage']) and !empty($_POST['homepage']))
+					if(strncmp(strtolower($_POST['homepage']),'http://',7) != 0)
+						$_POST['homepage'] = 'http://'.$_POST['homepage'];
+				$this->eventsmodel->insert_comments($_POST['event_id']);			
+				$this->commentsmodel->insert_record($_POST);
+				$_POST['commit'] = NULL;
+				redirect($pagevar['formaction']);
+				return TRUE;
+			endif;
+		endif;
+		$pagevar['event'] = $this->eventsmodel->event_record($event_id);
+		if(count($pagevar['event']) > 0)
+			$pagevar['event']['evnt_date'] = $this->operation_date($pagevar['event']['evnt_date']);
+		
+		$pagevar['comments'] = $this->commentsmodel->comments_records($event_id);
+		for($i = 0;$i < count($pagevar['comments']);$i++)
+			$pagevar['comments'][$i]['cmnt_usr_date'] = $this->operation_date_slash($pagevar['comments'][$i]['cmnt_usr_date']);
+		$this->load->view($pagevar['themeurl'].'/event',$pagevar);	
+	}
+	
+	function friends(){
+	
+		$usersite = $this->uri->segment(1);
+		if(!$this->usersmodel->user_exist('usite',$usersite)):
+			redirect('page404');
+		else:
+			$userid = $this->usersmodel->user_id('usite',$usersite);
+			$cfg = $this->configmodel->read_record($userid);
+		endif;
+		$pagevar = array(
+					'description'	=> '',
+					'keywords' 		=> '',
+					'title'			=> 'Свадебный сайт',
+					'baseurl' 		=> base_url(),
+					'themeurl' 		=> $cfg['cfgthemepath'],
+					'admin'			=> $this->usrinfo['status'],
+					'usite'			=> $usersite,
+					'$friendcard'	=> array(),
+					'socials'		=> array(),
+					'key'			=> 0
+					);
+		$this->session->set_userdata('backpage',$pagevar['usite'].'/friends');
+		$friends = $this->friendsmodel->friends_records($userid);
+		$pagevar['social'] = $this->socialmodel->social_records();
+		$i = 0; $y = 0; $key = 0;
+		$pagevar['friendcard'][$i][$y] = array('id'=>0,'name'=>'','profession'=>'','social'=>0,'note'=>'','image'=>'');
+		for($fr = 0;$fr < count($friends);$fr++):
+			$key++;				
+			$pagevar['friendcard'][$i][$y]['id'] 			= $friends[$fr]['fr_id'];
+			$pagevar['friendcard'][$i][$y]['name'] 			= $friends[$fr]['fr_name'];
+			$pagevar['friendcard'][$i][$y]['profession'] 	= $friends[$fr]['fr_profession'];
+			$pagevar['friendcard'][$i][$y]['social'] 		= $friends[$fr]['fr_social'];
+			$pagevar['friendcard'][$i][$y]['note'] 			= $friends[$fr]['fr_note'];
+			$pagevar['friendcard'][$i][$y]['image'] 		= $friends[$fr]['fr_image'];
+			if($key % 3 == 0):
+				$i++; $y = 0;
+			else:
+				$y++;	
+			endif;
+		endfor;
+		$this->load->view($pagevar['themeurl'].'/friends',$pagevar);
+	} /*end function friends */
+	
+	function about(){
+	
+		$usersite = $this->uri->segment(1);
+		if(!$this->usersmodel->user_exist('usite',$usersite)):
+			redirect('page404');
+		else:
+			$userid = $this->usersmodel->user_id('usite',$usersite);
+			$cfg = $this->configmodel->read_record($userid);
+		endif;
+		$pagevar = array(
+					'description'	=> '',
+					'keywords' 		=> '',
+					'title'			=> 'Свадебный сайт',
+					'baseurl' 		=> base_url(),
+					'themeurl' 		=> $cfg['cfgthemepath'],
+					'admin'			=> $this->usrinfo['status'],
+					'usite'			=> $usersite,
+					);
+		$this->session->set_userdata('backpage',$pagevar['usite'].'/about');	
+		$this->load->view($pagevar['themeurl'].'/about',$pagevar);
+	} /* end function about */
 	
 	function operation_date($field){
 			
@@ -85,5 +281,19 @@ class General extends Controller{
 		$replacement = "\$5/\$3/\$1"; 
 		return preg_replace($pattern, $replacement,$field);
 	} /* end function operation_date_slash */
+	
+	function viewimage(){
+		
+		$section = $this->uri->segment(2);
+		$id = $this->uri->segment(4);
+		switch ($section){
+			case 'album' :	$image = $this->albummodel->get_image($id);	break;
+			case 'small' :	$image = $this->imagesmodel->small_image($id); break;
+			case 'big'	 : 	$image = $this->imagesmodel->big_image($id); break;
+			case 'friend': 	$image = $this->friendsmodel->get_image($id); break;
+		}
+		header('Content-type: image/gif');
+		echo $image;
+	} /* end function viewimage */
 } /* end class General */
 ?>

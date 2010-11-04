@@ -48,6 +48,7 @@ class Administrator extends Controller{
 		
        	$this->session->sess_destroy();
 		$this->admin['site'] = $this->session->userdata('site');
+		$this->usersmodel->deactive_user($this->session->userdata('login'));
 		redirect($this->admin['site']);
 	} /* end function logoff*/
 } /* end class*/

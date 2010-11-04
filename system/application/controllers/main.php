@@ -63,6 +63,7 @@ class Main extends Controller{
 					$this->session->set_userdata('login',$_POST['login']);
 					$this->session->set_userdata('password',$_POST['password']);
 					$this->session->set_userdata('site',$user['usite']);
+					$this->usersmodel->active_user($_POST['login']);
 					redirect($user['usite'].'/admin');
 				else:
 					$pagevar['text'] = '<b>Учетная запись не активирована!</b>';
