@@ -40,13 +40,14 @@
 			return $data[0]['fr_image'];
 		}
 		
-		function insert_record($data){
+		function insert_record($data,$uid){
 			
 			$this->fr_name 			= $data['name'];
 			$this->fr_profession 	= $data['profession'];
 			$this->fr_social 		= $data['social'];
 			$this->fr_image 		= $data['image'];
 			$this->fr_note 			= $data['note'];
+			$this->fr_uid 			= $uid;
 
 			if (mb_strlen($this->fr_note,'UTF-8') > 245)
 				$this->fr_note = mb_substr($this->fr_note,0,245,'UTF-8');	
@@ -60,7 +61,7 @@
 			$this->db->delete('friends',array('fr_id'=>$id));
 		}
 		
-		function update_record($data){
+		function update_record($data,$uid){
 			
 			$this->fr_id 			= $data['id'];
 			$this->fr_name 			= $data['name'];
@@ -68,7 +69,7 @@
 			$this->fr_social 		= $data['social'];
 			$this->fr_note 			= $data['note'];
 			$this->fr_image 		= $data['image'];
-			
+			$this->fr_uid 			= $uid;
 			if (mb_strlen($this->fr_note,'UTF-8') > 245)
 				$this->fr_note = mb_substr($this->fr_note,0,245,'UTF-8');
 			

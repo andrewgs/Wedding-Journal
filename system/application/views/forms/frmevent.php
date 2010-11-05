@@ -1,12 +1,25 @@
+<?php if($valid):
+	$title 	= set_value('title');
+	$date 	= set_value('date');
+	$text 	= set_value('text');
+else:
+	$title 	= $event['evnt_title'];
+	$date 	= $event['evnt_date'];
+	$text 	= $event['evnt_text'];
+endif; ?>
 <?php echo form_open($formaction);?>
 	<div class="post-header">
 		<div class="post-title">
+			<?php if($edit): ?>
+				<?= form_hidden('id',$event['evnt_id']); ?>
+				<?= form_hidden('cnt',$event['evnt_cnt_cmnt']); ?>
+			<?php endif; ?>
 			<?= form_label('Оглавление','eventlabel');
 			$attr = array(
 						'name' 		=> 'title',
 						'id'   		=> 'eventtitle',
 						'class'		=> 'textfield',
-						'value'		=> set_value('title'),
+						'value'		=> $title,
 						'maxlength'	=> '200',
 						'size' 		=> '40',
 					); ?>
@@ -16,7 +29,7 @@
 						$attr = array(
 						'name' 		=> 'date',
 						'id'   		=> 'event-date',
-						'value'		=> set_value('date'),
+						'value'		=> $date,
 						'maxlength'	=> '20',
 						'size' 		=> '10',
 						'readonly' 	=> TRUE
@@ -32,7 +45,7 @@
 		<?php $attr =array(
 					'name' 	=> 'text',
 					'id'   	=> 'eventtext',
-					'value'	=> set_value('text'),
+					'value'	=> $text,
 					'cols'	=> '81',
 					'rows' 	=> '10'
 				); ?>

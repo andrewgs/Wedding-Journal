@@ -26,6 +26,7 @@ class Administrator extends Controller{
 		$this->load->model('socialmodel');
 		$this->load->model('commentsmodel');
 		$this->load->model('logmodel');
+		$this->load->library('image_lib');
 		$this->admin['login'] 		= $this->session->userdata('login');
 		$this->admin['password'] 	= $this->session->userdata('password');
 		$this->admin['site'] 		= $this->session->userdata('site');
@@ -177,7 +178,9 @@ class Administrator extends Controller{
 					'usite'			=> $this->admin['site'],
 					'message'		=> $this->setmessage('','','',0),
 					'backpath' 		=> $this->session->userdata('backpage'),
-					'formaction'	=> $this->admin['site'].'/event-new'
+					'formaction'	=> $this->uri->uri_string(),
+					'valid'			=> TRUE,
+					'edit'			=> FALSE
 					);
 		$this->session->unset_userdata('commentlist');
 		if($this->input->post('btnsubmit')):
@@ -201,7 +204,7 @@ class Administrator extends Controller{
 				redirect($pagevar['backpath']);
 			endif;
 		endif;
-		$this->load->view($pagevar['themeurl'].'/admin/admin-event-new',$pagevar);
+		$this->load->view($pagevar['themeurl'].'/admin/admin-event',$pagevar);
 	} /* end function eventsnew */
 	
 	function eventedit($event_id = 0,$error = FALSE){
@@ -218,7 +221,8 @@ class Administrator extends Controller{
 					'backpath' 		=> $this->session->userdata('backpage'),
 					'formaction'	=> $this->uri->uri_string(),
 					'valid'			=> $error,
-					'event'			=> array()
+					'event'			=> array(),
+					'edit'			=> TRUE
 					);
 		if($event_id == 0 or empty($event_id))
 			$event_id = $this->uri->segment(3);
@@ -248,8 +252,8 @@ class Administrator extends Controller{
 		if(count($pagevar['event']) > 0):
 			$pagevar['event']['evnt_date'] = $this->operation_date_slash($pagevar['event']['evnt_date']);
 		endif;
-        $this->load->view($pagevar['themeurl'].'/admin/admin-event-edit',$pagevar);
-	}				
+        $this->load->view($pagevar['themeurl'].'/admin/admin-event',$pagevar);
+	} /* end function eventedit */			
 	
 	function eventdestroy(){
 		
@@ -263,7 +267,339 @@ class Administrator extends Controller{
 		$this->session->set_flashdata('operation_message','Название удаленной записи - '.$event['evnt_title']);
 		$this->session->set_flashdata('operation_saccessfull','Запись удалена успешно');
 		redirect($backpath);
+	} /* end function eventdestroy */
+	
+	function commentedit($comment_id = 0,$event_id = 0,$error = FALSE){
+		
+		$pagevar = array(
+					'description'	=> '',
+					'keywords' 		=> '',
+					'title'			=> 'Администрирование | Редактирование комментария',
+					'baseurl' 		=> base_url(),
+					'admin'			=> TRUE,
+					'themeurl' 		=> $this->admin['themeurl'],
+					'usite'			=> $this->admin['site'],
+					'message'		=> $this->setmessage('','','',0),
+					'backpath' 		=> '',
+					'formaction'	=> $this->uri->uri_string(),
+					'valid'			=> $error,
+					'commentlist'	=> $this->session->userdata('commentlist'),
+					'comment'		=> array()
+					);
+		if($comment_id == 0 or empty($comment_id)):
+			$comment_id = $this->uri->segment(4);
+			$event_id 	= $this->uri->segment(3);
+		endif;
+		$pagevar['backpath'] = $pagevar['usite'].'/event/'.$event_id.'#comment_'.$comment_id;
+		if(isset($pagevar['commentlist']) and !empty($pagevar['commentlist'])) 
+			$pagevar['backpath'] = $pagevar['commentlist'].'#comment_'.$comment_id;
+		if($this->input->post('btnsubmit')):
+			$this->form_validation->set_rules('user_name','"Имя"','required');
+			$this->form_validation->set_rules('user_email','"E-mail"','required|valid_email');
+			$this->form_validation->set_rules('cmnt_text','"Текст комментария"','required');
+			$this->form_validation->set_rules('user_date','"Дата"','');
+			$this->form_validation->set_rules('homepage','"Веб-сайт"','');
+			$this->form_validation->set_error_delimiters('<div class="message">','</div>');
+			if (!$this->form_validation->run()):
+				$_POST['btnsubmit'] = NULL;
+				$this->commentedit($_POST['id'],$_POST['event_id'],TRUE);
+				return FALSE;
+			else:
+				$pattern = "/(\d+)\/(\w+)\/(\d+)/i";
+				$replacement = "\$3-\$2-\$1";
+				$_POST['user_date'] = preg_replace($pattern, $replacement, $_POST['user_date']);
+				$this->commentsmodel->update_record($_POST);
+				$this->session->set_flashdata('operation_error',' ');
+				$this->session->set_flashdata('operation_message','Комментарий от "'.$comment['cmnt_usr_name'].'"');
+				$this->session->set_flashdata('operation_saccessfull','Комментарий изменен');
+				redirect($pagevar['backpath']);
+			endif;
+		endif;
+		$pagevar['comment'] = $this->commentsmodel->comment_record($comment_id);
+		$pagevar['comment']['cmnt_usr_date'] = $this->operation_date_slash($pagevar['comment']['cmnt_usr_date']);
+		$this->load->view($pagevar['themeurl'].'/admin/admin-comment-edit',$pagevar);
+	} /* end function commentedit */
+	
+	function commentdestroy(){
+		
+		$event_id = $this->uri->segment(3);
+		$comment_id = $this->uri->segment(4);
+		$backpath = $this->admin['site'].'/event/'.$event_id;
+		$commentlist = $this->session->userdata('commentlist');
+		if(isset($commentlist) and !empty($commentlist)) 
+			$backpath = $commentlist;
+		$comment = $this->commentsmodel->comment_record($comment_id);
+		$this->eventsmodel->delete_comments($event_id);
+		$this->commentsmodel->delete_record($comment_id);
+		$this->session->set_flashdata('operation_error',' ');
+		$this->session->set_flashdata('operation_message','Комментарий от "'.$comment['cmnt_usr_name'].'"');
+		$this->session->set_flashdata('operation_saccessfull','Комментарий удален успешно');
+		redirect($backpath);
+	} /* end function commentdestroy */
+								 
+	function friendnew(){
+		
+		$pagevar = array(
+					'description'	=> '',
+					'keywords' 		=> '',
+					'title'			=> 'Администрирование | Создание карточки друга',
+					'baseurl' 		=> base_url(),
+					'admin'			=> TRUE,
+					'themeurl' 		=> $this->admin['themeurl'],
+					'usite'			=> $this->admin['site'],
+					'message'		=> $this->setmessage('','','',0),
+					'backpath' 		=> $this->session->userdata('backpage'),
+					'formaction'	=> $this->uri->uri_string(),
+					'valid'			=> TRUE,
+					'edit'			=> FALSE	
+					);
+		$this->session->unset_userdata('commentlist');
+		if($this->input->post('btnsubmit')):
+			$this->form_validation->set_rules('name','"Имя друга"','required');
+			$this->form_validation->set_rules('profession','"Профессия"','required');
+			$this->form_validation->set_rules('userfile','"Фото"','callback_userfile_check');
+			$this->form_validation->set_rules('note','"Описание друга"','required');
+			$this->form_validation->set_rules('social1','"Соц.сеть"','');
+			$this->form_validation->set_rules('social2','"Соц.сеть"','');
+			$this->form_validation->set_rules('hrefsocial1','"Ссылка"','prep_url');
+			$this->form_validation->set_rules('hrefsocial2','"Ссылка"','prep_url');
+			$this->form_validation->set_error_delimiters('<div class="message">','</div>');
+			if (!$this->form_validation->run()):
+				$_POST['btnsubmit'] = NULL;
+				$this->friendnew();
+				return FALSE;
+			else:
+				$tmpfile = $_FILES['userfile']['tmp_name'];
+				$this->resize_image($tmpfile,100,70,TRUE);
+				$file = fopen($tmpfile,'rb');
+				$_POST['image'] = fread($file,filesize($tmpfile));
+				fclose($file);
+				$_POST['social'] = 0;
+				$social[0] = array('friend_id'=>0,'social'=>'','href'=>'','flag'=>0);
+				$social[1] = array('friend_id'=>0,'social'=>'','href'=>'','flag'=>0);							
+				if(!empty($_POST['social1']) and !empty($_POST['hrefsocial1'])):
+					$_POST['social'] += 1;
+					$socstatus = 1;
+					$social[0]['friend_id'] = 0;
+					$social[0]['social'] 	= $_POST['social1'];
+					$social[0]['href'] 		= $_POST['hrefsocial1'];
+					$social[0]['flag'] 		= TRUE;
+				endif;
+				if(!empty($_POST['social2']) and !empty($_POST['hrefsocial2'])):
+					$_POST['social'] += 1;
+					$socstatus = 2;
+					$social[1]['friend_id'] = 0;
+					$social[1]['social'] 	= $_POST['social2'];
+					$social[1]['href'] 		= $_POST['hrefsocial2'];
+					$social[1]['flag']		= TRUE;
+				endif;
+				$friend_id = $this->friendsmodel->insert_record($_POST,$this->admin['uid']);				
+				if(isset($socstatus)):
+					for ($i = 0; $i < $socstatus; $i++):
+						if (!$social[$i]['flag']) continue;
+						$social[$i]['friend_id'] = $friend_id;
+						$this->socialmodel->insert_record($social[$i]);
+						$this->logmodel->insert_record($this->admin['uid'],'Создана новая карточка друга');			
+					endfor;
+				endif;	
+				$this->session->set_flashdata('operation_error',' ');
+				$this->session->set_flashdata('operation_message','Имя друга - '.$_POST['name']);
+				$this->session->set_flashdata('operation_saccessfull','Карточка создана успешно');
+				redirect($pagevar['backpath']);
+			endif;
+		endif;
+		$flasherr = $this->session->flashdata('operation_error');
+		$flashmsg = $this->session->flashdata('operation_message');
+		$flashsaf = $this->session->flashdata('operation_saccessfull');
+		if($flasherr && $flashmsg && $flashsaf)
+			$msg = $this->setmessage($flasherr,$flashsaf,$flashmsg,1);
+				
+		$this->load->view($pagevar['themeurl'].'/admin/admin-friend',$pagevar);
+	} /* end function friendnew */
+	
+	function friendedit($friend_id = 0,$error = FALSE){
+		
+		$pagevar = array(
+					'description'	=> '',
+					'keywords' 		=> '',
+					'title'			=> 'Администрирование | Редактирование карточки друга',
+					'baseurl' 		=> base_url(),
+					'admin'			=> TRUE,
+					'themeurl' 		=> $this->admin['themeurl'],
+					'usite'			=> $this->admin['site'],
+					'message'		=> $this->setmessage('','','',0),
+					'backpath' 		=> $this->session->userdata('backpage'),
+					'formaction'	=> $this->uri->uri_string(),
+					'valid'			=> $error,
+					'edit'			=> TRUE,
+					'friend'		=> array(),
+					'socials'		=> array(),
+					);
+		if($friend_id == 0 or empty($friend_id))
+			$friend_id = $this->uri->segment(3);
+		$pagevar['friend'] = $this->friendsmodel->friend_record($friend_id);
+		$pagevar['socials'][0] = array('id'=>'','social'=>'','href'=>'');
+		$pagevar['socials'][1] = array('id'=>'','social'=>'','href'=>'');
+		$socials = $this->socialmodel->friend_social($friend_id);
+		if($this->input->post('btnsubmit')):
+			$this->form_validation->set_rules('name','"Имя друга"','required');
+			$this->form_validation->set_rules('profession','"Профессия"','required');
+			if($_FILES['userfile']['error'] != 4)
+				$this->form_validation->set_rules('userfile','"Фото"','callback_userfile_check');
+			$this->form_validation->set_rules('note','"Описание друга"','required');
+			$this->form_validation->set_rules('social1','"Соц.сеть"','');
+			$this->form_validation->set_rules('social2','"Соц.сеть"','');
+			$this->form_validation->set_rules('hrefsocial1','"Ссылка"','prep_url');
+			$this->form_validation->set_rules('hrefsocial2','"Ссылка"','prep_url');
+			$this->form_validation->set_error_delimiters('<div class="message">','</div>');
+			if (!$this->form_validation->run()):
+				$_POST['btnsubmit'] = NULL;
+				$this->friendedit($friend_id,TRUE);
+				return FALSE;
+			else:
+				if($_FILES['userfile']['error'] != 4):
+					$tmpfile = $_FILES['userfile']['tmp_name'];
+					$this->resize_image($tmpfile,100,70,TRUE);
+					$file = fopen($tmpfile,'rb');
+					$_POST['image'] = fread($file,filesize($tmpfile));
+					fclose($file);
+				else:
+					$_POST['image'] = $pagevar['friend']['fr_image'];
+				endif;
+				$_POST['social'] = 0;			
+				$social[0] = array('id'=>0,'friend_id'=>0,'social'=>'','href'=>'','flag'=>0);
+				$social[1] = array('id'=>0,'friend_id'=>0,'social'=>'','href'=>'','flag'=>0);
+				if(!empty($_POST['social1']) and !empty($_POST['hrefsocial1'])):
+					$_POST['social'] 		+= 1;
+					$socstatus 				= 1;
+					$social[0]['friend_id'] = $_POST['id'];
+					$social[0]['social'] 	= $_POST['social1'];
+					$social[0]['href'] 		= $_POST['hrefsocial1'];
+					$social[0]['flag'] 		= 1;
+				endif;
+				if(!empty($_POST['social2']) and !empty($_POST['hrefsocial2'])):
+					$_POST['social'] 		+= 1;
+					$socstatus 				= 2;
+					$social[1]['friend_id'] = $_POST['id'];
+					$social[1]['social'] 	= $_POST['social2'];
+					$social[1]['href'] 		= $_POST['hrefsocial2'];
+					$social[1]['flag'] 		= 1;
+				endif;
+				$this->friendsmodel->reset_social($_POST['id']);
+				$this->socialmodel->delete_records($_POST['id']);
+				$this->friendsmodel->update_record($_POST,$this->admin['uid']);			
+				if(isset($socstatus)):
+					for ($i = 0; $i < $socstatus; $i++):
+						if ($social[$i]['flag'] == 0)continue;
+						$this->socialmodel->insert_record($social[$i]);				
+					endfor;
+				endif;
+				$this->logmodel->insert_record($this->admin['uid'],'Изменена карточка друга');	
+				$this->session->set_flashdata('operation_error',' ');
+				$this->session->set_flashdata('operation_message','Имя друга - '.$_POST['name']);
+				$this->session->set_flashdata('operation_saccessfull','Карточка изменена успешно');
+				redirect($pagevar['backpath']);
+			endif;
+		endif;
+		for($i = 0; $i < count($socials); $i++):
+			$pagevar['socials'][$i]['id'] 		= $socials[$i]['soc_id'];
+			$pagevar['socials'][$i]['social'] 	= $socials[$i]['soc_name'];
+			$pagevar['socials'][$i]['href'] 	= $socials[$i]['soc_href'];
+		endfor;
+		$this->load->view($pagevar['themeurl'].'/admin/admin-friend',$pagevar);
+	} /* end function friendedit */
+	
+	function frienddestroy(){
+		
+		$backpath = $this->session->userdata('backpage');
+		$friend_id = $this->uri->segment(3);
+		$friend = $this->friendsmodel->friend_record($friend_id);
+		$this->friendsmodel->delete_record($friend_id);
+		$this->socialmodel->delete_records($friend_id);
+		$this->logmodel->insert_record($this->admin['uid'],'Удалена карточка друга');
+		$this->session->set_flashdata('operation_error',' ');
+		$this->session->set_flashdata('operation_message','Удаленна карточка - '.$friend['fr_name']);
+		$this->session->set_flashdata('operation_saccessfull','Карточка удалена успешно');
+		redirect($backpath);
 	}
+	
+	function resize_img($tmpName,$wgt,$hgt){
+			
+		chmod($tmpName,0777);
+		$img = getimagesize($tmpName);		
+		$size_x = $img[0];
+		$size_y = $img[1];
+		
+		$wight = $wgt;
+		$height = $hgt; 
+		
+		if(($size_x < $wgt) or ($size_y < $hgt)):
+			$this->resize_image($tmpName,$wgt,$hgt,FALSE);
+			$file = fopen($tmpName,'rb');
+			$image = fread($file,filesize($tmpName));
+			fclose($file);
+			return $image;
+		endif;
+		if($size_x > $size_y)
+			$this->resize_image($tmpName,$size_x,$hgt,TRUE);
+		else
+			$this->resize_image($tmpName,$wgt,$size_y,TRUE);
+		$img = getimagesize($tmpName);		
+		$size_x = $img[0];
+		$size_y = $img[1];
+		switch ($img[2]){
+			case 1: $image_src = imagecreatefromgif($tmpName); break;
+			case 2: $image_src = imagecreatefromjpeg($tmpName); break;
+			case 3:	$image_src = imagecreatefrompng($tmpName); break;
+		}
+		$x = round(($size_x/2)-($wgt/2));
+		$y = round(($size_y/2)-($hgt/2));
+		if($x < 0):
+			$x = 0;	$wight = $size_x;
+		endif;
+		if($y < 0):
+			$y = 0; $height = $size_y;
+		endif;
+		
+		$image_dst = ImageCreateTrueColor($wight,$height);
+		imageCopy($image_dst,$image_src,0,0,$x,$y,$wgt,$hgt);
+		imagePNG($image_dst,$tmpName);
+		imagedestroy($image_dst);
+		imagedestroy($image_src);
+		
+		$file = fopen($tmpName,'rb');
+		$image = fread($file,filesize($tmpName));
+		fclose($file);
+		/*header('Content-Type: image/jpeg' );
+		echo $image['image'];
+		exit();*/
+		return $image;
+	} /* end function resize_img */	
+	
+	function case_image($file){
+			
+		$info = getimagesize($file);
+		switch ($info[2]):
+			case 1	: return TRUE;
+			case 2	: return TRUE;
+			case 3	: return TRUE;
+			default	: return FALSE;	
+		endswitch;
+	} /* end function case_image */
+		 
+	function resize_image($image,$wgt,$hgt,$ratio){
+			
+		$this->image_lib->clear();
+		$config['image_library'] 	= 'gd2';
+		$config['source_image']		= $image; 
+		$config['create_thumb'] 	= FALSE;
+		$config['maintain_ratio'] 	= $ratio;
+		$config['width'] 			= $wgt;
+		$config['height'] 			= $hgt;
+				
+		$this->image_lib->initialize($config);
+		$this->image_lib->resize();
+	} /* end function resize_image */
 	
 	function setmessage($error,$saccessfull,$message,$status){
 			

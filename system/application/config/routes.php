@@ -20,6 +20,12 @@ $route[':any/logoff'] = "administrator/logoff";
 $route['([a-zA-Z]){1}([a-zA-Z0-9_])*/event-new'] = "administrator/eventnew";
 $route['([a-zA-Z]){1}([a-zA-Z0-9_])*/event-edit/:num'] = "administrator/eventedit";
 $route['([a-zA-Z]){1}([a-zA-Z0-9_])*/event-destroy/:num'] = "administrator/eventdestroy";
+$route['([a-zA-Z]){1}([a-zA-Z0-9_])*/comment-edit/:num/:num'] = "administrator/commentedit";
+$route['([a-zA-Z]){1}([a-zA-Z0-9_])*/comment-destroy/:num/:num'] = "administrator/commentdestroy";
+$route['([a-zA-Z]){1}([a-zA-Z0-9_])*/friend-new'] = "administrator/friendnew";
+$route['([a-zA-Z]){1}([a-zA-Z0-9_])*/friend-edit/:num'] = "administrator/friendedit";
+$route['([a-zA-Z]){1}([a-zA-Z0-9_])*/friend-destroy/:num'] = "administrator/frienddestroy";
+
 /* Controller General*/
 $route['([a-zA-Z]){1}([a-zA-Z0-9_])*'] = "general/index";
 $route['([a-zA-Z]){1}([a-zA-Z0-9_])*/photo-albums'] = "general/albums";

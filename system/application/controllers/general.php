@@ -166,13 +166,14 @@ class General extends Controller{
 					'baseurl' 		=> base_url(),
 					'themeurl' 		=> $cfg['cfgthemepath'],
 					'admin'			=> $this->usrinfo['status'],
-					'basepath' 		=> getcwd(),
 					'backpath' 		=> $this->session->userdata('backpage'),
 					'formaction' 	=> $this->uri->uri_string(),
 					'usite'			=> $usersite,
 					'event'			=> array(),
 					'comments'		=> array(),
-					'count'			=> 0
+					'count'			=> 0,
+					'user'			=> $this->usrinfo,
+					'message'		=> $this->setmessage('','','',0)
 					);
 		if($event_id == 0 or empty($event_id))
 			$event_id = $this->uri->segment(3);
@@ -198,15 +199,24 @@ class General extends Controller{
 			endif;
 		endif;
 		$pagevar['event'] = $this->eventsmodel->event_record($event_id);
-		if(count($pagevar['event']) > 0)
+		if(count($pagevar['event']) > 0):
 			$pagevar['event']['evnt_date'] = $this->operation_date($pagevar['event']['evnt_date']);
-		
+		endif;
 		$pagevar['comments'] = $this->commentsmodel->comments_records($event_id);
-		for($i = 0;$i < count($pagevar['comments']);$i++)
+		for($i = 0;$i < count($pagevar['comments']);$i++):
 			$pagevar['comments'][$i]['cmnt_usr_date'] = $this->operation_date_slash($pagevar['comments'][$i]['cmnt_usr_date']);
+		endfor;
+		$pagevar['title'] .=' | '.$pagevar['event']['evnt_title'];
+		
+		$flasherr = $this->session->flashdata('operation_error');
+		$flashmsg = $this->session->flashdata('operation_message');
+		$flashsaf = $this->session->flashdata('operation_saccessfull');
+		if($flasherr && $flashmsg && $flashsaf)
+			$pagevar['message'] = $this->setmessage($flasherr,$flashsaf,$flashmsg,1);
+		
 		$this->load->view($pagevar['themeurl'].'/event',$pagevar);	
 	}
-	
+
 	function friends(){
 	
 		$usersite = $this->uri->segment(1);
@@ -224,29 +234,36 @@ class General extends Controller{
 					'themeurl' 		=> $cfg['cfgthemepath'],
 					'admin'			=> $this->usrinfo['status'],
 					'usite'			=> $usersite,
-					'$friendcard'	=> array(),
+					'friend'		=> array(),
 					'socials'		=> array(),
-					'key'			=> 0
+					'key'			=> 0,
+					'message'		=> $this->setmessage('','','',0)
 					);
 		$this->session->set_userdata('backpage',$pagevar['usite'].'/friends');
 		$friends = $this->friendsmodel->friends_records($userid);
 		$pagevar['social'] = $this->socialmodel->social_records();
-		$i = 0; $y = 0; $key = 0;
+		$i = 0; $y = 0; $pagevar['key'] = 0;
 		$pagevar['friendcard'][$i][$y] = array('id'=>0,'name'=>'','profession'=>'','social'=>0,'note'=>'','image'=>'');
 		for($fr = 0;$fr < count($friends);$fr++):
-			$key++;				
-			$pagevar['friendcard'][$i][$y]['id'] 			= $friends[$fr]['fr_id'];
-			$pagevar['friendcard'][$i][$y]['name'] 			= $friends[$fr]['fr_name'];
-			$pagevar['friendcard'][$i][$y]['profession'] 	= $friends[$fr]['fr_profession'];
-			$pagevar['friendcard'][$i][$y]['social'] 		= $friends[$fr]['fr_social'];
-			$pagevar['friendcard'][$i][$y]['note'] 			= $friends[$fr]['fr_note'];
-			$pagevar['friendcard'][$i][$y]['image'] 		= $friends[$fr]['fr_image'];
-			if($key % 3 == 0):
+			$pagevar['key']++;				
+			$pagevar['friend'][$i][$y]['id'] 			= $friends[$fr]['fr_id'];
+			$pagevar['friend'][$i][$y]['name'] 			= $friends[$fr]['fr_name'];
+			$pagevar['friend'][$i][$y]['profession'] 	= $friends[$fr]['fr_profession'];
+			$pagevar['friend'][$i][$y]['social'] 		= $friends[$fr]['fr_social'];
+			$pagevar['friend'][$i][$y]['note'] 			= $friends[$fr]['fr_note'];
+			$pagevar['friend'][$i][$y]['image'] 		= $friends[$fr]['fr_image'];
+			if($pagevar['key'] % 3 == 0):
 				$i++; $y = 0;
 			else:
 				$y++;	
 			endif;
 		endfor;
+		$flasherr = $this->session->flashdata('operation_error');
+		$flashmsg = $this->session->flashdata('operation_message');
+		$flashsaf = $this->session->flashdata('operation_saccessfull');
+		if($flasherr && $flashmsg && $flashsaf)
+			$pagevar['message'] = $this->setmessage($flasherr,$flashsaf,$flashmsg,1);
+		
 		$this->load->view($pagevar['themeurl'].'/friends',$pagevar);
 	} /*end function friends */
 	

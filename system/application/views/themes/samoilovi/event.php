@@ -13,6 +13,7 @@
 	<link rel="stylesheet" href="<?= $baseurl.$themeurl; ?>/css/reset.css" type="text/css" /> 
 	<link rel="stylesheet" href="<?= $baseurl.$themeurl; ?>/css/style.css" type="text/css" />
 	<script type="text/javascript" src="<?= $baseurl; ?>javascript/jquery.min.js"></script>
+	<script type="text/javascript" src="<?= $baseurl; ?>javascript/jquery.confirm.js"></script>
 	<script type="text/javascript"> 
 		var _gaq = _gaq || [];
 		_gaq.push(['_setAccount', 'UA-17193616-1']);
@@ -26,6 +27,7 @@
 			$("div.blog-content").each(function(){
 				$(this).parents("div.blog-center:first").css('height',$(this).height()+10);
 			});
+			$('a.delete').confirm();
 		});
 	</script>	
 </head>
@@ -40,6 +42,7 @@
 				<div id="internal_nav" class="grid_4">
 					<a href="#comment" style="text-align:center">Оставить комментарий</a>
 				</div>
+				<?php $this->load->view('message');?>
 			</div>
 			<div class="clear"></div>
 			<div class="container_16">
@@ -58,7 +61,7 @@
 						<div class="blog-content">
 							<div class="post-header">
 								<div class="post-title">
-									<a name="blog_'<?= $event['evnt_id'];?>"></a>
+									<a name="blog_<?= $event['evnt_id'];?>"></a>
 									<?= $event['evnt_title']; ?>
 								</div>
 								<div class="post-date">
@@ -83,7 +86,8 @@
 			</div>
 			<?php for($i = 0;$i < count($comments);$i++): ?>
 			<div class="container_16">
-				<div class="comment grid_10">
+				<div class="comment grid_12">
+					<a name="comment_<?= $comments[$i]['cmnt_id'];?>"></a>
 					<span class="user" id="<?= $comments[$i]['cmnt_id'];?>">
 					<?php if(!empty($comments[$i]['cmnt_web'])): ?>
 						<a title="" target="_blank" href="<?= $comments[$i]['cmnt_web'];?>"><?= $comments[$i]['cmnt_usr_name'];?></a>
@@ -94,6 +98,17 @@
 					<span class="dates"><?= $comments[$i]['cmnt_usr_date'];?></span>
 					<p><?= $comments[$i]['cmnt_text']; ?></p>
 					<div class="clear"></div>
+					<?php if($admin): ?>
+						<div>
+							<?php $text = 'Редактировать'; ?>
+							<?php $link = $usite.'/comment-edit/'.$comments[$i]['cmnt_evnt_id'].'/'.$comments[$i]['cmnt_id']; ?>
+							<?= anchor($link,$text).' | '; ?>
+							<?php $text = 'Удалить'; ?>
+							<?php $link = $usite.'/comment-destroy/'.$comments[$i]['cmnt_evnt_id'].'/'.$comments[$i]['cmnt_id']; ?>
+							<?php $attr = array('class'=>'delete'); ?>
+							<?= anchor($link,$text,$attr); ?>
+						</div>
+					<?php endif; ?>					
 				</div>			
 			</div>
 			<?php endfor; ?>
