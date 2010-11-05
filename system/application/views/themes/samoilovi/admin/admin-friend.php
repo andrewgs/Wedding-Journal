@@ -53,7 +53,7 @@
 					<div class="blog-center"> 
 						<div class="blog-l"> </div>
 						<div class="blog-content">
-							<?php $this->load->view('forms\frmfriend'); ?>
+							<?php $this->load->view('forms/frmfriend'); ?>
 						</div>
 						<div class="blog-r"> </div>
 						<div class="clear"></div>

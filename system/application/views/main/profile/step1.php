@@ -15,7 +15,6 @@
  	<h1 align="center">Свадьба - ты хоть за яйца меня подвесь, ну ее на ...!</h1>
 	<div class="" style="text-align:center">
 		<div class="">Добро пожаловать в систему создания свадебных сайтов</div>
-		<?php $this->load->view('transitions/fullback','{pathback}')?>
 	</div>
 	<?php $this->load->view('forms/frmsignup');?>
 </body>
