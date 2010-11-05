@@ -17,7 +17,9 @@ $route['activation/([a-zA-Z0-9])*'] = "main/activation";
 $route[':any/login'] = "administrator/login";
 $route[':any/admin'] = "administrator/index";
 $route[':any/logoff'] = "administrator/logoff";
-
+$route['([a-zA-Z]){1}([a-zA-Z0-9_])*/event-new'] = "administrator/eventnew";
+$route['([a-zA-Z]){1}([a-zA-Z0-9_])*/event-edit/:num'] = "administrator/eventedit";
+$route['([a-zA-Z]){1}([a-zA-Z0-9_])*/event-destroy/:num'] = "administrator/eventdestroy";
 /* Controller General*/
 $route['([a-zA-Z]){1}([a-zA-Z0-9_])*'] = "general/index";
 $route['([a-zA-Z]){1}([a-zA-Z0-9_])*/photo-albums'] = "general/albums";

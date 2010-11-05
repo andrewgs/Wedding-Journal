@@ -13,11 +13,12 @@
 	<link rel="stylesheet" href="<?= $baseurl.$themeurl; ?>/css/reset.css" type="text/css" /> 
 	<link rel="stylesheet" href="<?= $baseurl.$themeurl; ?>/css/style.css" type="text/css" />
 	<script type="text/javascript" src="<?= $baseurl; ?>javascript/jquery.min.js"></script>
+	<script type="text/javascript" src="<?= $baseurl; ?>javascript/jquery.confirm.js"></script>
 	<script type="text/javascript"> 
 		var _gaq = _gaq || [];
 		_gaq.push(['_setAccount', 'UA-17193616-1']);
 		_gaq.push(['_trackPageview']);
-		(function() {
+		(function(){
 			var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
 			ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
 			var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
@@ -26,6 +27,7 @@
 			$("div.blog-content").each(function(){
 				$(this).parents("div.blog-center:first").css('height',$(this).height()+10);
 			});
+			$('a.delete').confirm();
 		});
 	</script>	
 </head>
@@ -33,29 +35,36 @@
 	<div id="main-wrap">
 		<?php $this->load->view($themeurl.'/header'); ?>
 		<div id="content">
-			<?php if(isset($pages) and !empty($pages)): ?>
-				<div class="container_12">
+			<div class="container_12">
+				<?php if($admin): ?>
+					<div id="internal_nav" class="grid_4">
+						<a href="<?= $baseurl.$usite.'/event-new'; ?>">Создать новое событие &nbsp;&rarr;</a>
+					</div>
+				<?php endif; ?>
+				<div class="clear"></div>
+				<?php $this->load->view('message');?>
+				<?php if(isset($pages) and !empty($pages)): ?>
 					<div class="grid_3 omega">
 						<div class='pagination'><?= $pages; ?></div>
 					</div>
-				</div>
-				<div class="clear"></div>
-			<?php endif; ?>
+					<div class="clear"></div>
+				<?php endif; ?>
+			</div>	
 			<?php for($i = 0; $i < count($events);$i++): ?>
 			<div class="container_16">
 				<div id="blog" class="grid_16">
 					<div class="blog-top"> 
-						<div class="blog-tl"> </div>
-						<div class="blog-t"> </div>
-						<div class="blog-tr"> </div>
+						<div class="blog-tl"></div>
+						<div class="blog-t"></div>
+						<div class="blog-tr"></div>
 						<div class="clear"></div>
 					</div>
 					<div class="blog-center"> 
-						<div class="blog-l"> </div>
+						<div class="blog-l"></div>
 						<div class="blog-content">
 							<div class="post-header">
 								<div class="post-title">
-								<?= '<a name="event_'.$events[$i]['evnt_id'].'"></a>'.$events[$i]['evnt_title']; ?>
+									<a name="event_<?= $events[$i]['evnt_id'];?>"></a> <?= $events[$i]['evnt_title'];?>
 								</div>
 								<div class="post-date">
 									<?= $events[$i]['evnt_date']; ?>
@@ -67,6 +76,15 @@
 									<?php $text = $events[$i]['evnt_cnt_cmnt'].' комментариев &raquo;'; ?>
 									<?php $link = $usite.'/event/'.$events[$i]['evnt_id']; ?>
 									<?= anchor($link,$text); ?>
+									<?php if($admin): ?>
+										<?php $text = 'Редактировать'; ?>
+										<?php $str_uri = $usite.'/event-edit/'.$events[$i]['evnt_id']; ?>
+										<?= ' | '.anchor($str_uri,$text).' | '; ?>
+										<?php $text = 'Удалить';?>
+										<?php $str_uri = $usite.'/event-destroy/'.$events[$i]['evnt_id']; ?>
+										<?php $attr = array('class'=>'delete'); ?>
+										<?= anchor($str_uri,$text,$attr); ?>
+									<?php endif; ?>
 								</div>
 							</div>
 						</div>
@@ -83,7 +101,6 @@
 			</div>
 			<div class="clear"></div>
 		<?php endfor; ?>
-		
 		<?php if(isset($pages) and !empty($pages)): ?>
 			<div class="container_12">
 				<div class="grid_3 omega">

@@ -12,6 +12,6 @@
 </head>
 <body>
  	<h1 align="center">Ошибка 404! Запрашиваемая страница не найдена!</h1>
-	<center><?php echo anchor('','На главную')?></center>
+	<center><input name='back' type='button' value='Вернуться назад' onclick="javascript:history.back(1);"></center>
 </body>
 </html>

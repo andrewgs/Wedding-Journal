@@ -4,7 +4,7 @@ class Main extends Controller{
 	function Main(){
 	
 		parent::Controller();
-	} /* end constuructor Main*/
+	} /* end constructor Main*/
 	
 	function activation(){
 		
@@ -46,7 +46,8 @@ class Main extends Controller{
 					'title'			=> 'Авторизация пользователя',
 					'baseurl' 		=> base_url(),
 					'text'			=> '',
-					'formaction'	=> 'login'
+					'formaction'	=> 'login',
+					'message'		=> ''
 					);
 		if($this->input->post('btsubmit')):
 			$this->form_validation->set_rules('login','"Логин"','required|trim');
@@ -59,22 +60,22 @@ class Main extends Controller{
 					redirect('login');
 				endif;
 				if($user['ustatus'] == 'enabled'):
-					$this->session->set_userdata('login_id',md5(crypt($_POST['login'],$_POST['password'])));
+					$this->session->set_userdata('login_id',md5($_POST['login'].$_POST['password']));
 					$this->session->set_userdata('login',$_POST['login']);
 					$this->session->set_userdata('password',$_POST['password']);
 					$this->session->set_userdata('site',$user['usite']);
 					$this->usersmodel->active_user($_POST['login']);
 					redirect($user['usite'].'/admin');
 				else:
-					$pagevar['text'] = '<b>Учетная запись не активирована!</b>';
-					$this->parser->parse('main/login',$pagevar);
+					$pagevar['message'] = '<div class="join_error">Учетная запись не активирована!</div>';
+					$this->load->view('main/login',$pagevar);
 					return TRUE;
 				endif;
 			else:
 				return FALSE;
 			endif;
 		endif;
-		$this->parser->parse('main/login',$pagevar);
+		$this->load->view('main/login',$pagevar);
 	} /*end function authorization*/ 
 	
 	function choicetheme(){
@@ -238,7 +239,14 @@ class Main extends Controller{
 	
 	function page404(){
 	
-		$this->load->view('main/page404');
+		$pagevar = array(
+					'description'	=> '',
+					'keywords' 		=> '',
+					'title'			=> 'Свадебный сайт',
+					'baseurl' 		=> base_url(),
+					);
+					
+		$this->load->view('main/page404',$pagevar);
 	} /* end function index */
 	
 	function sendmail($email,$msg,$subject,$from){

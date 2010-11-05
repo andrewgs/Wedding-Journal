@@ -1,4 +1,4 @@
-<?php echo form_open('{formaction}'); ?>
+<?php echo form_open($formaction); ?>
 	<div class="b-auth-inputs">
 		Логин:
 		<?php $attr = array(

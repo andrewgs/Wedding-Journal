@@ -1,7 +1,7 @@
 <?php if($admin): ?>
 	<div id="admin-panel">
 	<span>Вы вошли как Администратор</span>
-		  &nbsp;&nbsp;<a class="logout" href="<?= $baseurl.$usite ?>/admin">Управление</a>&nbsp;|
+		  &nbsp;&nbsp;<a class="logout" href="<?= $baseurl.$usite ?>/admin">Настройки</a>&nbsp;|
 		  <a class="logout" href="<?= $baseurl.$usite ?>/logoff">Завершить сеанс</a>
 	</div>
 <?php endif; ?>

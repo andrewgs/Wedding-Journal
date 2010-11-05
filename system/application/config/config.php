@@ -1,5 +1,5 @@
 <?php  if ( ! defined('BASEPATH')) exit('No direct script access allowed');
-$config['base_url']					= "http://my-wedding.ru/";
+$config['base_url']					= "http://my-wedding/";
 $config['index_page'] 				= "";
 $config['uri_protocol']				= "AUTO";
 $config['url_suffix'] 				= "";

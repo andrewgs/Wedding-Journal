@@ -26,7 +26,7 @@ class General extends Controller{
 		$this->load->model('commentsmodel');
 		$login 		= $this->session->userdata('login');
 		$password 	= $this->session->userdata('password');
-		if($this->session->userdata('login_id') == md5(crypt($login,$password))):
+		if($this->session->userdata('login_id') == md5($login.$password)):
 			$userinfo = $this->usersmodel->read_record($login);
 			$this->usrinfo['firstname']		= $userinfo['uname'];
 			$this->usrinfo['secondname'] 	= $userinfo['usubname'];
@@ -35,7 +35,7 @@ class General extends Controller{
 		else:
 			$this->usrinfo['status'] = FALSE;
 		endif;
-	} /* end constuructor Main*/
+	} /* end constructor Main*/
 	
 	function index(){
 		
@@ -56,7 +56,7 @@ class General extends Controller{
 					'usite'			=> $usersite,
 					'events'		=> array()
 					);
-		$this->nsession->set_userdata('backpage',$pagevar['usite']);
+		$this->session->set_userdata('backpage',$pagevar['usite']);
 		$pagevar['events'] = $this->eventsmodel->new_events($userid,3);
 		for($i = 0;$i < count($pagevar['events']); $i++):
 			$pagevar['events'][$i]['evnt_date'] = $this->operation_date($pagevar['events'][$i]['evnt_date']);
@@ -114,7 +114,8 @@ class General extends Controller{
 					'usite'			=> $usersite,
 					'events'		=> array(),
 					'pages'			=> '',
-					'count'			=> 0
+					'count'			=> 0,
+					'message'		=> $this->setmessage('','','',0)
 					);
 		$this->session->set_userdata('backpage',$pagevar['usite'].'/events');
 		$pagevar['count'] = $this->eventsmodel->count_records();			
@@ -122,14 +123,14 @@ class General extends Controller{
         $config['total_rows'] 		= $pagevar['count']; 
         $config['per_page'] 		= 5;
         $config['num_links'] 		= 2;
-        $config['uri_segment'] 		= 2;
+        $config['uri_segment'] 		= 3;
 		$config['first_link']		= 'В начало';
 		$config['last_link'] 		= 'В конец';
 		$config['next_link'] 		= 'Далее &raquo;';
 		$config['prev_link'] 		= '&laquo; Назад';
 		$config['cur_tag_open']		= '<b>';
 		$config['cur_tag_close'] 	= '</b>';
-		$from = intval($this->uri->segment(2));
+		$from = intval($this->uri->segment(3));
 		if(isset($from) and !empty($from)):
 			$this->session->set_userdata('backpage',$pagevar['usite'].'/events/'.$from);
 		endif;			
@@ -139,6 +140,13 @@ class General extends Controller{
 		endfor;
 		$this->pagination->initialize($config);
 		$pagevar['pages'] = $this->pagination->create_links();
+		
+		$flasherr = $this->session->flashdata('operation_error');
+		$flashmsg = $this->session->flashdata('operation_message');
+		$flashsaf = $this->session->flashdata('operation_saccessfull');
+		if($flasherr && $flashmsg && $flashsaf)
+			$pagevar['message'] = $this->setmessage($flasherr,$flashsaf,$flashmsg,1);
+		
 		$this->load->view($pagevar['themeurl'].'/events',$pagevar);
 	} /* end function events */
 	
@@ -295,5 +303,14 @@ class General extends Controller{
 		header('Content-type: image/gif');
 		echo $image;
 	} /* end function viewimage */
+	
+	function setmessage($error,$saccessfull,$message,$status){
+			
+		$msg['error'] 		= $error;
+		$msg['saccessfull'] = $saccessfull;
+		$msg['message'] 	= $message;
+		$msg['status'] 		= $status;
+		return $msg;
+	} /* end function setmessage */
 } /* end class General */
 ?>

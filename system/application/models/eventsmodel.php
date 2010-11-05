@@ -28,12 +28,13 @@
 			return $query->result_array();
 		}
 		
-		function insert_record($data){
+		function insert_record($data,$uid){
 		
 			$this->evnt_title 		= $data['title'];
 			$this->evnt_date 		= $data['date']; 
 			$this->evnt_text 		= $data['text'];
 			$this->evnt_cnt_cmnt 	= 0;
+			$this->evnt_uid			= $uid;
 			$this->db->insert('events',$this);
 		}
 		
@@ -42,13 +43,14 @@
 			$this->db->delete('events',array('evnt_id'=>$id));
 		}		
 	
-		function update_record($data){
+		function update_record($data,$uid){
 			
 			$this->evnt_id 			= $data['id'];
 			$this->evnt_title 		= $data['title'];
 			$this->evnt_text 		= $data['text'];
 			$this->evnt_cnt_cmnt	= $data['cnt'];
 			$this->evnt_date 		= $data['date'];
+			$this->evnt_uid			= $uid;
 			$this->db->where('evnt_id',$this->evnt_id);
 			$this->db->update('events',$this);
 		}
