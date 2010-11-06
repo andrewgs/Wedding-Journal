@@ -52,13 +52,14 @@ class Albummodel extends Model{
 		$this->db->update('albums');
 	}
 		
-	function insert_record($data){
+	function insert_record($data,$uid){
 		
 		$this->alb_title 		= $data['title'];
 		$this->alb_amt 			= 0;
 		$this->alb_annotation 	= $data['annotation'];
 		$this->alb_photo 		= $data['image'];
 		$this->alb_photo_title 	= $data['photo_title'];
+		$this->alb_uid	 		= $uid;
 		
 		if (mb_strlen($this->alb_annotation,'UTF-8') > 125)
 			$this->alb_annotation = mb_substr($this->alb_annotation,0,125,'UTF-8');
@@ -71,7 +72,7 @@ class Albummodel extends Model{
 		$this->db->delete('albums',array('alb_id'=>$album_id));
 	}
 	
-	function update_record($data){
+	function update_record($data,$uid){
 	
 		$this->alb_id 			= $data['id'];
 		$this->alb_title 		= $data['title'];
@@ -79,6 +80,7 @@ class Albummodel extends Model{
 		$this->alb_annotation 	= $data['annotation'];
 		$this->alb_photo 		= $data['image'];
 		$this->alb_photo_title 	= $data['photo_title'];
+		$this->alb_uid	 		= $uid;
 		
 		if (mb_strlen($this->alb_annotation,'UTF-8') > 125)
 			$this->alb_annotation = mb_substr($this->alb_annotation,0,125,'UTF-8');

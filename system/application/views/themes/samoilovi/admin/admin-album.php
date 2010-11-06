@@ -16,28 +16,28 @@
 	<script type="text/javascript" src="<?= $baseurl; ?>javascript/jquery.maxlength-min.js"></script>
 	<script type="text/javascript"> 
 		$(document).ready(function(){
-			$("div.blog-content").each(function(){$(this).parents("div.blog-center:first").css('height',$(this).height()+15);});
-			$('#friendnote').maxlength({
-				maxCharacters		: 245,
-				status				: true,
-				statusClass			: "lenghtstatus",
-				statusText			: " символов осталось.",
-				notificationClass	: "lenghtnotifi",
-				slider				: true
+			$("div.blog-content").each(function(){ $(this).parents("div.blog-center:first").css('height',$(this).height()+30); });
+			$('#annotation').maxlength({
+					maxCharacters		: 125,
+					status				: true,
+					statusClass			: "lenghtstatus",
+					statusText			: " символов осталось.",
+					notificationClass	: "lenghtnotifi",
+					slider				: true
 			});
 		});
-	</script>	
+		</script>  	
 </head>
 <body>
 	<div id="main-wrap">
 		<?php $this->load->view($themeurl.'/header'); ?>
-		<div class="content">
-			<?php $this->load->view('transitions/fullback'); ?>
+		<div id="content">
+			<?php $this->load->view('transitions/fullback');?>
 			<div class="container_16">
-				<?= form_error('name'); ?>
-				<?= form_error('profession'); ?>
+				<?= form_error('title'); ?>
+				<?= form_error('photo_title'); ?>
 				<?= form_error('userfile'); ?>
-				<?= form_error('note'); ?>
+				<?= form_error('annotation'); ?>
 				<div id="blog" class="grid_16">
 					<div class="blog-top"> 
 						<div class="blog-tl"> </div>
@@ -48,7 +48,7 @@
 					<div class="blog-center"> 
 						<div class="blog-l"> </div>
 						<div class="blog-content">
-							<?php $this->load->view('forms/frmfriend'); ?>
+							<?php $this->load->view('forms/frmalbum'); ?>
 						</div>
 						<div class="blog-r"> </div>
 						<div class="clear"></div>

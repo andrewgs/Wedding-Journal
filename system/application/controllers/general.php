@@ -88,10 +88,18 @@ class General extends Controller{
 					'themeurl' 		=> $cfg['cfgthemepath'],
 					'admin'			=> $this->usrinfo['status'],
 					'usite'			=> $usersite,
-					'albums'		=> array()
+					'albums'		=> array(),
+					'message'		=> $this->setmessage('','','',0)
 					);
 		$this->session->set_userdata('backpage',$pagevar['usite'].'/photo-albums');
-		$pagevar['albums'] = $this->albummodel->albums_records($userid);	 
+		$pagevar['albums'] = $this->albummodel->albums_records($userid);
+		
+		$flasherr = $this->session->flashdata('operation_error');
+		$flashmsg = $this->session->flashdata('operation_message');
+		$flashsaf = $this->session->flashdata('operation_saccessfull');
+		if($flasherr && $flashmsg && $flashsaf)
+			$pagevar['message'] = $this->setmessage($flasherr,$flashsaf,$flashmsg,1);
+			 
 		$this->load->view($pagevar['themeurl'].'/albums',$pagevar);
 	} /* end function albums */
 	
@@ -215,7 +223,7 @@ class General extends Controller{
 			$pagevar['message'] = $this->setmessage($flasherr,$flashsaf,$flashmsg,1);
 		
 		$this->load->view($pagevar['themeurl'].'/event',$pagevar);	
-	}
+	} /* end function event */
 
 	function friends(){
 	

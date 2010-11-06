@@ -310,14 +310,14 @@ class Administrator extends Controller{
 				$_POST['user_date'] = preg_replace($pattern, $replacement, $_POST['user_date']);
 				$this->commentsmodel->update_record($_POST);
 				$this->session->set_flashdata('operation_error',' ');
-				$this->session->set_flashdata('operation_message','Комментарий от "'.$comment['cmnt_usr_name'].'"');
+				$this->session->set_flashdata('operation_message','Комментарий от "'.$_POST['user_name'].'"');
 				$this->session->set_flashdata('operation_saccessfull','Комментарий изменен');
 				redirect($pagevar['backpath']);
 			endif;
 		endif;
 		$pagevar['comment'] = $this->commentsmodel->comment_record($comment_id);
 		$pagevar['comment']['cmnt_usr_date'] = $this->operation_date_slash($pagevar['comment']['cmnt_usr_date']);
-		$this->load->view($pagevar['themeurl'].'/admin/admin-comment-edit',$pagevar);
+		$this->load->view($pagevar['themeurl'].'/admin/admin-comment',$pagevar);
 	} /* end function commentedit */
 	
 	function commentdestroy(){
@@ -521,7 +521,140 @@ class Administrator extends Controller{
 		$this->session->set_flashdata('operation_message','Удаленна карточка - '.$friend['fr_name']);
 		$this->session->set_flashdata('operation_saccessfull','Карточка удалена успешно');
 		redirect($backpath);
-	}
+	} /* end function frienddestroy */
+
+	function albumnew(){
+		
+		$pagevar = array(
+					'description'	=> '',
+					'keywords' 		=> '',
+					'title'			=> 'Администрирование | Создание нового фотоальбома',
+					'baseurl' 		=> base_url(),
+					'admin'			=> TRUE,
+					'themeurl' 		=> $this->admin['themeurl'],
+					'usite'			=> $this->admin['site'],
+					'message'		=> $this->setmessage('','','',0),
+					'backpath' 		=> $this->session->userdata('backpage'),
+					'formaction'	=> $this->uri->uri_string(),
+					'valid'			=> TRUE,
+					'edit'			=> FALSE	
+					);
+		$this->session->unset_userdata('commentlist');
+		if($this->input->post('btnsubmit')):
+			$this->form_validation->set_rules('title','"Название альбома"','required');
+			$this->form_validation->set_rules('photo_title','"Подпись"','required');
+			$this->form_validation->set_rules('userfile','"Фото"','callback_userfile_check');
+			$this->form_validation->set_rules('annotation','"Описание альбома"','required|prep_for_form');
+			$this->form_validation->set_error_delimiters('<div class="message">','</div>');
+			if (!$this->form_validation->run()):
+				$_POST['btnsubmit'] = NULL;
+				$this->albumnew();
+				return FALSE;
+			else:
+				$_POST['image'] = $this->resize_img($_FILES['userfile']['tmp_name'],186,186);
+				$this->albummodel->insert_record($_POST,$this->admin['uid']);
+				$this->session->set_flashdata('operation_error',' ');
+				$this->session->set_flashdata('operation_message','Название альбома - '.$_POST['title']);
+				$this->session->set_flashdata('operation_saccessfull','Альбом создан успешно');
+				$this->logmodel->insert_record($this->admin['uid'],'Создан новый альбом');
+				redirect($pagevar['backpath']);
+			endif;
+		endif;
+		$this->load->view($pagevar['themeurl'].'/admin/admin-album',$pagevar);
+	} /* end function albumnew */
+	
+	function albumedit($album_id = 0,$error = FALSE){
+		
+		$pagevar = array(
+					'description'	=> '',
+					'keywords' 		=> '',
+					'title'			=> 'Администрирование | Редактирование альбома',
+					'baseurl' 		=> base_url(),
+					'admin'			=> TRUE,
+					'themeurl' 		=> $this->admin['themeurl'],
+					'usite'			=> $this->admin['site'],
+					'message'		=> $this->setmessage('','','',0),
+					'backpath' 		=> $this->session->userdata('backpage'),
+					'formaction'	=> $this->uri->uri_string(),
+					'valid'			=> $error,
+					'edit'			=> TRUE,
+					'$album'		=> array(),
+					);
+		if($album_id == 0 or empty($album_id))
+			$album_id = $this->uri->segment(3);
+		$this->session->unset_userdata('commentlist');
+		$pagevar['album'] = $this->albummodel->album_record($album_id);
+		if($this->input->post('btnsubmit')):
+			$this->form_validation->set_rules('title','"Название альбома"','required');
+			$this->form_validation->set_rules('photo_title','"Подпись"','required');
+			if($_FILES['userfile']['error'] != 4)
+				$this->form_validation->set_rules('userfile','"Фото"','callback_userfile_check');
+			$this->form_validation->set_rules('annotation','"Описание альбома"','required|prep_for_form');
+			$this->form_validation->set_error_delimiters('<div class="message">','</div>');
+			if (!$this->form_validation->run()):
+				$_POST['btnsubmit'] = NULL;
+				$this->albumedit($album_id,TRUE);
+				return FALSE;
+			else:
+				if($_FILES['userfile']['error'] != 4)
+					$_POST['image'] = $this->resize_img($_FILES['userfile']['tmp_name'],186,186);
+				else
+					$_POST['image'] = $pagevar['album']['alb_photo'];
+				$this->albummodel->update_record($_POST,$this->admin['uid']);
+				$this->session->set_flashdata('operation_error',' ');
+				$this->session->set_flashdata('operation_message','Название альбома - '.$_POST['title']);
+				$this->session->set_flashdata('operation_saccessfull','Альбом изменен успешно');
+				$this->logmodel->insert_record($this->admin['uid'],'Изменен альбом');
+				redirect($pagevar['backpath']);
+			endif;
+		endif;
+        $this->load->view($pagevar['themeurl'].'/admin/admin-album',$pagevar);
+	} /* end function albumedit */
+
+	function albumdestroy(){
+			
+		$backpath = $this->session->userdata('backpage');
+		$album_id = $this->uri->segment(3);
+		$album = $this->albummodel->album_record($album_id);
+		$this->albummodel->delete_record($album_id);
+		$this->logmodel->insert_record($this->admin['uid'],'Удален альбом');
+		$this->session->set_flashdata('operation_error',' ');
+		$this->session->set_flashdata('operation_message','Название удаленного альбома - '.$album['alb_title']);
+		$this->session->set_flashdata('operation_saccessfull','Альбом удален успешно');
+		redirect($backpath);
+	} /* end function albumdestroy */
+
+	function oldpass_check($pass){
+			
+		$login = $this->session->userdata('login');
+		$userinfo = $this->authentication->user_info($login);
+			
+		if(md5($pass) == $userinfo['usr_password']):
+			return TRUE;
+		else:
+			$this->form_validation->set_message('oldpass_check','Введен не верный пароль!');
+			return FALSE;
+		endif;
+	} /* end function oldpass_check */
+	
+	function userfile_check($file){
+		
+		$tmpName = $_FILES['userfile']['tmp_name'];
+		
+		if ($_FILES['userfile']['error'] == 4):
+			$this->form_validation->set_message('userfile_check','Не указана фотография!');
+			return FALSE;
+		endif;
+		if(!$this->case_image($tmpName)):
+			$this->form_validation->set_message('userfile_check','Формат картинки не поддерживается!');
+			return FALSE;
+		endif;
+		if($_FILES['userfile']['error'] == 1):
+			$this->form_validation->set_message('userfile_check','Размер картинки более 10 Мб!');
+			return FALSE;
+		endif;
+		return TRUE;
+	} /* end function userfile_check */
 	
 	function resize_img($tmpName,$wgt,$hgt){
 			
