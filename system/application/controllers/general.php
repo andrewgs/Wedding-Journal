@@ -24,6 +24,7 @@ class General extends Controller{
 		$this->load->model('friendsmodel');
 		$this->load->model('socialmodel');
 		$this->load->model('commentsmodel');
+		$this->load->model('imagesmodel');
 		$login 		= $this->session->userdata('login');
 		$password 	= $this->session->userdata('password');
 		if($this->session->userdata('login_id') == md5($login.$password)):
@@ -102,6 +103,32 @@ class General extends Controller{
 			 
 		$this->load->view($pagevar['themeurl'].'/albums',$pagevar);
 	} /* end function albums */
+	
+	function photo(){
+		
+		$usersite = $this->uri->segment(1);
+		if(!$this->usersmodel->user_exist('usite',$usersite)):
+			redirect('page404');
+		else:
+			$userid = $this->usersmodel->user_id('usite',$usersite);
+			$cfg = $this->configmodel->read_record($userid);
+		endif;
+		$pagevar = array(
+					'description'	=> '',
+					'keywords' 		=> '',
+					'title'			=> 'Свадебный сайт | Фоторепортажи | Фотографии',
+					'baseurl' 		=> base_url(),
+					'backpath' 		=> $this->session->userdata('backpage'),
+					'themeurl' 		=> $cfg['cfgthemepath'],
+					'admin'			=> $this->usrinfo['status'],
+					'usite'			=> $usersite,
+					'images'		=> array(),
+					'album'			=> $this->uri->segment(4),
+					'message'		=> $this->setmessage('','','',0)
+					);
+		$pagevar['images'] = $this->imagesmodel->get_images($pagevar['album']);
+		$this->load->view($pagevar['themeurl'].'/photo-gallery',$pagevar);
+	}
 	
 	function events(){
 	
