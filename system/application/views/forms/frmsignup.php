@@ -11,46 +11,46 @@
 						<dd>
 						<?php $attr['name'] 	= 'login'; ?>
 						<?php $attr['value'] 	= set_value('login'); ?>
-						<?php echo form_input($attr); ?>
+						<?= form_input($attr); ?>
 						</dd>
-						<?php echo form_error('login'); ?>
+						<?= form_error('login'); ?>
 						<dt>Ваш пароль:</dt>
 						<dd>
 						<?php $attr['name'] 	= 'password'; ?>
 						<?php $attr['value'] 	= set_value('password'); ?>
-						<?php echo form_password($attr); ?>
+						<?= form_password($attr); ?>
 						</dd>
-						<?php echo form_error('password'); ?>
+						<?= form_error('password'); ?>
 						<dt>Подтверждение пароля:</dt>
 						<dd>
 						<?php $attr['name'] 	= 'confirmpass'; ?>
 						<?php $attr['value'] 	= set_value('confirmpass'); ?>
-						<?php echo form_password($attr); ?>
+						<?= form_password($attr); ?>
 						</dd>
 						<dt>Нзвание сайта:</dt>
 						<dd>
 						<?php $attr['name'] 		= 'sitename'; ?>
 						<?php $attr['value'] 		= set_value('sitename'); ?>
 						<?php $attr['maxlength'] 	= '60'; ?>
-						<?php echo form_input($attr); ?>
+						<?= form_input($attr); ?>
 						</dd>
-						<?php echo form_error('sitename'); ?>
+						<?= form_error('sitename'); ?>
 						<dt>Ваше имя:</dt>
 						<dd>
 						<?php $attr['name'] 		= 'name'; ?>
 						<?php $attr['value'] 		= set_value('name'); ?>
 						<?php $attr['maxlength'] 	= '60'; ?>
-						<?php echo form_input($attr); ?>
+						<?= form_input($attr); ?>
 						</dd>
-						<?php echo form_error('name'); ?>
+						<?= form_error('name'); ?>
 						<dt>Ваша фамилия:</dt>
 						<dd>
 						<?php $attr['name'] 		= 'subname'; ?>
 						<?php $attr['value'] 		= set_value('subname'); ?>
 						<?php $attr['maxlength'] 	= '60'; ?>
-						<?php echo form_input($attr); ?>
+						<?= form_input($attr); ?>
 						</dd>
-						<?php echo form_error('subname'); ?>
+						<?= form_error('subname'); ?>
 						<dt>Ваш email:</dt>
 						<dd>
 						<?php $attr['name'] 		= 'email'; ?>
@@ -58,30 +58,30 @@
 						<?php $attr['maxlength'] 	= '255'; ?>
 						<?php echo form_input($attr); ?>
 						</dd>
-						<?php echo form_error('email'); ?>
+						<?= form_error('email'); ?>
 						<dt>Код защиты:</dt>
 						<dd>
 							<img src="{baseurl}capcha" alt=""/>
 						<?php $attr['name'] 		= 'code'; ?>
 						<?php $attr['value'] 		= ''; ?>
 						<?php $attr['maxlength'] 	= '6'; ?>
-						<?php echo form_input($attr); ?>
+						<?= form_input($attr); ?>
 						</dd>
-						<?php echo form_error('code'); ?>
+						<?= form_error('code'); ?>
 					</dl>
 					<div class="b-join-rule">
 						<p>Пользовательское соглашение:</p>
 						<div>
 							<?php $attr['name'] 	= 'license'; ?>
 							<?php $attr['class'] 	= 'join_textarea'; ?>
-							<?php echo form_textarea($attr); ?>
+							<?= form_textarea($attr); ?>
 						</div>
 					</div>
 					<div class="b-join-button">
 					<?php $attr['name']		= 'btsubmit'; ?>
 					<?php $attr['value']  	= 'Я принимаю условия. Зарегистрируйте меня'; ?>
 					<?php $attr['class']  	= ''; ?>
-					<?php echo form_submit($attr); ?>
+					<?= form_submit($attr); ?>
 					</div>
 				<?php echo form_close(); ?>
 				</div>

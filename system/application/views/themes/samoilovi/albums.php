@@ -32,12 +32,14 @@
 	<div id="main-wrap">
 		<?php $this->load->view($themeurl.'/header'); ?>
 		<div id="content">
+			<?php if($admin): ?>
 			<div class="container_12">
 				<div id="internal_nav" class="grid_4">
 					<a href="<?=$baseurl.$usite.'/album-new'; ?>">Создать новый альбом &nbsp;&rarr;</a>
 				</div>
 				<div class="clear"></div>
 				<?php $this->load->view('message');?>
+			<?php endif; ?>
 			<div class="clear"></div>
 			<?php if(count($albums) > 0): ?>
 				<div id="photo-gallery" class="container_12">

@@ -72,7 +72,7 @@ class Main extends Controller{
 					return TRUE;
 				endif;
 			else:
-				return FALSE;
+				redirect('login');
 			endif;
 		endif;
 		$this->load->view('main/login',$pagevar);
@@ -107,7 +107,7 @@ class Main extends Controller{
 		$pagevar['themes'] = $this->themesmodel->read_records(TRUE);
 		$this->parser->parse('main/profile/step2',$pagevar);
 	} /* end fun choicetheme */
-							  
+
 	function capcha(){
 	
 		$backimg = base_url().'images/capcha/'.round(mt_rand(1,3)).'.jpg';
@@ -120,6 +120,58 @@ class Main extends Controller{
 		ImageDestroy($image);
 	} /* end function capcha */
 
+	function passrestore(){
+		
+		$pagevar = array(
+					'description'	=> '',
+					'keywords' 		=> '',
+					'title'			=> 'Восстановление пароля',
+					'baseurl' 		=> base_url(),
+					'text'			=> '',
+					'formaction'	=> 'restore',
+					'message'		=> '',
+					'errortext'		=> 'Произошла ошибка при создании учетной записи.',
+					'errorcode'		=> '0x0000'
+					);
+		if($this->input->post('btsubmit')):
+			$this->form_validation->set_rules('email','"E-mail"','required|valid_email|trim|callback_email_restore');
+			$this->form_validation->set_error_delimiters('<div class="join_error">','</div>');
+			if($this->form_validation->run()):
+				$_POST['btsubmit'] = NULL;
+				$password = $this->generate_password(12);
+				if(!$this->usersmodel->update_password($password,$_POST['email'])):
+					$pagevar['errorcode'] = '0x0007';
+					$this->parser->parse('main/error',$pagevar);
+					return FALSE;
+				endif;
+				$message = "My-wedding.ru\nСистема восстановления паролей!\nНовый пароль - ".$password."\nВвойдите в систему под новым паролем.\nМожете измениете его через панель администратора.";
+				if($this->sendmail($_POST['email'],$message,"Восстановление пароля","admin@my-wedding.ru")):
+					$pagevar['text'] = '<b>На указанный E-mail выслано письмо c новым паролем</b>';
+					$this->parser->parse('main/message',$pagevar);
+					return TRUE;
+				else:
+					$this->email->print_debugger();
+				endif;
+			else:
+				$_POST['btsubmit'] = NULL;
+				$this->passrestore();
+				return FALSE;
+			endif;
+		endif;
+		$this->load->view('main/restore',$pagevar);
+	} /* end fun restore */
+	
+	function generate_password($number){
+
+		$arr = array('a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','r','s','t','u','v','x','y','z','A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','R','S','T','U','V','X','Y','Z','1','2','3','4','5','6','7','8','9','0');
+		$pass = '';
+		for($i = 0; $i < $number; $i++):
+			$index = rand(0,count($arr) - 1);
+			$pass .= $arr[$index];
+		endfor;
+		return $pass;
+	} /* end function generate_password */
+	
 	function code_check($code){
 		
 		if($code != $this->session->userdata('capcha')):
@@ -137,7 +189,16 @@ class Main extends Controller{
 		endif;
 		return TRUE;
 	} /* end function email_check */
-									
+	
+	function email_restore($email){
+	
+		if(!$this->usersmodel->user_exist('uemail',$email)):
+			$this->form_validation->set_message('email_restore','E-mail не зарегистрирован');
+			return FALSE;
+		endif;
+		return TRUE;
+	} /* end function email_restore */
+
 	function error($text,$code){
 	
 		$pagevar = array(

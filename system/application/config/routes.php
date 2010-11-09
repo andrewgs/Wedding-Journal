@@ -12,6 +12,7 @@ $route['page404'] = "main/page404";
 $route['login']	= "main/authorization";
 $route['capcha'] = "main/capcha";
 $route['activation/([a-zA-Z0-9])*'] = "main/activation";
+$route['restore'] = "main/passrestore";
 
 /* Controller Administrator*/
 $route[':any/login'] = "administrator/login";

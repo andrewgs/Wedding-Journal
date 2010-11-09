@@ -88,6 +88,18 @@
 			return TRUE;
 		}
 		
+		function update_password($password,$email){
+			
+			$this->db->set('upassword',md5($password));
+			$this->db->set('ucryptpassword',$this->encrypt->encode($password));
+			$this->db->where('ustatus','enabled');
+			$this->db->where('uemail',$email);
+			$this->db->update('users');
+			$res = $this->db->affected_rows();
+			if($res == 0) return FALSE;
+			return TRUE;
+		}
+		
 		function user_exist($field,$parameter){
 			
 			$this->db->where($field,$parameter);
