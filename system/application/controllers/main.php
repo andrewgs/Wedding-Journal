@@ -253,6 +253,7 @@ class Main extends Controller{
 				return FALSE;
 			endif;
 		endif;
+		
 		$this->session->unset_userdata('userid');
 		$pagevar['pathback'] = base_url().$pagevar['site'];
 		$this->load->view('main/profile/finish',$pagevar);

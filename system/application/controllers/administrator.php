@@ -790,6 +790,7 @@ class Administrator extends Controller{
 				$replacement = "\$3-\$2-\$1";
 				$_POST['weddingdate'] = preg_replace($pattern,$replacement,$_POST['weddingdate']);
 				$this->usersmodel->update_profile($_POST,$this->admin['uid']);
+				$this->logmodel->insert_record($this->admin['uid'],'Личные данные изменены');
 				$this->session->set_flashdata('operation_error',' ');
 				$this->session->set_flashdata('operation_message',' ');
 				$this->session->set_flashdata('operation_saccessfull','Личные данные изменены.');
@@ -829,6 +830,7 @@ class Administrator extends Controller{
 				return FALSE;
 			else:
 				$this->usersmodel->changepassword($_POST,$this->admin['uid']);
+				$this->logmodel->insert_record($this->admin['uid'],'Пароль изменен');
 				$this->session->set_flashdata('operation_error',' ');
 				$this->session->set_flashdata('operation_message',' ');
 				$this->session->set_flashdata('operation_saccessfull','Пароль изменен.');
@@ -906,6 +908,7 @@ class Administrator extends Controller{
 				die('денег хватает только на водку!');
 			endif;
 			$this->configmodel->update_theme($themes,$this->admin['uid']);
+			$this->logmodel->insert_record($this->admin['uid'],'Тема изменена');
 			$this->session->set_flashdata('operation_error',' ');
 			$this->session->set_flashdata('operation_message','Выбрана тема - '.$themes['thname']);
 			$this->session->set_flashdata('operation_saccessfull','Тема применена.');
