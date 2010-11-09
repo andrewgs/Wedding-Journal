@@ -48,7 +48,6 @@ endif; ?>
 		<?php echo form_input($attr); ?>
 		<?= form_error('weddingdate'); ?>
 		<div class="clear"></div>
-		<div class="clear"></div>
 		<?php $attr['name'] 	= 'btnsubmit'; ?>
 		<?php $attr['value'] 	= 'Сохранить'; ?>
 		<?php $attr['class'] 	= 'senden'; ?>

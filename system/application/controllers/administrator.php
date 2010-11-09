@@ -31,7 +31,7 @@ class Administrator extends Controller{
 			die('такой сайт не существует!');
 		endif;
 		$this->admin['login'] 		= $this->session->userdata('login');
-		$this->admin['password'] 	= $this->session->userdata('password');
+		$this->admin['password'] 	= $this->session->userdata('password');;
 		$this->admin['uid'] 		= $this->usersmodel->user_id('ulogin',$this->admin['login']);
 		$this->admin['site'] 		= $this->usersmodel->read_field($this->admin['uid'],'usite');
 		$this->admin['themeurl'] 	= $this->configmodel->read_field($this->admin['uid'],'cfgthemepath');
@@ -54,21 +54,16 @@ class Administrator extends Controller{
 					);
 		$this->session->set_userdata('backpage',$pagevar['usite'].'/admin');
 		$this->session->unset_userdata('commentlist');
-		
 		$flasherr = $this->session->flashdata('operation_error');
 		$flashmsg = $this->session->flashdata('operation_message');
 		$flashsaf = $this->session->flashdata('operation_saccessfull');
 		if($flasherr && $flashmsg && $flashsaf)
-			$pagevar['message'] = $this->setmessage($flasherr,$flashsaf,$flashmsg,1);
+			$pagevar['message'] = $this->setmessage(trim($flasherr),trim($flashsaf),trim($flashmsg),1);
 		$this->load->view($pagevar['themeurl'].'/admin/adminpanel',$pagevar);
 	} /* end function index*/
 	
 	function login(){
 		
-		$usersite = $this->uri->segment(1);
-		if(!$this->usersmodel->user_exist('usite',$usersite)):
-			redirect('page404');
-		endif;
 		$pagevar = array(
 					'description'	=> '',
 					'keywords' 		=> '',
@@ -91,10 +86,9 @@ class Administrator extends Controller{
 					redirect($user['usite'].'/login');
 				endif;
 				if($user['ustatus'] == 'enabled'):
-					$this->session->set_userdata('login_id',md5(crypt($_POST['login'],$_POST['password'])));
+					$this->session->set_userdata('login_id',md5($_POST['login'].$_POST['password']));
 					$this->session->set_userdata('login',$_POST['login']);
 					$this->session->set_userdata('password',$_POST['password']);
-					$this->session->set_userdata('site',$user['usite']);
 					$this->usersmodel->active_user($_POST['login']);
 					redirect($user['usite'].'/admin');
 				else:
@@ -627,19 +621,6 @@ class Administrator extends Controller{
 		redirect($backpath);
 	} /* end function albumdestroy */
 
-	function oldpass_check($pass){
-			
-		$login = $this->session->userdata('login');
-		$userinfo = $this->authentication->user_info($login);
-			
-		if(md5($pass) == $userinfo['usr_password']):
-			return TRUE;
-		else:
-			$this->form_validation->set_message('oldpass_check','Введен не верный пароль!');
-			return FALSE;
-		endif;
-	} /* end function oldpass_check */
-	
 	function userfile_check($file){
 		
 		$tmpName = $_FILES['userfile']['tmp_name'];
@@ -788,7 +769,6 @@ class Administrator extends Controller{
 					'baseurl'		=> base_url(),
 					'themeurl'		=> $this->admin['themeurl'],
 					'usite'			=> $this->admin['site'],
-					'message'		=> $this->setmessage('','','',0),
 					'backpath'		=> $this->session->userdata('backpage'),
 					'formaction'	=> $this->uri->uri_string(),
 					'user'			=> array(),
@@ -801,17 +781,17 @@ class Administrator extends Controller{
 			$this->form_validation->set_rules('sitename','"Нзвание сайта"','required|callback_sitename_check|trim');
 			$this->form_validation->set_rules('email','"E-mail"','required|valid_email|trim|callback_email_check');
 			$this->form_validation->set_error_delimiters('<dd><div class="join_error">','</div></dd>');
-			$this->form_validation->set_message('min_length','Длина пароля не менее 6 символов.');
-			$this->form_validation->set_message('matches','Пароли не совпадают');
 			if (!$this->form_validation->run()):
-				$pagevar['message'] = $this->setmessage('Не выполнены условия.','','Ошибка',1);
-				$this->load->view($pagevar['themeurl'].'/admin/profile',$pagevar);
+				$_POST['btnsubmit'] = NULL;
+				$this->profile(TRUE);
 				return FALSE;
 			else:
 				$pattern = "/(\d+)\/(\w+)\/(\d+)/i";
 				$replacement = "\$3-\$2-\$1";
 				$_POST['weddingdate'] = preg_replace($pattern,$replacement,$_POST['weddingdate']);
 				$this->usersmodel->update_profile($_POST,$this->admin['uid']);
+				$this->session->set_flashdata('operation_error',' ');
+				$this->session->set_flashdata('operation_message',' ');
 				$this->session->set_flashdata('operation_saccessfull','Личные данные изменены.');
 				redirect($_POST['sitename'].'/admin');
 				return TRUE;
@@ -823,11 +803,56 @@ class Administrator extends Controller{
 		endif;
 		$this->load->view($pagevar['themeurl'].'/admin/profile',$pagevar);
 	} /* end function profile */
-	
+
 	function passwordchange(){
-		
-		
+	
+		$pagevar = array(
+					'description'	=> '',
+					'keywords'		=> '',
+					'title'			=> 'Администрирование | Смена пароля администратора',
+					'baseurl'		=> base_url(),
+					'themeurl'		=> $this->admin['themeurl'],
+					'usite'			=> $this->admin['site'],
+					'message'		=> $this->setmessage('','','',0),
+					'backpath'		=> $this->session->userdata('backpage'),
+					'formaction'	=> $this->uri->uri_string(),
+				);
+		if($this->input->post('btnsubmit')):
+			$this->form_validation->set_rules('oldpass','"Старый пароль"','required|callback_oldpass_check');
+			$this->form_validation->set_rules('password','"Новый пароль"','required|min_length[6]|matches[confirmpass]');
+			$this->form_validation->set_rules('confirmpass','"Подтверждение пароля"','required');
+			$this->form_validation->set_error_delimiters('<div class="join_error">','</div>');
+			$this->form_validation->set_message('min_length','Минимальная длина пароля — 6 символов.');
+			$this->form_validation->set_message('matches','Пароли не совпадают');
+			if ($this->form_validation->run() == FALSE):
+				$pagevar['message'] = $this->setmessage('Не выполнены условия.','','Ошибка при изменении пароля',1);
+				$this->load->view($pagevar['themeurl'].'/admin/password',$pagevar);
+				return FALSE;
+			else:
+				$this->usersmodel->changepassword($_POST,$this->admin['uid']);
+				$this->session->set_flashdata('operation_error',' ');
+				$this->session->set_flashdata('operation_message',' ');
+				$this->session->set_flashdata('operation_saccessfull','Пароль изменен.');
+				redirect($pagevar['usite'].'/admin');
+				return TRUE;
+			endif;
+		endif;
+		$flashmsg = $this->session->flashdata('operation_saccessfull');
+		if(isset($flashmsg) and !empty($flashmsg)):
+			$pagevar['message'] = $this->setmessage('','',$flashmsg,1);
+		endif;
+        $this->load->view($pagevar['themeurl'].'/admin/password',$pagevar);
 	} /* end function passwordchange */
+									 
+	function oldpass_check($pass){
+		
+		$password = $this->usersmodel->read_field($this->admin['uid'],'upassword');
+		if(md5($pass) != $password):
+			$this->form_validation->set_message('oldpass_check','Введен не верный пароль!');
+			return FALSE;
+		endif;
+		return TRUE;
+	} /* end function oldpass_check */
 	
 	function sitename_check($sitename){
 	
@@ -848,6 +873,18 @@ class Administrator extends Controller{
 		endif;
 		return TRUE;
 	} /* end function sitename_check */
+	
+	function email_check($email){
+		
+		if($email === $this->usersmodel->read_field($this->admin['uid'],'uemail')):
+			return TRUE;
+		endif;
+		if($this->usersmodel->user_exist('uemail',$email)):
+			$this->form_validation->set_message('email_check','E-mail уже ceществует');
+			return FALSE;
+		endif;
+		return TRUE;
+	} /* end function email_check */
 	
 } /* end class*/
 ?>

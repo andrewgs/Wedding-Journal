@@ -18,6 +18,7 @@
 		<?php $this->load->view($themeurl.'/admin/header-admin'); ?>
 		<div id="content">
 			<div class="container_12">
+				<?php $this->load->view('message');?>
 				<div class="grid_6">
 					<div id="internal_nav" class="grid_4 suffix_2">
 						<a href="<?= $baseurl.$usite.'/admin/events'; ?>">Управление событиями &nbsp;&rarr;</a>
@@ -49,14 +50,6 @@
 					</div>
 				</div>
 				<div class="clear"></div>
-				<?php if($message['status']): ?>
-					<div class="message">
-						<?= $msg['saccessfull']; ?><br/>
-						<?= $msg['message']; ?>	<br/>
-						<?= $msg['error'];?>
-					</div>
-					<div class="clear"></div>
-				<?php endif; ?>
 				<?= form_fieldset('Быстрый вызов функций',array('class'=>'fieldset')); ?>
 					<div class="grid_12">
 						<div id="internal_nav" class="grid_4">

@@ -137,5 +137,14 @@
 			$this->db->update('users');
 			return TRUE;
 		}
+		
+		function changepassword($updatedata,$uid){
+			
+			$this->db->set('upassword',md5($updatedata['password']));
+			$this->db->set('ucryptpassword',$this->encrypt->encode($updatedata['password']));
+			$this->db->where('uid',$uid);
+			$this->db->update('users');
+			return TRUE;
+		}
 	}
 ?>

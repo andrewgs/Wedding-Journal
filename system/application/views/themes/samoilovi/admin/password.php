@@ -12,27 +12,18 @@
 	<link rel="stylesheet" href="<?= $baseurl; ?>css/960.css" type="text/css" />
 	<link rel="stylesheet" href="<?= $baseurl.$themeurl; ?>/css/reset.css" type="text/css" /> 
 	<link rel="stylesheet" href="<?= $baseurl.$themeurl; ?>/css/style.css" type="text/css" />
-	<link rel="stylesheet" href="<?= $baseurl; ?>css/datepicker/jquery.ui.all.css" type="text/css" />
-	<script type="text/javascript" src="<?= $baseurl; ?>javascript/datepicker/jquery-1.4.2.js"></script>
-	<script type="text/javascript" src="<?= $baseurl; ?>javascript/datepicker/jquery.bgiframe-2.1.1.js"></script>
-	<script type="text/javascript" src="<?= $baseurl; ?>javascript/datepicker/jquery.ui.core.js"></script>
-	<script type="text/javascript" src="<?= $baseurl; ?>javascript/datepicker/jquery.ui.datepicker-ru.js"></script>
-	<script type="text/javascript" src="<?= $baseurl; ?>javascript/datepicker/jquery.ui.datepicker.js"></script>
-	<script type="text/javascript" src="<?= $baseurl; ?>javascript/datepicker/jquery.ui.widget.js"></script>
-	<script type="text/javascript">
-		$(document).ready(function(){
-			$("input#wedding-date").datepicker($.datepicker.regional['ru']);
-		});
-	</script>
 </head>
 <body>
 	<div id="main-wrap">
 		<?php $this->load->view($themeurl.'/admin/header-admin'); ?>
 		<div class="content">
 			<?php $this->load->view('transitions/fullback'); ?>
+			<div class="container_12">
+				<?php $this->load->view('message');?>
+			</div>
 			<div class="container_16">
 				<div id="comment-form-content" class="grid_6 form-content">
-					<?php $this->load->view('forms/frmprofile'); ?>
+					<?php $this->load->view('forms/frmpassword'); ?>
 				</div>
 			</div>
 		</div>

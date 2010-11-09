@@ -128,7 +128,7 @@ class General extends Controller{
 					);
 		$pagevar['images'] = $this->imagesmodel->get_images($pagevar['album']);
 		$this->load->view($pagevar['themeurl'].'/photo-gallery',$pagevar);
-	}
+	} /* end function photo */
 	
 	function events(){
 	
