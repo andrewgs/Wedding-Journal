@@ -46,6 +46,10 @@
 					</div>
 					<div class="clear"></div>
 					<div id="internal_nav" class="grid_4 suffix_2">
+						<a href="<?= $baseurl.$usite.'/admin/theme'; ?>">Изменение темы сайта &nbsp;&rarr;</a>
+					</div>
+					<div class="clear"></div>
+					<div id="internal_nav" class="grid_4 suffix_2">
 						<a href="<?= $baseurl.$usite; ?>">На главную страницу &nbsp;&rarr;</a>
 					</div>
 				</div>

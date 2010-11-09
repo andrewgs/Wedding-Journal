@@ -46,7 +46,7 @@ class Administrator extends Controller{
 		$pagevar = array(
 					'description'	=> '',
 					'keywords' 		=> '',
-					'title'			=> 'Свадебный сайт',
+					'title'			=> 'Панель администрирования',
 					'baseurl' 		=> base_url(),
 					'themeurl' 		=> $this->admin['themeurl'],
 					'usite'			=> $this->admin['site'],
@@ -794,7 +794,6 @@ class Administrator extends Controller{
 				$this->session->set_flashdata('operation_message',' ');
 				$this->session->set_flashdata('operation_saccessfull','Личные данные изменены.');
 				redirect($_POST['sitename'].'/admin');
-				return TRUE;
 			endif;
 		endif;
 		$pagevar['user'] = $this->usersmodel->read_record($this->admin['login']);
@@ -885,6 +884,36 @@ class Administrator extends Controller{
 		endif;
 		return TRUE;
 	} /* end function email_check */
+	
+	function themechange(){
+		
+		$pagevar = array(
+					'description'	=> '',
+					'keywords' 		=> '',
+					'title'			=> 'Панель администрирования | Изменение темы',
+					'baseurl' 		=> base_url(),
+					'themeurl' 		=> $this->admin['themeurl'],
+					'backpath' 		=> $this->session->userdata('backpage'),
+					'usite'			=> $this->admin['site'],
+					'message'		=> $this->setmessage('','','',0),
+					'themes'		=> array(),
+					'formaction'	=> $this->uri->uri_string()
+					);
+		if($this->input->post('btsubmit')):			
+			$_POST['btsubmit'] = NULL;
+			$themes = $this->themesmodel->read_record($_POST['theme']);
+			if($themes['thstatus'] != 'free'):
+				die('денег хватает только на водку!');
+			endif;
+			$this->configmodel->update_theme($themes,$this->admin['uid']);
+			$this->session->set_flashdata('operation_error',' ');
+			$this->session->set_flashdata('operation_message','Выбрана тема - '.$themes['thname']);
+			$this->session->set_flashdata('operation_saccessfull','Тема применена.');
+			redirect($pagevar['usite'].'/admin');
+		endif;
+		$pagevar['themes'] = $this->themesmodel->read_records(TRUE);
+		$this->parser->parse($pagevar['themeurl'].'/admin/themechange',$pagevar);
+	}
 	
 } /* end class*/
 ?>

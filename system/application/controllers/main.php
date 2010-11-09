@@ -17,20 +17,18 @@ class Main extends Controller{
 		$code = $this->uri->segment(2);
 		if(!isset($code) or !empty($code)):
 			if($this->usersmodel->user_id('uconfirmation',$code) == FALSE):
-				$this->session->unset_userdata('signupstatus');
 				$this->session->unset_userdata('userid');
 				$pagevar['text'] = '<b>Активация невозможна: ссылка устарела!</b>';
-				$this->parser->parse('main/message',$pagevar);
+				$this->load->view('main/message',$pagevar);
 				return TRUE;
 			endif;
 			if($this->usersmodel->update_status($code)):
-				$this->session->set_userdata('signupstatus',TRUE);
 				$user_id = $this->usersmodel->user_id('uconfirmation',$code);
 				$this->session->set_userdata('userid',$user_id);
 				redirect('signup/themes');
 			else:
 				$pagevar['text'] = '<b>Активация невозможна: профиль уже активирован</b>';
-				$this->parser->parse('main/message',$pagevar);
+				$this->load->view('main/message',$pagevar);
 				return TRUE;
 			endif;
 		else:
@@ -79,8 +77,6 @@ class Main extends Controller{
 	
 	function choicetheme(){
 		
-		$status = $this->session->userdata('signupstatus');
-		if(!isset($status) or empty($status)) redirect('signup');
 		$pagevar = array(
 					'description'	=> '',
 					'keywords' 		=> '',
@@ -92,7 +88,6 @@ class Main extends Controller{
 					);
 		if($this->input->post('btsubmit')):			
 			$_POST['btsubmit'] = NULL;
-			$this->session->set_userdata('signupstatus',TRUE);
 			$themes = $this->themesmodel->read_record($_POST['theme']);
 			if($themes['thstatus'] != 'free'):
 				redirect(base_url());
@@ -140,13 +135,13 @@ class Main extends Controller{
 				$password = $this->generate_password(12);
 				if(!$this->usersmodel->update_password($password,$_POST['email'])):
 					$pagevar['errorcode'] = '0x0007';
-					$this->parser->parse('main/error',$pagevar);
+					$this->load->view('main/error',$pagevar);
 					return FALSE;
 				endif;
 				$message = "My-wedding.ru\nСистема восстановления паролей!\nНовый пароль - ".$password."\nВвойдите в систему под новым паролем.\nМожете измениете его через панель администратора.";
 				if($this->sendmail($_POST['email'],$message,"Восстановление пароля","admin@my-wedding.ru")):
 					$pagevar['text'] = '<b>На указанный E-mail выслано письмо c новым паролем</b>';
-					$this->parser->parse('main/message',$pagevar);
+					$this->load->view('main/message',$pagevar);
 					return TRUE;
 				else:
 					$this->email->print_debugger();
@@ -209,13 +204,11 @@ class Main extends Controller{
 					'errortext'		=> $text,
 					'errorcode'		=> $code
 				);
-		$this->parser->parse('main/error',$pagevar);
+		$this->load->view('main/error',$pagevar);
 	} /* end function error */
 	
 	function finish(){
 		
-		$status = $this->session->userdata('signupstatus');
-		if(!isset($status) or empty($status)) redirect('signup');
 		$pagevar = array(
 					'description'	=> '',
 					'keywords' 		=> '',
@@ -230,40 +223,39 @@ class Main extends Controller{
 		$pagevar['site'] = $this->usersmodel->read_field($user_id,'usite');
 		if(!$pagevar['site']):
 			$pagevar['errorcode'] = '0x0001';
-			$this->parser->parse('main/error',$pagevar);
+			$this->load->view('main/error',$pagevar);
 			return FALSE;
 		endif;
 		$userdir = getcwd().'/users/'.$pagevar['site'];
 		if(is_dir($userdir)):
 			$pagevar['errorcode'] = '0x0002';
-			$this->parser->parse('main/error',$pagevar);
+			$this->load->view('main/error',$pagevar);
 			return FALSE;
 		endif;
 		if(!mkdir($userdir,'0755')):
 			$pagevar['errorcode'] = '0x0003';
-			$this->parser->parse('main/error',$pagevar);
+			$this->load->view('main/error',$pagevar);
 			return FALSE;
 		else:
 			if(!mkdir($userdir.'/images','0777')):
 				$pagevar['errorcode'] = '0x0004';
-				$this->parser->parse('main/error',$pagevar);
+				$this->load->view('main/error',$pagevar);
 				return FALSE;
 			endif;
 			if(!mkdir($userdir.'/video','0777')):
 				$pagevar['errorcode'] = '0x0005';
-				$this->parser->parse('main/error',$pagevar);
+				$this->load->view('main/error',$pagevar);
 				return FALSE;
 			endif;
 			if(!mkdir($userdir.'/swf','0777')):
 				$pagevar['errorcode'] = '0x0006';
-				$this->parser->parse('main/error',$pagevar);
+				$this->load->view('main/error',$pagevar);
 				return FALSE;
 			endif;
 		endif;
-		$this->session->unset_userdata('signupstatus');
 		$this->session->unset_userdata('userid');
 		$pagevar['pathback'] = base_url().$pagevar['site'];
-		$this->parser->parse('main/profile/finish',$pagevar);
+		$this->load->view('main/profile/finish',$pagevar);
 	} /* end function finish */
 	
 	function index(){
@@ -271,13 +263,12 @@ class Main extends Controller{
 		$pagevar = array(
 					'description'	=> '',
 					'keywords' 		=> '',
-					'title'			=> 'Главная страница системы постороения свадебных сайтов',
+					'title'			=> 'Свадебный сайт',
 					'baseurl' 		=> base_url(),
 					'formaction'	=> 'login'
 					);
-		$this->session->unset_userdata('signupstatus');
 		$this->session->unset_userdata('userid');
-		$this->parser->parse('main/welcome',$pagevar);
+		$this->load->view('main/welcome',$pagevar);
 	} /* end function index */
 	
 	function login_check($login){
@@ -336,7 +327,6 @@ class Main extends Controller{
 					'pathback'		=> base_url(),
 					'formaction'	=> 'signup'
 					);
-		$this->session->set_userdata('signupstatus',FALSE);
 		$this->session->unset_userdata('userid');
 		if($this->input->post('btsubmit')):
 			$this->form_validation->set_rules('login','"Ваш логин"','required|callback_login_check|trim');

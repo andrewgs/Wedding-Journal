@@ -10,10 +10,26 @@
 	<meta name="keywords" content="<?= $keywords; ?>"/>
 	<title><?= $title; ?></title>
 	<link rel="stylesheet" href="<?= $baseurl; ?>css/960.css" type="text/css" />
-	<link rel="stylesheet" href="<?= $baseurl; ?>css/signup.css" type="text/css" />
+	<link rel="stylesheet" href="<?= $baseurl.$themeurl; ?>/css/reset.css" type="text/css" /> 
+	<link rel="stylesheet" href="<?= $baseurl.$themeurl; ?>/css/style.css" type="text/css" />
+	<script type="text/javascript" src="<?= $baseurl; ?>javascript/jquery.min.js"></script>
+	<script type="text/javascript">
+		$(document).ready(function(){
+			
+		});
+	</script>
 </head>
 <body>
- 	<h1 align="center">Ошибка 404! Запрашиваемая страница не найдена!</h1>
-	<center><input name='back' type='button' value='Вернуться назад' onclick="javascript:history.back(1);"></center>
+	<div id="main-wrap">
+		<?php $this->load->view($themeurl.'/admin/header-admin'); ?>
+		<div id="content">
+			<?php $this->load->view('transitions/fullback'); ?>
+			<div class="container_16">
+				<?php $this->load->view('forms/frmtheme'); ?>
+			</div>
+		</div>
+		<div class="push"></div>
+	</div>
+	<?php $this->load->view($themeurl.'/footer'); ?>
 </body>
 </html>

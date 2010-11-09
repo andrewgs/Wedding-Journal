@@ -9,7 +9,8 @@
 	<meta name="description" content="<?= $description; ?>"/>
 	<meta name="keywords" content="<?= $keywords; ?>"/>
 	<title><?= $title; ?></title>
-	<link rel="stylesheet" type="text/css" media="screen" href="<?= $baseurl; ?>css/signup.css" />
+	<link rel="stylesheet" href="<?= $baseurl; ?>css/960.css" type="text/css" />
+	<link rel="stylesheet" href="<?= $baseurl; ?>css/signup.css" type="text/css" />
 </head>
 <body>
  	<h1 align="center">Свадьба - ты хоть за яйца меня подвесь, ну ее на ...!</h1>

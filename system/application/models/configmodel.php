@@ -13,9 +13,9 @@
 			parent::Model();
 		}
 		
-		function read_record($userid){
+		function read_record($uid){
 		
-			$this->db->where('cfguid',$userid);
+			$this->db->where('cfguid',$uid);
 			$query = $this->db->get('configuration',1);
 			$data = $query->result_array();
 			if(isset($data[0])) return $data[0];
@@ -30,6 +30,15 @@
 			
 			$this->db->insert('configuration',$this);
 			return $this->db->insert_id();
+		}
+		
+		function update_theme($updatedata,$uid){
+			
+			$this->db->set('cfgtheme',$updatedata['thname']);
+			$this->db->set('cfgthemepath',$updatedata['thpath']);
+			$this->db->where('cfguid',$uid);
+			$this->db->update('configuration');
+			return TRUE;
 		}
 		
 		function read_field($userid,$field){
