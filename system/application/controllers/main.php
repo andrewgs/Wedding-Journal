@@ -363,7 +363,7 @@ class Main extends Controller{
 				$message .= "\n".'или скопируйте ссылку в окно ввода адреса браузера и нажмите enter.';
 				if($this->sendmail($_POST['email'],$message,"Подтверждение регистарции на сайте","admin@my-wedding.ru")):
 					$pagevar['text'] = '<b>Учетная запись создана.</b><br><b>На Ваш адрес "'.$_POST['email'].'" выслано письмо</b><br><b>Для активации учетной записи перейдите по ссылке указанной в письме</b><br><b>Спасибо за регистрацию на нашем сайте.</b><br>';
-					$this->parser->parse('main/message',$pagevar);
+					$this->load->view('main/message',$pagevar);
 					return TRUE;
 				else:
 					$this->email->print_debugger();
@@ -371,7 +371,7 @@ class Main extends Controller{
 			endif;
 		endif;
 		$this->session->set_userdata('capcha',mt_rand(100000,999999));
-		$this->parser->parse('main/profile/step1',$pagevar);
+		$this->load->view('main/profile/step1',$pagevar);
 	} /* end function signup */
 	
 	function sitename_check($sitename){

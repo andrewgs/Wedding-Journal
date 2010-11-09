@@ -4,7 +4,7 @@
 		<div class="h-inside-left">
 			<div class="b-content-362-ins">
 				<div class="h-block">
-				<?php echo form_open('{formaction}'); ?>
+				<?php echo form_open($formaction); ?>
 					<?php $attr = array('name'=>'','id'=>'','class'=>'join_input','value'=>'','maxlength'=>'32'); ?>
 					<dl>
 						<dt>Ваш логин:</dt>
@@ -27,7 +27,7 @@
 						<?php $attr['value'] 	= set_value('confirmpass'); ?>
 						<?= form_password($attr); ?>
 						</dd>
-						<dt>Нзвание сайта:</dt>
+						<dt>Название сайта:</dt>
 						<dd>
 						<?php $attr['name'] 		= 'sitename'; ?>
 						<?php $attr['value'] 		= set_value('sitename'); ?>
@@ -61,7 +61,7 @@
 						<?= form_error('email'); ?>
 						<dt>Код защиты:</dt>
 						<dd>
-							<img src="{baseurl}capcha" alt=""/>
+							<img src="<?= $baseurl; ?>capcha" alt=""/>
 						<?php $attr['name'] 		= 'code'; ?>
 						<?php $attr['value'] 		= ''; ?>
 						<?php $attr['maxlength'] 	= '6'; ?>

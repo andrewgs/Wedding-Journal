@@ -12,6 +12,7 @@
 	<link rel="stylesheet" href="<?= $baseurl; ?>css/960.css" type="text/css" />
 	<link rel="stylesheet" href="<?= $baseurl; ?>css/login.css" type="text/css"/> 
 	<script type="text/javascript" src="<?= $baseurl; ?>javascript/jquery.min.js"></script>
+</head>
 <body>
  	<h1 align="center">Свадьба - ты хоть за яйца меня подвесь, ну ее на ...!</h1>
 	<div class="" style="text-align:center">

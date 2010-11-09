@@ -27,14 +27,14 @@ class Administrator extends Controller{
 		$this->load->model('commentsmodel');
 		$this->load->model('logmodel');
 		$this->load->library('image_lib');
+		if(!$this->usersmodel->user_exist('usite',$this->uri->segment(1))):
+			die('такой сайт не существует!');
+		endif;
 		$this->admin['login'] 		= $this->session->userdata('login');
 		$this->admin['password'] 	= $this->session->userdata('password');
-		$this->admin['site'] 		= $this->session->userdata('site');
 		$this->admin['uid'] 		= $this->usersmodel->user_id('ulogin',$this->admin['login']);
+		$this->admin['site'] 		= $this->usersmodel->read_field($this->admin['uid'],'usite');
 		$this->admin['themeurl'] 	= $this->configmodel->read_field($this->admin['uid'],'cfgthemepath');
-		if(!$this->admin['site']):
-			$this->admin['site'] = $this->uri->segment(1);
-		endif;
 		$segm = $this->uri->total_segments();
 		if($this->session->userdata('login_id') == md5($this->admin['login'].$this->admin['password'])) return;
 		if ($this->uri->segment($segm)==='login') return;
@@ -112,6 +112,9 @@ class Administrator extends Controller{
 	function logoff(){
 		
 		$backpage = $this->session->userdata('backpage');
+		if(preg_match("/admin/i",$backpage)):
+			$backpage = $this->admin['site'];
+		endif;
 		$this->usersmodel->deactive_user($this->session->userdata('login'));
 		$this->session->sess_destroy();
 		redirect($backpage);
@@ -336,7 +339,7 @@ class Administrator extends Controller{
 		$this->session->set_flashdata('operation_saccessfull','Комментарий удален успешно');
 		redirect($backpath);
 	} /* end function commentdestroy */
-								 
+
 	function friendnew(){
 		
 		$pagevar = array(
@@ -775,6 +778,76 @@ class Administrator extends Controller{
 		header('Content-type: image/gif');
 		echo $image;
 	} /* end function viewimage */
+	
+	function profile($error = FALSE){
+		
+		$pagevar = array(
+					'description'	=> '',
+					'keywords'		=> '',
+					'title'			=> 'Администрирование | Изменение личных данных',
+					'baseurl'		=> base_url(),
+					'themeurl'		=> $this->admin['themeurl'],
+					'usite'			=> $this->admin['site'],
+					'message'		=> $this->setmessage('','','',0),
+					'backpath'		=> $this->session->userdata('backpage'),
+					'formaction'	=> $this->uri->uri_string(),
+					'user'			=> array(),
+					'valid'			=> $error
+					);
+		if($this->input->post('btnsubmit')):
+			$this->form_validation->set_rules('name','"Ваше имя"','required|xss_clean|encode_php_tags|trim');
+			$this->form_validation->set_rules('subname','"Ваша фамилия"','required|trim');
+			$this->form_validation->set_rules('weddingdate','"Дата свадьбы"','required|trim');
+			$this->form_validation->set_rules('sitename','"Нзвание сайта"','required|callback_sitename_check|trim');
+			$this->form_validation->set_rules('email','"E-mail"','required|valid_email|trim|callback_email_check');
+			$this->form_validation->set_error_delimiters('<dd><div class="join_error">','</div></dd>');
+			$this->form_validation->set_message('min_length','Длина пароля не менее 6 символов.');
+			$this->form_validation->set_message('matches','Пароли не совпадают');
+			if (!$this->form_validation->run()):
+				$pagevar['message'] = $this->setmessage('Не выполнены условия.','','Ошибка',1);
+				$this->load->view($pagevar['themeurl'].'/admin/profile',$pagevar);
+				return FALSE;
+			else:
+				$pattern = "/(\d+)\/(\w+)\/(\d+)/i";
+				$replacement = "\$3-\$2-\$1";
+				$_POST['weddingdate'] = preg_replace($pattern,$replacement,$_POST['weddingdate']);
+				$this->usersmodel->update_profile($_POST,$this->admin['uid']);
+				$this->session->set_flashdata('operation_saccessfull','Личные данные изменены.');
+				redirect($_POST['sitename'].'/admin');
+				return TRUE;
+			endif;
+		endif;
+		$pagevar['user'] = $this->usersmodel->read_record($this->admin['login']);
+		if(count($pagevar['user']) > 0):
+			$pagevar['user']['uweddingdate'] = $this->operation_date_slash($pagevar['user']['uweddingdate']);
+		endif;
+		$this->load->view($pagevar['themeurl'].'/admin/profile',$pagevar);
+	} /* end function profile */
+	
+	function passwordchange(){
+		
+		
+	} /* end function passwordchange */
+	
+	function sitename_check($sitename){
+	
+		if(preg_match('/^admin/i',$sitename)):
+			$this->form_validation->set_message('sitename_check','Не допустимое название сайта');
+			return FALSE;
+		endif;
+		if(!preg_match('/^[a-zA-Z]{1}[a-zA-Z0-9_]*$/',$sitename)):
+			$this->form_validation->set_message('sitename_check','Название сайта не соответствует правилам');
+			return FALSE;
+		endif;
+		if($sitename === $this->admin['site']):
+			return TRUE;
+		endif;
+		if($this->usersmodel->user_exist('usite',$sitename)):
+			$this->form_validation->set_message('sitename_check','Название сайта уже занято');
+			return FALSE;
+		endif;
+		return TRUE;
+	} /* end function sitename_check */
 	
 } /* end class*/
 ?>

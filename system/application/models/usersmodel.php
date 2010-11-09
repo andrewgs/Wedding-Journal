@@ -14,8 +14,9 @@
 		var $ulastlogindate = '';	/* дата последней авторизации пользователя*/
 		var $ustatus 		= '';	/* статус пользователя (активирован /не активирован) */
 		var $uactive 		= '';	/* статус активности пользователя */
-		var $udestroy		= ''; 	/* дата запланированого удаления пользователя */
-		var $uconfirmation	= ''; 	/* идентификатор подтверждения регистрации */
+		var $udestroy		= '';	/* дата запланированого удаления пользователя */
+		var $uconfirmation	= '';	/* идентификатор подтверждения регистрации */
+		var $uweddingdate	= '';	/* дата свадьбы */
 		
 		function Usersmodel(){			
 			
@@ -72,7 +73,7 @@
 			$this->uactive 			= FALSE;
 			$this->udestroy 		= '3000-01-01';
 			$this->uconfirmation	= $insertdata['confirm'];
-			
+			$this->uweddingdate		= '2012-12-22';
 			$this->db->insert('users',$this);
 			return $this->db->insert_id();
 		}
@@ -125,6 +126,16 @@
 			$data = $query->result_array();
 			if(isset($data[0])) return $data[0][$field];
 			return FALSE;
+		}
+		
+		function update_profile($updatedata,$uid){
+			
+			$data = array('uname'=>$updatedata['name'],'usubname'=>$updatedata['subname'],'uemail'=>$updatedata['email'],
+						'usite'=>strtolower($updatedata['sitename']),'uweddingdate'=>$updatedata['weddingdate']);
+			$this->db->set($data);
+			$this->db->where('uid',$uid);
+			$this->db->update('users');
+			return TRUE;
 		}
 	}
 ?>

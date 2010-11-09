@@ -29,6 +29,8 @@ $route['([a-zA-Z]){1}([a-zA-Z0-9_])*/friend-destroy/:num'] = "administrator/frie
 $route['([a-zA-Z]){1}([a-zA-Z0-9_])*/album-new'] = "administrator/albumnew";
 $route['([a-zA-Z]){1}([a-zA-Z0-9_])*/album-edit/:num'] = "administrator/albumedit";
 $route['([a-zA-Z]){1}([a-zA-Z0-9_])*/album-destroy/:num'] = "administrator/albumdestroy";
+$route['([a-zA-Z]){1}([a-zA-Z0-9_])*/admin/profile'] = "administrator/profile";
+$route['([a-zA-Z]){1}([a-zA-Z0-9_])*/admin/password'] = "administrator/passwordchange";
 
 /* Controller General*/
 $route['([a-zA-Z]){1}([a-zA-Z0-9_])*'] = "general/index";

@@ -79,8 +79,8 @@
 					<div class="blog-bottom">
 						<div class="blog-bl"></div>
 						<div class="blog-b"></div>
-						<div class="blog-br"></div>						
-					 </div>
+						<div class="blog-br"></div>
+					</div>
 					<div class="clear"></div>
 				</div>
 			</div>
@@ -108,8 +108,8 @@
 							<?php $attr = array('class'=>'delete'); ?>
 							<?= anchor($link,$text,$attr); ?>
 						</div>
-					<?php endif; ?>					
-				</div>			
+					<?php endif; ?>
+				</div>
 			</div>
 			<?php endfor; ?>
 			<div class="container_16">

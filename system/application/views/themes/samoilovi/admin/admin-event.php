@@ -2,13 +2,13 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="ru"> 
 <head> 
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/> 
-    <meta http-equiv="Pragma" content="no-cache"/>
-    <meta http-equiv="Cache-Control" content="no-cache"/>
-    <meta http-equiv="Expires" content="1 Jan 2000 0:00:00 GMT"/>
+	<meta http-equiv="Pragma" content="no-cache"/>
+	<meta http-equiv="Cache-Control" content="no-cache"/>
+	<meta http-equiv="Expires" content="1 Jan 2000 0:00:00 GMT"/>
 	<meta name="language" content="ru" />
-    <meta name="description" content="<?= $description; ?>"/>
-    <meta name="keywords" content="<?= $keywords; ?>"/>
-    <title><?= $title; ?></title>
+	<meta name="description" content="<?= $description; ?>"/>
+	<meta name="keywords" content="<?= $keywords; ?>"/>
+	<title><?= $title; ?></title>
 	<link rel="stylesheet" href="<?= $baseurl; ?>css/960.css" type="text/css" />
 	<link rel="stylesheet" href="<?= $baseurl.$themeurl; ?>/css/reset.css" type="text/css" /> 
 	<link rel="stylesheet" href="<?= $baseurl.$themeurl; ?>/css/style.css" type="text/css" />
@@ -82,8 +82,8 @@
 					<div class="blog-bottom">
 						<div class="blog-bl"></div>
 						<div class="blog-b"></div>
-						<div class="blog-br"></div>						
-					 </div>
+						<div class="blog-br"></div>
+					</div>
 					<div class="clear"></div>
 				</div>
 			</div>
