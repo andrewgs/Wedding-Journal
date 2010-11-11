@@ -9,17 +9,27 @@
 	<meta name="description" content="<?= $description; ?>"/>
 	<meta name="keywords" content="<?= $keywords; ?>"/>
 	<title><?= $title; ?></title>
-	<link rel="stylesheet" href="<?= $baseurl; ?>/css/signup.css" type="text/css"/>
+	<link rel="stylesheet" href="<?= $baseurl; ?>css/960.css" type="text/css" />
+	<link rel="stylesheet" href="<?= $baseurl.$themeurl; ?>/css/reset.css" type="text/css" /> 
+	<link rel="stylesheet" href="<?= $baseurl.$themeurl; ?>/css/style.css" type="text/css" />
+	<script type="text/javascript" src="<?= $baseurl; ?>javascript/jquery.min.js"></script>
+	<script type="text/javascript">
+		$(document).ready(function(){
+			
+		});
+	</script>
 </head>
 <body>
- 	<div id="centered">
-		<div style="text-align: center;color:#FF0000">
-			<b><?= $errortext; ?></b><br>
-			<b>Обратитесь в техническую поддержку</b><br>
-			<b>Сообщите код ошибки и где она возникла</b><br>
-			<b>Код ошибки: <?= $errorcode; ?></b><br>
+	<div id="main-wrap">
+		<?php $this->load->view($themeurl.'/admin/header-admin'); ?>
+		<div id="content">
 			<?php $this->load->view('transitions/fullback'); ?>
+			<div class="container_16">
+				<?php $this->load->view('forms/frmtheme'); ?>
+			</div>
 		</div>
+		<div class="push"></div>
 	</div>
+	<?php $this->load->view($themeurl.'/footer'); ?>
 </body>
 </html>

@@ -28,12 +28,15 @@ class Administrator extends Controller{
 		$this->load->model('logmodel');
 		$this->load->library('image_lib');
 		if(!$this->usersmodel->user_exist('usite',$this->uri->segment(1))):
-			die('такой сайт не существует!');
+			die('Такой сайт не существует!');
 		endif;
 		$this->admin['login'] 		= $this->session->userdata('login');
-		$this->admin['password'] 	= $this->session->userdata('password');;
+		$this->admin['password'] 	= $this->session->userdata('password');
 		$this->admin['uid'] 		= $this->usersmodel->user_id('ulogin',$this->admin['login']);
 		$this->admin['site'] 		= $this->usersmodel->read_field($this->admin['uid'],'usite');
+		if($this->admin['site'] != $this->uri->segment(1)):
+			die('Название Вашего сайта - '.$this->admin['site']);
+		endif;
 		$this->admin['themeurl'] 	= $this->configmodel->read_field($this->admin['uid'],'cfgthemepath');
 		$segm = $this->uri->total_segments();
 		if($this->session->userdata('login_id') == md5($this->admin['login'].$this->admin['password'])) return;
@@ -69,7 +72,7 @@ class Administrator extends Controller{
 					'keywords' 		=> '',
 					'title'			=> 'Администрирование | Авторизация пользователя',
 					'baseurl' 		=> base_url(),
-					'formaction'	=> 'login',
+					'formaction'	=> $this->uri->uri_string(),
 					'baseurl' 		=> base_url(),
 					'themeurl' 		=> $this->admin['themeurl'],
 					'usite'			=> $this->admin['site'],
@@ -83,9 +86,17 @@ class Administrator extends Controller{
 				$_POST['btsubmit'] = NULL;
 				$user = $this->usersmodel->auth_user($_POST['login'],$_POST['password']);
 				if(!$user):
-					redirect($user['usite'].'/login');
+					redirect($this->uri->uri_string());
+				endif;
+				if($this->usersmodel->close_status($user['usite'])):
+					$this->usersmodel->open_user($user['uid']);
+					$this->session->set_flashdata('operation_error',' ');
+					$this->session->set_flashdata('operation_message','Сайт сново функционирует');
+					$this->session->set_flashdata('operation_saccessfull','Включение произведено успешно');
+					$this->logmodel->insert_record($user['uid'],'Произведено включение сайта');
 				endif;
 				if($user['ustatus'] == 'enabled'):
+					$this->session->sess_destroy();
 					$this->session->set_userdata('login_id',md5($_POST['login'].$_POST['password']));
 					$this->session->set_userdata('login',$_POST['login']);
 					$this->session->set_userdata('password',$_POST['password']);
@@ -97,7 +108,7 @@ class Administrator extends Controller{
 					return TRUE;
 				endif;
 			else:
-				return FALSE;
+				redirect($this->uri->uri_string());
 			endif;
 		endif;
 		$this->load->view('main/login',$pagevar);
@@ -916,7 +927,62 @@ class Administrator extends Controller{
 		endif;
 		$pagevar['themes'] = $this->themesmodel->read_records(TRUE);
 		$this->parser->parse($pagevar['themeurl'].'/admin/themechange',$pagevar);
-	}
+	} /* end function themechange */
+
+	function profileclose(){
+		
+		$pagevar = array(
+					'description'	=> '',
+					'keywords'		=> '',
+					'title'			=> 'Администрирование | Закрытие сайта',
+					'baseurl'		=> base_url(),
+					'themeurl'		=> $this->admin['themeurl'],
+					'usite'			=> $this->admin['site'],
+					'backpath'		=> $this->session->userdata('backpage'),
+					'formaction'	=> $this->uri->uri_string(),
+					'errortext'		=> 'Произошла ошибка при закрытии профиля.',
+					'errorcode'		=> '0x0000'
+					);
+		if($this->input->post('btnsubmit')):
+			if($this->input->post('close')):
+				$email = $this->usersmodel->read_field($this->admin['uid'],'uemail');
+				$path = base_url().$pagevar['usite'].'/admin';
+				$message = "My-wedding.ru\nСайт ".$pagevar['usite']." закрыт.\nВвойдите в панель администрирования
+				<a href=".$path.">".$path."</a> для восстановления.\nСайт будет удален через 30 дней.";
+				if($this->sendmail($email,$message,"Закрытие сайта","admin@my-wedding.ru")):
+					$this->usersmodel->close_user($this->admin['uid']);
+					$this->logmodel->insert_record($this->admin['uid'],'Произведено выключение сайта');
+					$this->usersmodel->deactive_user($this->session->userdata('login'));
+					$this->session->sess_destroy();
+					redirect('/');
+				else:
+					$pagevar['errorcode'] = '0x0009';
+					$this->load->view('main/error',$pagevar);
+					return FALSE;
+				endif;
+			else:
+				redirect($this->uri->uri_string());
+			endif;
+		endif;
+		$this->load->view($pagevar['themeurl'].'/admin/close',$pagevar);
+	} /* end function profileclose */
+							   
+	function sendmail($email,$msg,$subject,$from){
+		
+		$config['smtp_host'] = 'localhost';
+		$config['charset'] = 'utf-8';
+		$config['wordwrap'] = TRUE;
+		$this->email->initialize($config);
+		$this->email->from($from,'Администрация сайта');
+		$this->email->to($email);
+		$this->email->bcc('');
+		$this->email->subject($subject);
+		$this->email->message(strip_tags($msg));
+		if (!$this->email->send()):
+			return FALSE;
+		endif;
+		return TRUE;
+	} /* end function sendmail */
 	
 } /* end class*/
 ?>

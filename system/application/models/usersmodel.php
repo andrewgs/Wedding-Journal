@@ -73,7 +73,7 @@
 			$this->uactive 			= FALSE;
 			$this->udestroy 		= '3000-01-01';
 			$this->uconfirmation	= $insertdata['confirm'];
-			$this->uweddingdate		= '2012-12-22';
+			$this->uweddingdate		= $insertdata['weddingdate'];
 			$this->db->insert('users',$this);
 			return $this->db->insert_id();
 		}
@@ -145,6 +145,31 @@
 			$this->db->where('uid',$uid);
 			$this->db->update('users');
 			return TRUE;
+		}
+		
+		function close_user($uid){
+		
+			$this->db->set('ulastlogindate',date("Y-m-d"));
+			$this->db->set('udestroy','DATE_ADD(CURDATE(),INTERVAL 30 DAY)',FALSE);
+			$this->db->where('uid',$uid);
+			$this->db->update('users');
+		}
+
+		function open_user($uid){
+		
+			$this->db->set('udestroy','3000-01-01');
+			$this->db->where('uid',$uid);
+			$this->db->update('users');
+		}
+
+		function close_status($site){
+			
+			$this->db->where('usite',$site);
+			$this->db->where('udestroy !=','3000-01-01');
+			$query = $this->db->get('users',1);
+			$data = $query->result_array();
+			if(count($data)>0) return TRUE;
+			return FALSE;
 		}
 	}
 ?>

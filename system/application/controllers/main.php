@@ -57,7 +57,16 @@ class Main extends Controller{
 				if(!$user):
 					redirect('login');
 				endif;
+				if($this->usersmodel->close_status($user['usite'])):
+					$this->usersmodel->open_user($user['uid']);
+					$this->session->set_flashdata('operation_error',' ');
+					$this->session->set_flashdata('operation_message','Сайт сново функционирует');
+					$this->session->set_flashdata('operation_saccessfull','Включение произведено успешно');
+					$this->load->model('logmodel');
+					$this->logmodel->insert_record($user['uid'],'Произведено включение сайта');
+				endif;
 				if($user['ustatus'] == 'enabled'):
+					$this->session->sess_destroy();
 					$this->session->set_userdata('login_id',md5($_POST['login'].$_POST['password']));
 					$this->session->set_userdata('login',$_POST['login']);
 					$this->session->set_userdata('password',$_POST['password']);
@@ -82,17 +91,25 @@ class Main extends Controller{
 					'keywords' 		=> '',
 					'title'			=> 'Регистрация нового пользователя | Выбор темы',
 					'baseurl' 		=> base_url(),
-					'pathback'		=> base_url(),
+					'backpath'		=> '',
 					'themes'		=> array(),
-					'formaction'	=> 'signup/themes'
+					'formaction'	=> $this->uri->uri_string(),
+					'errortext'		=> 'Произошла ошибка при создании учетной записи.',
+					'errorcode'		=> '0x0000'
 					);
+		$user_id = $this->session->userdata('userid');
+		if(!isset($user_id) or empty($user_id)):
+			$pagevar['errorcode'] = '0x0007';
+			$this->load->view('main/error',$pagevar);
+			return FALSE;
+		endif;
 		if($this->input->post('btsubmit')):			
 			$_POST['btsubmit'] = NULL;
 			$themes = $this->themesmodel->read_record($_POST['theme']);
 			if($themes['thstatus'] != 'free'):
 				redirect(base_url());
 			endif;
-			$theme['userid'] = $this->session->userdata('userid');;
+			$theme['userid'] = $user_id;
 			$theme['name'] 	 = $themes['thname'];
 			$theme['path'] 	 = $themes['thpath'];
 			$this->configmodel->insert_record($theme);
@@ -208,18 +225,23 @@ class Main extends Controller{
 	} /* end function error */
 	
 	function finish(){
-		
+	
 		$pagevar = array(
 					'description'	=> '',
 					'keywords' 		=> '',
 					'title'			=> 'Регистрация нового пользователя | Завершение регистрации',
 					'baseurl' 		=> base_url(),
 					'site'			=> '',
-					'pathback'		=> '',
+					'backpath'		=> '',
 					'errortext'		=> 'Произошла ошибка при создании учетной записи.',
 					'errorcode'		=> '0x0000'
 				);
 		$user_id = $this->session->userdata('userid');
+		if(!isset($user_id) or empty($user_id)):
+			$pagevar['errorcode'] = '0x0007';
+			$this->load->view('main/error',$pagevar);
+			return FALSE;
+		endif;
 		$pagevar['site'] = $this->usersmodel->read_field($user_id,'usite');
 		if(!$pagevar['site']):
 			$pagevar['errorcode'] = '0x0001';
@@ -253,11 +275,55 @@ class Main extends Controller{
 				return FALSE;
 			endif;
 		endif;
-		
+		$pagevar['errorcode'] = $this->defaultobjects($user_id,$pagevar['site']);
+		if($pagevar['errorcode'] != '0x0000'):
+			$this->load->view('main/error',$pagevar);
+			return FALSE;
+		endif;
 		$this->session->unset_userdata('userid');
-		$pagevar['pathback'] = base_url().$pagevar['site'];
+		$pagevar['backpath'] = base_url().$pagevar['site'];
 		$this->load->view('main/profile/finish',$pagevar);
 	} /* end function finish */
+	
+	function defaultobjects($uid,$site){
+		
+		/* cоздание записи по-умолчанию */
+		$this->load->model('eventsmodel');
+		$this->eventsmodel->insert_record(array('title'=>'Тестовая запись','date'=>date("Y-m-d"),'text'=>'Текст записи'),$uid);
+		/* cоздание альбом по-умолчанию */
+		$this->load->model('albummodel');
+		$filepath = getcwd().'/images/default/wedding.jpg';
+		$file = fopen($filepath,'rb');
+		$image = fread($file,filesize($filepath));
+		fclose($file);
+		$album = $this->albummodel->insert_record(array('title'=>'Тестовы альбом','annotation'=>'Описание альбома','image'=>$image,'photo_title'=>'фото'),$uid);
+		$file = getcwd().'/images/default/1.jpg';
+		$newfile = getcwd().'/users/'.$site.'/images/1.jpg';
+		if (!copy($file,$newfile)):
+    		return '0x0008';
+		endif;
+		$file = getcwd().'/images/default/2.jpg';
+		$newfile = getcwd().'/users/'.$site.'/images/2.jpg';
+		if (!copy($file,$newfile)):
+    		return '0x0008';
+		endif;
+		$this->load->model('imagesmodel');
+		for($i = 1; $i < 3; $i++):
+			$this->imagesmodel->insert_record(array('file'=>$i.'.jpg','imagetitle'=>'Описание фото','album'=>$album),$uid);
+			$this->albummodel->insert_photo($album);
+		endfor;
+		/* cоздание карточки друга по-умолчанию */
+		$this->load->model('friendsmodel');
+		$this->load->model('socialmodel');
+		$filepath = getcwd().'/images/default/friend.jpg';
+		$file = fopen($filepath,'rb');
+		$image = fread($file,filesize($filepath));
+		fclose($file);
+		$friend = $this->friendsmodel->insert_record(array('name'=>'Мой друг','profession'=>'Студент','social'=>2,'image'=>$image,'note'=>'Описание друга'),$uid);
+		$this->socialmodel->insert_record(array('friend_id'=>$friend,'social'=>'ВКОНТАКТЕ','href'=>'http://vkontakte.ru'));
+		$this->socialmodel->insert_record(array('friend_id'=>$friend,'social'=>'ОДНОКЛАССНИКИ','href'=>'http://odnoklasniki.ru/'));
+		return '0x0000';
+	} /* end function defaultobjects */
 	
 	function index(){
 	
@@ -337,6 +403,7 @@ class Main extends Controller{
 			$this->form_validation->set_rules('name','"Ваше имя"','required|xss_clean|encode_php_tags|trim');
 			$this->form_validation->set_rules('subname','"Ваша фамилия"','required|trim');
 			$this->form_validation->set_rules('email','"Ваш email"','required|valid_email|trim|callback_email_check');
+			$this->form_validation->set_rules('weddingdate','"Дата свадьбы"','required|trim');
 			$this->form_validation->set_rules('code','"Код защиты"','required|trim|callback_code_check');
 			$this->form_validation->set_error_delimiters('<dd><div class="join_error">','</div></dd>');
 			$this->form_validation->set_message('min_length','Длина пароля не менее 6 символов.');
@@ -348,6 +415,9 @@ class Main extends Controller{
 			else:
 				$_POST['btsubmit'] = NULL;
 				$_POST['confirm'] = md5($_SERVER['HTTP_USER_AGENT'].$_SERVER['REMOTE_ADDR'].mktime());
+				$pattern = "/(\d+)\/(\w+)\/(\d+)/i";
+				$replacement = "\$3-\$2-\$1";
+				$_POST['weddingdate'] = preg_replace($pattern,$replacement,$_POST['weddingdate']);
 				$user_id = $this->usersmodel->insert_record($_POST);
 				$message = 'Для активации аккаунта пройдите по следующей ссылке'."\n".'<a href="'.base_url().'activation/'.$_POST['confirm'].'" target="_blank">'.base_url().'activation/'.$_POST['confirm'].'</a>';
 				$message .= "\n".'или скопируйте ссылку в окно ввода адреса браузера и нажмите enter.';

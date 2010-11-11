@@ -41,12 +41,14 @@ class Albummodel extends Model{
 	}
 	
 	function insert_photo($id){
+	
 		$this->db->set('alb_amt','alb_amt+1', FALSE);
 		$this->db->where('alb_id',$id);
 		$this->db->update('albums');
 	}
 	
 	function delete_photo($id){
+	
 		$this->db->set('alb_amt','alb_amt-1',FALSE);
 		$this->db->where('alb_id',$id);
 		$this->db->update('albums');
@@ -65,6 +67,7 @@ class Albummodel extends Model{
 			$this->alb_annotation = mb_substr($this->alb_annotation,0,125,'UTF-8');
 			
 		$this->db->insert('albums',$this);
+		return $this->db->insert_id();
 	}
 	
 	function delete_record($album_id){

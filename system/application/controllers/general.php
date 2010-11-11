@@ -25,6 +25,12 @@ class General extends Controller{
 		$this->load->model('socialmodel');
 		$this->load->model('commentsmodel');
 		$this->load->model('imagesmodel');
+		if($this->usersmodel->close_status($this->uri->segment(1))):
+			die('Cайт закрыт!');
+		endif;
+		if(!$this->usersmodel->user_exist('usite',$this->uri->segment(1))):
+			die('Такой сайт не существует!');
+		endif;
 		$login 		= $this->session->userdata('login');
 		$password 	= $this->session->userdata('password');
 		if($this->session->userdata('login_id') == md5($login.$password)):

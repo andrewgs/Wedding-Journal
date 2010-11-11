@@ -5,7 +5,7 @@
 			<div class="b-content-362-ins">
 				<div class="h-block">
 				<?php echo form_open($formaction); ?>
-					<?php $attr = array('name'=>'','id'=>'','class'=>'join_input','value'=>'','maxlength'=>'32'); ?>
+					<?php $attr = array('name'=>'','id'=>'','class'=>'join_input','value'=>'','maxlength'=>'60'); ?>
 					<dl>
 						<dt>Ваш логин:</dt>
 						<dd>
@@ -31,7 +31,6 @@
 						<dd>
 						<?php $attr['name'] 		= 'sitename'; ?>
 						<?php $attr['value'] 		= set_value('sitename'); ?>
-						<?php $attr['maxlength'] 	= '60'; ?>
 						<?= form_input($attr); ?>
 						</dd>
 						<?= form_error('sitename'); ?>
@@ -39,7 +38,6 @@
 						<dd>
 						<?php $attr['name'] 		= 'name'; ?>
 						<?php $attr['value'] 		= set_value('name'); ?>
-						<?php $attr['maxlength'] 	= '60'; ?>
 						<?= form_input($attr); ?>
 						</dd>
 						<?= form_error('name'); ?>
@@ -47,7 +45,6 @@
 						<dd>
 						<?php $attr['name'] 		= 'subname'; ?>
 						<?php $attr['value'] 		= set_value('subname'); ?>
-						<?php $attr['maxlength'] 	= '60'; ?>
 						<?= form_input($attr); ?>
 						</dd>
 						<?= form_error('subname'); ?>
@@ -56,30 +53,34 @@
 						<?php $attr['name'] 		= 'email'; ?>
 						<?php $attr['value'] 		= set_value('email'); ?>
 						<?php $attr['maxlength'] 	= '255'; ?>
-						<?php echo form_input($attr); ?>
+						<?= form_input($attr); ?>
 						</dd>
 						<?= form_error('email'); ?>
+						<dt>Дата свадьбы:</dt>
+						<dd>
+						<?php $attr['name'] 		= 'weddingdate'; ?>
+						<?php $attr['value'] 		= set_value('weddingdate'); ?>
+						<?php $attr['id'] 			= 'wedding-date'; ?>
+						<?php $attr['maxlength'] 	= '20'; ?>
+						<?php $attr['readonly'] 	= TRUE; ?>
+						<?= form_input($attr); ?>
+						</dd>
+						<?= form_error('weddingdate'); ?>
+						<div class="clear"></div>
 						<dt>Код защиты:</dt>
 						<dd>
 							<img src="<?= $baseurl; ?>capcha" alt=""/>
-						<?php $attr['name'] 		= 'code'; ?>
-						<?php $attr['value'] 		= ''; ?>
-						<?php $attr['maxlength'] 	= '6'; ?>
-						<?= form_input($attr); ?>
+						<?php $attribite['name'] 		= 'code'; ?>
+						<?php $attribite['value'] 		= ''; ?>
+						<?php $attribite['maxlength'] 	= '6'; ?>
+						<?php $attribite['class'] 		= 'join_input'; ?>
+						<?= form_input($attribite); ?>
 						</dd>
 						<?= form_error('code'); ?>
 					</dl>
-					<div class="b-join-rule">
-						<p>Пользовательское соглашение:</p>
-						<div>
-							<?php $attr['name'] 	= 'license'; ?>
-							<?php $attr['class'] 	= 'join_textarea'; ?>
-							<?= form_textarea($attr); ?>
-						</div>
-					</div>
 					<div class="b-join-button">
 					<?php $attr['name']		= 'btsubmit'; ?>
-					<?php $attr['value']  	= 'Я принимаю условия. Зарегистрируйте меня'; ?>
+					<?php $attr['value']  	= 'Зарегистрироватся'; ?>
 					<?php $attr['class']  	= ''; ?>
 					<?= form_submit($attr); ?>
 					</div>

@@ -22,7 +22,7 @@
 		<div style="text-align: center;">
 			<b>Спасибо за то что пользуетесь нашим сервисом</b><br><br>
 			<script>
-				window.setTimeout("window.location='<?= $pathback; ?>'",5000);
+				window.setTimeout("window.location='<?= $backpath; ?>'",5000);
 			</script>
 			<br>
 			<b>После создания, Вас автоматически перенаправит на страницу информации</b>
