@@ -21,7 +21,7 @@
 				<?php $this->load->view('message');?>
 				<div class="grid_6">
 					<div id="internal_nav" class="grid_4 suffix_2">
-						<a href="<?= $baseurl.$usite.'/admin/events'; ?>">Управление событиями &nbsp;&rarr;</a>
+						<a href="<?= $baseurl.$usite.'/events'; ?>">Управление событиями &nbsp;&rarr;</a>
 					</div>
 					<div class="clear"></div>
 					<div id="internal_nav" class="grid_4 suffix_2">
@@ -29,11 +29,11 @@
 					</div>
 					<div class="clear"></div>
 					<div id="internal_nav" class="grid_4 suffix_2">
-						<a href="<?= $baseurl.$usite.'/admin/album-gallary'; ?>">Управление альбомами &nbsp;&rarr;</a>
+						<a href="<?= $baseurl.$usite.'/photo-albums'; ?>">Управление альбомами &nbsp;&rarr;</a>
 					</div>
 					<div class="clear"></div>
 					<div id="internal_nav" class="grid_4 suffix_2">
-						<a href="<?= $baseurl.$usite.'/admin/friends'; ?>">Карточки друзей &nbsp;&rarr;</a>
+						<a href="<?= $baseurl.$usite.'/friends'; ?>">Карточки друзей &nbsp;&rarr;</a>
 					</div>
 				</div>
 				<div class="grid_6">
@@ -57,13 +57,13 @@
 				<?= form_fieldset('Быстрый вызов функций',array('class'=>'fieldset')); ?>
 					<div class="grid_12">
 						<div id="internal_nav" class="grid_4">
-							<a href="<?= $baseurl.$usite.'/admin/event-new'; ?>">Создать новое событие &nbsp;&rarr;</a>
+							<a href="<?= $baseurl.$usite.'/event-new'; ?>">Создать новое событие &nbsp;&rarr;</a>
 						</div>
 						<div id="internal_nav" class="grid_4">
-							<a href="<?= $baseurl.$usite.'/admin/album-new'; ?>">Создать новый альбом &nbsp;&rarr;</a>
+							<a href="<?= $baseurl.$usite.'/album-new'; ?>">Создать новый альбом &nbsp;&rarr;</a>
 						</div>
 						<div id="internal_nav" class="grid_3">
-							<a href="<?= $baseurl.$usite.'/admin/friend-new'; ?>">Создать карточку друга &nbsp;&rarr;</a>
+							<a href="<?= $baseurl.$usite.'/friend-new'; ?>">Создать карточку друга &nbsp;&rarr;</a>
 						</div>
 					</div>
 					<div class="clear"></div>

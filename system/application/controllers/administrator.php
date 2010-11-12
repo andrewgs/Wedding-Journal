@@ -32,12 +32,16 @@ class Administrator extends Controller{
 		endif;
 		$this->admin['login'] 		= $this->session->userdata('login');
 		$this->admin['password'] 	= $this->session->userdata('password');
-		$this->admin['uid'] 		= $this->usersmodel->user_id('ulogin',$this->admin['login']);
-		$this->admin['site'] 		= $this->usersmodel->read_field($this->admin['uid'],'usite');
-		if($this->admin['site'] != $this->uri->segment(1)):
-			die('Название Вашего сайта - '.$this->admin['site']);
+		if($this->admin['login'] and $this->admin['password']):
+			$this->admin['uid'] 		= $this->usersmodel->user_id('ulogin',$this->admin['login']);
+			$this->admin['site'] 		= $this->usersmodel->read_field($this->admin['uid'],'usite');
+			if($this->admin['site'] != $this->uri->segment(1)):
+				die('Название Вашего сайта - '.$this->admin['site']);
+			endif;
+			$this->admin['themeurl'] 	= $this->configmodel->read_field($this->admin['uid'],'cfgthemepath');
+		else:
+			$this->admin['site'] = $this->uri->segment(1);
 		endif;
-		$this->admin['themeurl'] 	= $this->configmodel->read_field($this->admin['uid'],'cfgthemepath');
 		$segm = $this->uri->total_segments();
 		if($this->session->userdata('login_id') == md5($this->admin['login'].$this->admin['password'])) return;
 		if ($this->uri->segment($segm)==='login') return;
@@ -86,6 +90,9 @@ class Administrator extends Controller{
 				$_POST['btsubmit'] = NULL;
 				$user = $this->usersmodel->auth_user($_POST['login'],$_POST['password']);
 				if(!$user):
+					redirect($this->uri->uri_string());
+				endif;
+				if($user['usite'] != $this->uri->segment(1)):
 					redirect($this->uri->uri_string());
 				endif;
 				if($this->usersmodel->close_status($user['usite'])):

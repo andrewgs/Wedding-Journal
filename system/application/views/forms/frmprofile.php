@@ -39,18 +39,11 @@ endif; ?>
 		<?= form_error('sitename'); ?>
 		<div class="clear"></div>
 		<?= form_label('Дата свадьбы:','userlabel'); ?>
-		<?php $attr['name'] 		= 'weddingdate'; ?>
-		<?php $attr['value'] 		= $weddingdate; ?>
-		<?php $attr['id'] 			= 'wedding-date'; ?>
-		<?php $attr['maxlength'] 	= '20'; ?>
-		<?php $attr['size'] 		= '10'; ?>
-		<?php $attr['readonly'] 	= TRUE; ?>
+		<?php $attr = array('name'=>'weddingdate','id'=>'wedding-date','value'=>$weddingdate,'maxlength'=>'20','size'=>'10','readonly'=>TRUE); ?>
 		<?php echo form_input($attr); ?>
 		<?= form_error('weddingdate'); ?>
 		<div class="clear"></div>
-		<?php $attr['name'] 	= 'btnsubmit'; ?>
-		<?php $attr['value'] 	= 'Сохранить'; ?>
-		<?php $attr['class'] 	= 'senden'; ?>
+		<?php $attr = array('name'=>'btnsubmit','class'=>'senden','value'=>'Сохранить'); ?>
 		<?= form_submit($attr);?>
 	</div>
 <?= form_close(); ?>

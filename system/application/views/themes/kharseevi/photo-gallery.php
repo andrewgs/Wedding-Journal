@@ -119,14 +119,14 @@
 					<?php for($i = 0;$i < count($images);$i++): ?>
 						<div class="grid_3 photo-album">
 							<div class="album-background images">
-							<?php $link = $pagevalue['baseurl'].'big/viewimage/'.$images[$i]['img_id']; ?>
-							<?php $text = '<img src="'.$pagevalue['baseurl'].'small/viewimage/'.$images[$i]['img_id'].'" 
-										alt="'.$images[$i]['img_title'].'" '.'title="'.$images[$i]['img_title'].'"/></a>'; ?>
+							<?php $link = $baseurl.'users/'.$usite.'/images/'.$images[$i]['img_src']; ?>
+							<?php $text = '<img src="'.$baseurl.$usite.'/photo/viewimage/'.$images[$i]['img_id'].'" 
+										alt="'.$images[$i]['img_title'].'" '.'title="'.$images[$i]['img_title'].'"/>'; ?>
 							<?php $attr = array('class'=>'pirobox'); ?>
-							<?php echo anchor($link,$text,$attr); ?>
+							<?= anchor($link,$text,$attr); ?>
 							</div>
 							<div class="images-text"> 
-								<div class="image-title"><?php echo $images[$i]['img_title']; ?></div>
+								<div class="image-title"><?= $images[$i]['img_title']; ?></div>
 							</div>
 						</div>
 					<?php endfor; ?>

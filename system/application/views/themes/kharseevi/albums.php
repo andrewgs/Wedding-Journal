@@ -49,7 +49,7 @@
 						<?php $text='<img class="album-main-photo" src="'.$baseurl.$usite.'/album/viewimage/'.$albums[$i]['alb_id'].'"
 									alt="'.$albums[$i]['alb_photo_title'].'"/>'; ?>
 						<?php $link = $usite.'/photo-albums/photo-gallery/'.$albums[$i]['alb_id']; ?>
-						<?php echo anchor($link,$text); ?>
+						<?= anchor($link,$text); ?>
 						</div>
 						<div class="album-text"> 
 							<div class="album-title"><?= $albums[$i]['alb_title']; ?></div>

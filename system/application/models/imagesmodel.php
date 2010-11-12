@@ -6,7 +6,8 @@
 		var $img_title 	= '';
 		var $img_uid 	= 0;
 		var $img_album	= 0;
-	
+		var $img_thumb	= 0;
+		 
 		function Imagesmodel(){			
 			
 			parent::Model();
@@ -18,6 +19,7 @@
 			$this->img_title 	= $data['imagetitle'];
 			$this->img_uid 		= $uid;
 			$this->img_album 	= $data['album'];
+			$this->img_thumb 	= $data['thumb'];
 			
 			$this->db->insert('images', $this);
 		}
@@ -32,9 +34,10 @@
 			return $query->result();
 		}
 			
-		function get_images($album){
+		function get_images($album,$uid){
 		
 			$this->db->where('img_album',$album);
+			$this->db->where('img_uid',$uid);
 			$query = $this->db->get('images');
 			return $query->result_array();
 		}
@@ -53,9 +56,10 @@
 			
 			$this->db->where('img_id',$id);
 			$query = $this->db->get('images');
-			return $query->result();
+			$data = $query->result_array();
+			return $data[0]['img_thumb'];
 		}
-		
+				
 		function image_delete($id){
 			
 			$this->db->delete('images',array('img_id' => $id));

@@ -85,11 +85,13 @@
 			$this->db->update('events');
 		}
 		
-		function count_records(){
+		function count_records($userid){
 		
-			return $this->db->count_all('events');
+			$this->db->select('count(*) as cnt');
+			$this->db->where('evnt_uid',$userid);
+			$query = $this->db->get('events');
+			$data = $query->result_array();
+			return $data[0]['cnt'];
 		}
-		
 	}
-
 ?>

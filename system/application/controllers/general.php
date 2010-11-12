@@ -9,16 +9,12 @@ class General extends Controller{
 						"11"=>"ноября",		"12"=>"декабря"
 					);
 					
-	var $usrinfo = array(
-					'name' 		=> '',
-					'subname' 	=> '',
-					'email' 	=> '',
-					'status' 	=> FALSE
-					);
+	var $usrinfo = array('name'=>'','subname'=>'','email'=>'','status'=>FALSE);
 					
 	function General(){
 	
 		parent::Controller();
+		
 		$this->load->model('eventsmodel');
 		$this->load->model('albummodel');
 		$this->load->model('friendsmodel');
@@ -132,7 +128,7 @@ class General extends Controller{
 					'album'			=> $this->uri->segment(4),
 					'message'		=> $this->setmessage('','','',0)
 					);
-		$pagevar['images'] = $this->imagesmodel->get_images($pagevar['album']);
+		$pagevar['images'] = $this->imagesmodel->get_images($pagevar['album'],$userid);
 		$this->load->view($pagevar['themeurl'].'/photo-gallery',$pagevar);
 	} /* end function photo */
 	
@@ -159,7 +155,7 @@ class General extends Controller{
 					'message'		=> $this->setmessage('','','',0)
 					);
 		$this->session->set_userdata('backpage',$pagevar['usite'].'/events');
-		$pagevar['count'] = $this->eventsmodel->count_records();			
+		$pagevar['count'] = $this->eventsmodel->count_records($userid);
 		$config['base_url'] 		= $pagevar['baseurl'].$pagevar['usite'].'/events';
         $config['total_rows'] 		= $pagevar['count']; 
         $config['per_page'] 		= 5;
@@ -349,13 +345,12 @@ class General extends Controller{
 	} /* end function operation_date_slash */
 	
 	function viewimage(){
-		
+	
 		$section = $this->uri->segment(2);
 		$id = $this->uri->segment(4);
 		switch ($section){
 			case 'album' :	$image = $this->albummodel->get_image($id);	break;
-			case 'small' :	$image = $this->imagesmodel->small_image($id); break;
-			case 'big'	 : 	$image = $this->imagesmodel->big_image($id); break;
+			case 'photo' :	$image = $this->imagesmodel->get_image($id); break;
 			case 'friend': 	$image = $this->friendsmodel->get_image($id); break;
 		}
 		header('Content-type: image/gif');

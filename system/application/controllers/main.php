@@ -254,22 +254,22 @@ class Main extends Controller{
 			$this->load->view('main/error',$pagevar);
 			return FALSE;
 		endif;
-		if(!mkdir($userdir,'0755')):
+		if(!mkdir($userdir,0777)):
 			$pagevar['errorcode'] = '0x0003';
 			$this->load->view('main/error',$pagevar);
 			return FALSE;
 		else:
-			if(!mkdir($userdir.'/images','0777')):
+			if(!mkdir($userdir.'/images',0777)):
 				$pagevar['errorcode'] = '0x0004';
 				$this->load->view('main/error',$pagevar);
 				return FALSE;
 			endif;
-			if(!mkdir($userdir.'/video','0777')):
+			if(!mkdir($userdir.'/video',0777)):
 				$pagevar['errorcode'] = '0x0005';
 				$this->load->view('main/error',$pagevar);
 				return FALSE;
 			endif;
-			if(!mkdir($userdir.'/swf','0777')):
+			if(!mkdir($userdir.'/swf',0777)):
 				$pagevar['errorcode'] = '0x0006';
 				$this->load->view('main/error',$pagevar);
 				return FALSE;
@@ -280,7 +280,7 @@ class Main extends Controller{
 			$this->load->view('main/error',$pagevar);
 			return FALSE;
 		endif;
-		$this->session->unset_userdata('userid');
+		$this->session->sess_destroy();
 		$pagevar['backpath'] = base_url().$pagevar['site'];
 		$this->load->view('main/profile/finish',$pagevar);
 	} /* end function finish */
@@ -309,7 +309,11 @@ class Main extends Controller{
 		endif;
 		$this->load->model('imagesmodel');
 		for($i = 1; $i < 3; $i++):
-			$this->imagesmodel->insert_record(array('file'=>$i.'.jpg','imagetitle'=>'Описание фото','album'=>$album),$uid);
+			$filepath = getcwd().'/images/default/thumb_'.$i.'.jpg';
+			$file = fopen($filepath,'rb');
+			$image = fread($file,filesize($filepath));
+			fclose($file); 
+			$this->imagesmodel->insert_record(array('file'=>$i.'.jpg','imagetitle'=>'Описание фото','album'=>$album,'thumb'=>$image),$uid);
 			$this->albummodel->insert_photo($album);
 		endfor;
 		/* cоздание карточки друга по-умолчанию */

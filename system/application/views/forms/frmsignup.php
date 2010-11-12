@@ -58,11 +58,8 @@
 						<?= form_error('email'); ?>
 						<dt>Дата свадьбы:</dt>
 						<dd>
-						<?php $attr['name'] 		= 'weddingdate'; ?>
-						<?php $attr['value'] 		= set_value('weddingdate'); ?>
-						<?php $attr['id'] 			= 'wedding-date'; ?>
-						<?php $attr['maxlength'] 	= '20'; ?>
-						<?php $attr['readonly'] 	= TRUE; ?>
+						<?php $attr = array('name'=>'weddingdate','id'=>'wedding-date','class'=>'join_input',
+											'value'=>set_value('weddingdate'),'maxlength'=>'20','readonly'=>TRUE); ?>
 						<?= form_input($attr); ?>
 						</dd>
 						<?= form_error('weddingdate'); ?>
@@ -70,18 +67,13 @@
 						<dt>Код защиты:</dt>
 						<dd>
 							<img src="<?= $baseurl; ?>capcha" alt=""/>
-						<?php $attribite['name'] 		= 'code'; ?>
-						<?php $attribite['value'] 		= ''; ?>
-						<?php $attribite['maxlength'] 	= '6'; ?>
-						<?php $attribite['class'] 		= 'join_input'; ?>
-						<?= form_input($attribite); ?>
+						<?php $attr = array('name'=>'code','class'=>'join_input','value'=>'','maxlength'=>'6'); ?>
+						<?= form_input($attr); ?>
 						</dd>
 						<?= form_error('code'); ?>
 					</dl>
 					<div class="b-join-button">
-					<?php $attr['name']		= 'btsubmit'; ?>
-					<?php $attr['value']  	= 'Зарегистрироватся'; ?>
-					<?php $attr['class']  	= ''; ?>
+					<?php $attr = array('name'=>'btsubmit','class'=>'','value'=>'Зарегистрироватся'); ?>
 					<?= form_submit($attr); ?>
 					</div>
 				<?php echo form_close(); ?>
