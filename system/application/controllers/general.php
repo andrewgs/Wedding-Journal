@@ -126,9 +126,39 @@ class General extends Controller{
 					'usite'			=> $usersite,
 					'images'		=> array(),
 					'album'			=> $this->uri->segment(4),
-					'message'		=> $this->setmessage('','','',0)
+					'message'		=> $this->setmessage('','','',0),
+//					'formaction1'	=> $usersite.'/admin/singl-upload',
+					'formaction1'	=> $this->uri->uri_string(),
+//					'formaction2'	=> $usersite.'/admin/multi-upload'
+					'formaction2'	=> $this->uri->uri_string()
 					);
 		$pagevar['images'] = $this->imagesmodel->get_images($pagevar['album'],$userid);
+		if($this->input->post('btnsubmit')):
+			$this->form_validation->set_rules('imagetitle','"Описание"','required');
+			$this->form_validation->set_rules('userfile','"Фото"','callback_userfile_check');
+			$this->form_validation->set_error_delimiters('<div class="message">','</div>');
+			if (!$this->form_validation->run()):
+				$_POST['btnsubmit'] = NULL;
+				$this->load->view($pagevar['themeurl'].'/photo-gallery',$pagevar);
+				return FALSE;
+			else:
+				$_POST['big_image'] = $this->resize_img($_FILES['userfile']['tmp_name'],640,480);
+				$_POST['image'] = $this->resize_img($_FILES['userfile']['tmp_name'],186,186);
+				$this->imagesmodel->insert_record($_POST);
+				$this->albummodel->insert_photo($_POST['album']);
+				$this->session->set_flashdata('operation_error',' ');
+				$this->session->set_flashdata('operation_message','Название фотографии - '.$_FILES['userfile']['name']);
+				$this->session->set_flashdata('operation_saccessfull','Фотография загружена успешно');
+				redirect('admin/photo-gallary/'.$_POST['album']);
+			endif;
+		endif;
+		$flasherr = $this->session->flashdata('operation_error');
+		$flashmsg = $this->session->flashdata('operation_message');
+		$flashsaf = $this->session->flashdata('operation_saccessfull');
+		if($flasherr && $flashmsg && $flashsaf):
+			$pagevar['message'] = $this->setmessage($flasherr,$flashsaf,$flashmsg,1);
+		endif;
+//		$pagevar['images'] = $this->imagesmodel->get_images($pagevar['album'],$userid);
 		$this->load->view($pagevar['themeurl'].'/photo-gallery',$pagevar);
 	} /* end function photo */
 	
@@ -365,5 +395,25 @@ class General extends Controller{
 		$msg['status'] 		= $status;
 		return $msg;
 	} /* end function setmessage */
+
+	function userfile_check($file){
+		
+		$tmpName = $_FILES['userfile']['tmp_name'];
+		
+		if ($_FILES['userfile']['error'] == 4):
+			$this->form_validation->set_message('userfile_check','Не указана фотография!');
+			return FALSE;
+		endif;
+		if(!$this->case_image($tmpName)):
+			$this->form_validation->set_message('userfile_check','Формат картинки не поддерживается!');
+			return FALSE;
+		endif;
+		if($_FILES['userfile']['error'] == 1):
+			$this->form_validation->set_message('userfile_check','Размер картинки более 10 Мб!');
+			return FALSE;
+		endif;
+		return TRUE;
+	} /* end function userfile_check */
+
 } /* end class General */
 ?>

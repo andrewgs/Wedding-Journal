@@ -595,8 +595,9 @@ class Administrator extends Controller{
 					'edit'			=> TRUE,
 					'$album'		=> array(),
 					);
-		if($album_id == 0 or empty($album_id))
+		if($album_id == 0 or empty($album_id)):
 			$album_id = $this->uri->segment(3);
+		endif;
 		$this->session->unset_userdata('commentlist');
 		$pagevar['album'] = $this->albummodel->album_record($album_id);
 		if($this->input->post('btnsubmit')):
@@ -790,7 +791,9 @@ class Administrator extends Controller{
 					'backpath'		=> $this->session->userdata('backpage'),
 					'formaction'	=> $this->uri->uri_string(),
 					'user'			=> array(),
-					'valid'			=> $error
+					'valid'			=> $error,
+					'errortext'		=> 'Произошла ошибка при изменении профиля.',
+					'errorcode'		=> '0x0000'
 					);
 		if($this->input->post('btnsubmit')):
 			$this->form_validation->set_rules('name','"Ваше имя"','required|xss_clean|encode_php_tags|trim');
@@ -804,6 +807,20 @@ class Administrator extends Controller{
 				$this->profile(TRUE);
 				return FALSE;
 			else:
+				$userdir = getcwd().'/users/'.$pagevar['usite'];
+				$newdir = getcwd().'/users/'.$_POST['sitename'];
+				if($pagevar['usite'] != $_POST['sitename']):
+					if(!is_dir($userdir)):
+						$pagevar['errorcode'] = '0x0010';
+						$this->load->view('main/error',$pagevar);
+						return FALSE;
+					endif;
+					if(!rename($userdir,$newdir)):
+						$pagevar['errorcode'] = '0x0011';
+						$this->load->view('main/error',$pagevar);
+						return FALSE;
+					endif;
+				endif;
 				$pattern = "/(\d+)\/(\w+)\/(\d+)/i";
 				$replacement = "\$3-\$2-\$1";
 				$_POST['weddingdate'] = preg_replace($pattern,$replacement,$_POST['weddingdate']);
@@ -990,6 +1007,31 @@ class Administrator extends Controller{
 		endif;
 		return TRUE;
 	} /* end function sendmail */
+	
+	function singlupload(){
+	
+		if($this->input->post('btnsubmit')):
+			$this->form_validation->set_rules('imagetitle','"Описание"','required');
+			$this->form_validation->set_rules('userfile','"Фото"','callback_userfile_check');
+			$this->form_validation->set_error_delimiters('<div class="message">','</div>');
+			if (!$this->form_validation->run()):
+				$_POST['btnsubmit'] = NULL;
+				$this->session->set_flashdata('operation_error',' ');
+				$this->session->set_flashdata('operation_message','Сайт сново функционирует');
+				$this->session->set_flashdata('operation_saccessfull','Включение произведено успешно');
+				return FALSE;
+			else:
+				$_POST['big_image'] = $this->resize_img($_FILES['userfile']['tmp_name'],640,480);
+				$_POST['image'] = $this->resize_img($_FILES['userfile']['tmp_name'],186,186);
+				$this->imagesmodel->insert_record($_POST);
+				$this->albummodel->insert_photo($_POST['album']);
+				$this->session->set_flashdata('operation_error',' ');
+				$this->session->set_flashdata('operation_message','Название фотографии - '.$_FILES['userfile']['name']);
+				$this->session->set_flashdata('operation_saccessfull','Фотография загружена успешно');
+				redirect($this->uri->uri_string());
+			endif;
+		endif;
+	} /* end function singlupload */
 	
 } /* end class*/
 ?>

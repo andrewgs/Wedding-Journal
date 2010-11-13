@@ -122,7 +122,7 @@
 							<?php $link = $baseurl.'users/'.$usite.'/images/'.$images[$i]['img_src']; ?>
 							<?php $text = '<img src="'.$baseurl.$usite.'/photo/viewimage/'.$images[$i]['img_id'].'" 
 										alt="'.$images[$i]['img_title'].'" '.'title="'.$images[$i]['img_title'].'"/>'; ?>
-							<?php $attr = array('class'=>'pirobox'); ?>
+							<?php $attr = array('class'=>'pirobox','title'=>$images[$i]['img_title']); ?>
 							<?= anchor($link,$text,$attr); ?>
 							</div>
 							<div class="images-text"> 

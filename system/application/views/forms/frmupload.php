@@ -1,6 +1,7 @@
 <div class="grid_12">
 	<?= form_error('imagetitle'); ?>
 	<?= form_error('userfile'); ?>
+	<div class="clear"></div>
 	<div class="grid_3">
 		<button id="singleupload">Добавить одну фотографию</button>
 	</div>
@@ -12,7 +13,7 @@
 		<div id="ssuwindowswidget">
 			<fieldset class="singleuploadform">
 				<legend><strong>Загрузка одной фотографии</strong></legend>
-				<?= form_open_multipart('admin/photo-gallary/'.$album);?>
+				<?= form_open_multipart($formaction1);?>
 					<?= form_hidden('album',$album); ?>
 					<?= form_label('Описание: ','uploadlabel'); ?>
 					<?php $attr = array(
@@ -51,7 +52,7 @@
 		<div id="smuwindowswidget">
 			<fieldset class="multiupload">
 				<legend><strong>Загрузка нескольких фотографий</strong></legend>
-				<?= form_open_multipart('admin/photo-upload',array('id'=>'uploadForm'));?>
+				<?= form_open_multipart($formaction2,array('id'=>'uploadForm'));?>
 					<?= form_hidden('album',$album); ?>
 					<img id="loading" src="<?= $baseurl; ?>images/loading.gif" style="display:none;float:left;"/>
 					<?= form_upload(array('name'=>'fileToUpload[]','id'=>'fileToUpload','class'=>'MultiFile'));?>

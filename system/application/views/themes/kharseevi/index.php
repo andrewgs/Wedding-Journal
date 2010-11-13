@@ -32,7 +32,7 @@
 		<div id="content">
 			<div class="container_16">
 				<div id="slogan" class="grid_16">
-				<?php echo '<img src="'.$baseurl.$themeurl.'/images/slogan.png" alt=""/>'; ?>
+					<img src="<?= $baseurl.$themeurl;?>/images/slogan.png" alt=""/>
 				</div>
 			</div>
 			<div class="clear"></div>
@@ -57,7 +57,7 @@
 			<?php for($i = 0;$i < count($events);$i++): ?>
 				<div class="grid_4">
 					<h2><?= $events[$i]['evnt_date']; ?></h2>
-					<?php $link = 'event/'.$events[$i]['evnt_id'].'#event_'.$events[$i]['evnt_id']; ?>
+					<?php $link = $usite.'/event/'.$events[$i]['evnt_id'].'#event_'.$events[$i]['evnt_id']; ?>
 					<p><?= $events[$i]['evnt_text'].anchor($link,' Читать далее '); ?></p>
 				</div>
 			<?php endfor; ?>
