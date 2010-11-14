@@ -1,12 +1,12 @@
 <?php if($message['status']): ?>
 	<div class="message">
-		<?if(!empty($message['saccessfull'])): ?>
+		<?if($message['saccessfull'] != 'none'): ?>
 			<?=$message['saccessfull']; ?><br/>
 		<?php endif; ?>
-		<?if(!empty($message['message'])): ?>
+		<?if($message['message'] != 'none'): ?>
 			<?= $message['message']; ?><br/>
 		<?php endif; ?>
-		<?if(!empty($message['error'])): ?>
+		<?if($message['error'] != 'none'): ?>
 			<?= $message['error']; ?><br/>
 		<?php endif; ?>
 	</div>

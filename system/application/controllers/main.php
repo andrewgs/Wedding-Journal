@@ -59,7 +59,7 @@ class Main extends Controller{
 				endif;
 				if($this->usersmodel->close_status($user['usite'])):
 					$this->usersmodel->open_user($user['uid']);
-					$this->session->set_flashdata('operation_error',' ');
+					$this->session->set_flashdata('operation_error','none');
 					$this->session->set_flashdata('operation_message','Сайт сново функционирует');
 					$this->session->set_flashdata('operation_saccessfull','Включение произведено успешно');
 					$this->load->model('logmodel');

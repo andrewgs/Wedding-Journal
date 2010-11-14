@@ -26,7 +26,7 @@ class Administrator extends Controller{
 		$this->load->model('socialmodel');
 		$this->load->model('commentsmodel');
 		$this->load->model('logmodel');
-		$this->load->library('image_lib');
+		$this->load->model('imagesmodel');
 		if(!$this->usersmodel->user_exist('usite',$this->uri->segment(1))):
 			die('Такой сайт не существует!');
 		endif;
@@ -97,7 +97,7 @@ class Administrator extends Controller{
 				endif;
 				if($this->usersmodel->close_status($user['usite'])):
 					$this->usersmodel->open_user($user['uid']);
-					$this->session->set_flashdata('operation_error',' ');
+					$this->session->set_flashdata('operation_error','none');
 					$this->session->set_flashdata('operation_message','Сайт сново функционирует');
 					$this->session->set_flashdata('operation_saccessfull','Включение произведено успешно');
 					$this->logmodel->insert_record($user['uid'],'Произведено включение сайта');
@@ -213,7 +213,7 @@ class Administrator extends Controller{
 				$_POST['date'] = preg_replace($pattern,$replacement,$_POST['date']);
 				$this->eventsmodel->insert_record($_POST,$this->admin['uid']);
 				$this->logmodel->insert_record($this->admin['uid'],'Создана новая запись');
-				$this->session->set_flashdata('operation_error',' ');
+				$this->session->set_flashdata('operation_error','none');
 				$this->session->set_flashdata('operation_message','Название новой записи - '.$_POST['title']);
 				$this->session->set_flashdata('operation_saccessfull','Новая запись создана успешно');
 				redirect($pagevar['backpath']);
@@ -257,7 +257,7 @@ class Administrator extends Controller{
 				$_POST['date'] = preg_replace($pattern,$replacement,$_POST['date']);
 				$this->eventsmodel->update_record($_POST,$this->admin['uid']);
 				$this->logmodel->insert_record($this->admin['uid'],'Изменена запись');
-				$this->session->set_flashdata('operation_error',' ');
+				$this->session->set_flashdata('operation_error','none');
 				$this->session->set_flashdata('operation_message','Название записи - '.$_POST['title']);
 				$this->session->set_flashdata('operation_saccessfull','Запись изменена');
 				redirect($pagevar['backpath']);
@@ -278,7 +278,7 @@ class Administrator extends Controller{
 		$this->eventsmodel->delete_record($event_id);
 		$this->commentsmodel->delete_records($event_id);
 		$this->logmodel->insert_record($this->admin['uid'],'Удалена запись');
-		$this->session->set_flashdata('operation_error',' ');
+		$this->session->set_flashdata('operation_error','none');
 		$this->session->set_flashdata('operation_message','Название удаленной записи - '.$event['evnt_title']);
 		$this->session->set_flashdata('operation_saccessfull','Запись удалена успешно');
 		redirect($backpath);
@@ -324,7 +324,7 @@ class Administrator extends Controller{
 				$replacement = "\$3-\$2-\$1";
 				$_POST['user_date'] = preg_replace($pattern, $replacement, $_POST['user_date']);
 				$this->commentsmodel->update_record($_POST);
-				$this->session->set_flashdata('operation_error',' ');
+				$this->session->set_flashdata('operation_error','none');
 				$this->session->set_flashdata('operation_message','Комментарий от "'.$_POST['user_name'].'"');
 				$this->session->set_flashdata('operation_saccessfull','Комментарий изменен');
 				redirect($pagevar['backpath']);
@@ -346,7 +346,7 @@ class Administrator extends Controller{
 		$comment = $this->commentsmodel->comment_record($comment_id);
 		$this->eventsmodel->delete_comments($event_id);
 		$this->commentsmodel->delete_record($comment_id);
-		$this->session->set_flashdata('operation_error',' ');
+		$this->session->set_flashdata('operation_error','none');
 		$this->session->set_flashdata('operation_message','Комментарий от "'.$comment['cmnt_usr_name'].'"');
 		$this->session->set_flashdata('operation_saccessfull','Комментарий удален успешно');
 		redirect($backpath);
@@ -417,7 +417,7 @@ class Administrator extends Controller{
 						$this->logmodel->insert_record($this->admin['uid'],'Создана новая карточка друга');			
 					endfor;
 				endif;	
-				$this->session->set_flashdata('operation_error',' ');
+				$this->session->set_flashdata('operation_error','none');
 				$this->session->set_flashdata('operation_message','Имя друга - '.$_POST['name']);
 				$this->session->set_flashdata('operation_saccessfull','Карточка создана успешно');
 				redirect($pagevar['backpath']);
@@ -510,7 +510,7 @@ class Administrator extends Controller{
 					endfor;
 				endif;
 				$this->logmodel->insert_record($this->admin['uid'],'Изменена карточка друга');	
-				$this->session->set_flashdata('operation_error',' ');
+				$this->session->set_flashdata('operation_error','none');
 				$this->session->set_flashdata('operation_message','Имя друга - '.$_POST['name']);
 				$this->session->set_flashdata('operation_saccessfull','Карточка изменена успешно');
 				redirect($pagevar['backpath']);
@@ -532,7 +532,7 @@ class Administrator extends Controller{
 		$this->friendsmodel->delete_record($friend_id);
 		$this->socialmodel->delete_records($friend_id);
 		$this->logmodel->insert_record($this->admin['uid'],'Удалена карточка друга');
-		$this->session->set_flashdata('operation_error',' ');
+		$this->session->set_flashdata('operation_error','none');
 		$this->session->set_flashdata('operation_message','Удаленна карточка - '.$friend['fr_name']);
 		$this->session->set_flashdata('operation_saccessfull','Карточка удалена успешно');
 		redirect($backpath);
@@ -568,7 +568,7 @@ class Administrator extends Controller{
 			else:
 				$_POST['image'] = $this->resize_img($_FILES['userfile']['tmp_name'],186,186);
 				$this->albummodel->insert_record($_POST,$this->admin['uid']);
-				$this->session->set_flashdata('operation_error',' ');
+				$this->session->set_flashdata('operation_error','none');
 				$this->session->set_flashdata('operation_message','Название альбома - '.$_POST['title']);
 				$this->session->set_flashdata('operation_saccessfull','Альбом создан успешно');
 				$this->logmodel->insert_record($this->admin['uid'],'Создан новый альбом');
@@ -593,7 +593,7 @@ class Administrator extends Controller{
 					'formaction'	=> $this->uri->uri_string(),
 					'valid'			=> $error,
 					'edit'			=> TRUE,
-					'$album'		=> array(),
+					'album'			=> array(),
 					);
 		if($album_id == 0 or empty($album_id)):
 			$album_id = $this->uri->segment(3);
@@ -617,7 +617,7 @@ class Administrator extends Controller{
 				else
 					$_POST['image'] = $pagevar['album']['alb_photo'];
 				$this->albummodel->update_record($_POST,$this->admin['uid']);
-				$this->session->set_flashdata('operation_error',' ');
+				$this->session->set_flashdata('operation_error','none');
 				$this->session->set_flashdata('operation_message','Название альбома - '.$_POST['title']);
 				$this->session->set_flashdata('operation_saccessfull','Альбом изменен успешно');
 				$this->logmodel->insert_record($this->admin['uid'],'Изменен альбом');
@@ -634,7 +634,7 @@ class Administrator extends Controller{
 		$album = $this->albummodel->album_record($album_id);
 		$this->albummodel->delete_record($album_id);
 		$this->logmodel->insert_record($this->admin['uid'],'Удален альбом');
-		$this->session->set_flashdata('operation_error',' ');
+		$this->session->set_flashdata('operation_error','none');
 		$this->session->set_flashdata('operation_message','Название удаленного альбома - '.$album['alb_title']);
 		$this->session->set_flashdata('operation_saccessfull','Альбом удален успешно');
 		redirect($backpath);
@@ -652,6 +652,10 @@ class Administrator extends Controller{
 			$this->form_validation->set_message('userfile_check','Формат картинки не поддерживается!');
 			return FALSE;
 		endif;
+		/*if(!preg_match("/(^[a-zA-Z0-9]+([a-zA-Z\_ 0-9\.-]*))$/",$_FILES['userfile']['name'])):
+			$this->form_validation->set_message('userfile_check','Имя должно содержать только латинские символы, цифры и пробелы');
+			return FALSE;
+		endif;*/
 		if($_FILES['userfile']['error'] == 1):
 			$this->form_validation->set_message('userfile_check','Размер картинки более 10 Мб!');
 			return FALSE;
@@ -665,21 +669,18 @@ class Administrator extends Controller{
 		$img = getimagesize($tmpName);		
 		$size_x = $img[0];
 		$size_y = $img[1];
-		
 		$wight = $wgt;
 		$height = $hgt; 
-		
 		if(($size_x < $wgt) or ($size_y < $hgt)):
 			$this->resize_image($tmpName,$wgt,$hgt,FALSE);
-			$file = fopen($tmpName,'rb');
-			$image = fread($file,filesize($tmpName));
-			fclose($file);
+			$image = file_get_contents($tmpName);
 			return $image;
 		endif;
-		if($size_x > $size_y)
+		if($size_x > $size_y):
 			$this->resize_image($tmpName,$size_x,$hgt,TRUE);
-		else
+		else:
 			$this->resize_image($tmpName,$wgt,$size_y,TRUE);
+		endif;
 		$img = getimagesize($tmpName);		
 		$size_x = $img[0];
 		$size_y = $img[1];
@@ -696,18 +697,17 @@ class Administrator extends Controller{
 		if($y < 0):
 			$y = 0; $height = $size_y;
 		endif;
-		
 		$image_dst = ImageCreateTrueColor($wight,$height);
-		imageCopy($image_dst,$image_src,0,0,$x,$y,$wgt,$hgt);
+		imageCopy($image_dst,$image_src,0,0,$x,$y,$wight,$height);
 		imagePNG($image_dst,$tmpName);
 		imagedestroy($image_dst);
 		imagedestroy($image_src);
-		
-		$file = fopen($tmpName,'rb');
+		$image = file_get_contents($tmpName);
+		/*$file = fopen($tmpName,'rb');
 		$image = fread($file,filesize($tmpName));
 		fclose($file);
-		/*header('Content-Type: image/jpeg' );
-		echo $image['image'];
+		header('Content-Type: image/jpeg' );
+		echo $image;
 		exit();*/
 		return $image;
 	} /* end function resize_img */	
@@ -826,8 +826,8 @@ class Administrator extends Controller{
 				$_POST['weddingdate'] = preg_replace($pattern,$replacement,$_POST['weddingdate']);
 				$this->usersmodel->update_profile($_POST,$this->admin['uid']);
 				$this->logmodel->insert_record($this->admin['uid'],'Личные данные изменены');
-				$this->session->set_flashdata('operation_error',' ');
-				$this->session->set_flashdata('operation_message',' ');
+				$this->session->set_flashdata('operation_error','none');
+				$this->session->set_flashdata('operation_message','none');
 				$this->session->set_flashdata('operation_saccessfull','Личные данные изменены.');
 				redirect($_POST['sitename'].'/admin');
 			endif;
@@ -866,8 +866,8 @@ class Administrator extends Controller{
 			else:
 				$this->usersmodel->changepassword($_POST,$this->admin['uid']);
 				$this->logmodel->insert_record($this->admin['uid'],'Пароль изменен');
-				$this->session->set_flashdata('operation_error',' ');
-				$this->session->set_flashdata('operation_message',' ');
+				$this->session->set_flashdata('operation_error','none');
+				$this->session->set_flashdata('operation_message','none');
 				$this->session->set_flashdata('operation_saccessfull','Пароль изменен.');
 				redirect($pagevar['usite'].'/admin');
 				return TRUE;
@@ -944,13 +944,13 @@ class Administrator extends Controller{
 			endif;
 			$this->configmodel->update_theme($themes,$this->admin['uid']);
 			$this->logmodel->insert_record($this->admin['uid'],'Тема изменена');
-			$this->session->set_flashdata('operation_error',' ');
+			$this->session->set_flashdata('operation_error','none');
 			$this->session->set_flashdata('operation_message','Выбрана тема - '.$themes['thname']);
 			$this->session->set_flashdata('operation_saccessfull','Тема применена.');
 			redirect($pagevar['usite'].'/admin');
 		endif;
 		$pagevar['themes'] = $this->themesmodel->read_records(TRUE);
-		$this->parser->parse($pagevar['themeurl'].'/admin/themechange',$pagevar);
+		$this->load->view($pagevar['themeurl'].'/admin/themechange',$pagevar);
 	} /* end function themechange */
 
 	function profileclose(){
@@ -1007,31 +1007,82 @@ class Administrator extends Controller{
 		endif;
 		return TRUE;
 	} /* end function sendmail */
-	
-	function singlupload(){
-	
+													 
+	function uploadfiles(){
+		
+		$pagevar = array(
+					'description'	=> '',
+					'keywords' 		=> '',
+					'title'			=> 'Администрирование | Редактирование альбома',
+					'baseurl' 		=> base_url(),
+					'admin'			=> TRUE,
+					'themeurl' 		=> $this->admin['themeurl'],
+					'usite'			=> $this->admin['site'],
+					'message'		=> $this->setmessage('','','',0),
+					'backpath' 		=> '',
+					'album' 		=> $this->uri->segment(4),
+					'formaction1'	=> $this->uri->uri_string(),
+					'formaction2'	=> $this->admin['site'].'/admin/multi-upload',
+					'errortext'		=> 'Произошла ошибка при загрузке фотографий.',
+					'errorcode'		=> '0x0000'
+					);
+		$pagevar['backpath'] = $this->admin['site'].'/photo-albums/photo-gallery/'.$pagevar['album'];
 		if($this->input->post('btnsubmit')):
 			$this->form_validation->set_rules('imagetitle','"Описание"','required');
 			$this->form_validation->set_rules('userfile','"Фото"','callback_userfile_check');
 			$this->form_validation->set_error_delimiters('<div class="message">','</div>');
 			if (!$this->form_validation->run()):
 				$_POST['btnsubmit'] = NULL;
-				$this->session->set_flashdata('operation_error',' ');
-				$this->session->set_flashdata('operation_message','Сайт сново функционирует');
-				$this->session->set_flashdata('operation_saccessfull','Включение произведено успешно');
+				$this->uploadfiles();
 				return FALSE;
 			else:
-				$_POST['big_image'] = $this->resize_img($_FILES['userfile']['tmp_name'],640,480);
-				$_POST['image'] = $this->resize_img($_FILES['userfile']['tmp_name'],186,186);
-				$this->imagesmodel->insert_record($_POST);
-				$this->albummodel->insert_photo($_POST['album']);
-				$this->session->set_flashdata('operation_error',' ');
-				$this->session->set_flashdata('operation_message','Название фотографии - '.$_FILES['userfile']['name']);
+				$_FILES['userfile']['name'] = preg_replace('/.+(.)(\.)+/',date("Ymdhis")."\$2", $_FILES['userfile']['name']);
+				$_POST['file'] = $_FILES['userfile']['name'];
+				$_POST['album'] = $pagevar['album'];
+				if(!$this->fileupload($this->admin['site'],480,640)):
+					$pagevar['errorcode'] = '0x0012';
+					$this->load->view('main/error',$pagevar);
+					return FALSE;
+				endif;
+				$_POST['thumb'] = $this->resize_img($_FILES['userfile']['tmp_name'],186,186);
+				$this->imagesmodel->insert_record($_POST,$this->admin['uid']);
+				$this->albummodel->insert_photo($pagevar['album']);
+				$this->logmodel->insert_record($this->admin['uid'],'Загружена фотография');
+				$this->session->set_flashdata('operation_error','none');
+				$this->session->set_flashdata('operation_message','Название фотографии - '.$_POST['file']);
 				$this->session->set_flashdata('operation_saccessfull','Фотография загружена успешно');
-				redirect($this->uri->uri_string());
+				redirect($pagevar['backpath']);
 			endif;
 		endif;
-	} /* end function singlupload */
+		$this->load->view($pagevar['themeurl'].'/admin/uploadfiles',$pagevar);
+	} /* end function uploadfiles */
 	
+	function fileupload($user,$height,$wight){
+		
+		$path = getcwd().'/users/'.$user.'/images/';
+		$this->load->library('upload');
+		$config['upload_path'] 		= $path;
+		$config['allowed_types'] 	= 'gif|jpg|png';
+		$config['remove_spaces'] 	= TRUE;
+		$config['overwrite'] 		= FALSE;
+		$this->upload->initialize($config);
+		if(!$this->upload->do_upload()):
+			$this->logmodel->insert_record($this->admin['uid'],$this->upload->display_errors());
+			return FALSE;
+		else:
+			$file = $this->upload->data();
+			$this->load->library('image_lib');
+			$this->image_lib->clear();
+			$conf['image_library'] 	= 'gd2';
+			$conf['source_image']	= $file['full_path']; 
+			$conf['create_thumb'] 	= FALSE;
+			$conf['maintain_ratio'] = TRUE;
+			$conf['width']	 		= $wight;
+			$conf['height']			= $height;
+			$this->image_lib->initialize($conf); 
+			$this->image_lib->resize();
+		endif;
+		return TRUE;
+	} /* end function fileupload */
 } /* end class*/
 ?>

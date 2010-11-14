@@ -14,7 +14,6 @@
 			<fieldset class="singleuploadform">
 				<legend><strong>Загрузка одной фотографии</strong></legend>
 				<?= form_open_multipart($formaction1);?>
-					<?= form_hidden('album',$album); ?>
 					<?= form_label('Описание: ','uploadlabel'); ?>
 					<?php $attr = array(
 								'name'		=> 'imagetitle',

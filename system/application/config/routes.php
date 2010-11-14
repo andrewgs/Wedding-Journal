@@ -33,7 +33,8 @@ $route['([a-zA-Z]){1}([a-zA-Z0-9_])*/admin/profile'] = "administrator/profile";
 $route['([a-zA-Z]){1}([a-zA-Z0-9_])*/admin/password'] = "administrator/passwordchange";
 $route['([a-zA-Z]){1}([a-zA-Z0-9_])*/admin/theme'] = "administrator/themechange";
 $route['([a-zA-Z]){1}([a-zA-Z0-9_])*/admin/close'] = "administrator/profileclose";
-$route['([a-zA-Z]){1}([a-zA-Z0-9_])*/admin/singl-upload'] = "administrator/singlupload";
+$route['([a-zA-Z]){1}([a-zA-Z0-9_])*/photo-albums/photo-gallery/:num/upload'] = "administrator/uploadfiles";
+$route['([a-zA-Z]){1}([a-zA-Z0-9_])*/admin/singl-upload'] = "administrator/uploadfiles";
 $route['([a-zA-Z]){1}([a-zA-Z0-9_])*/admin/multi-upload'] = "administrator/multiupload";
 
 /* Controller General*/
