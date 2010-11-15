@@ -52,11 +52,11 @@
 			<fieldset class="multiupload">
 				<legend><strong>Загрузка нескольких фотографий</strong></legend>
 				<?= form_open_multipart($formaction2,array('id'=>'uploadForm'));?>
-					<?= form_hidden('album',$album); ?>
-					<img id="loading" src="<?= $baseurl; ?>images/loading.gif" style="display:none;float:left;"/>
-					<?= form_upload(array('name'=>'fileToUpload[]','id'=>'fileToUpload','class'=>'MultiFile'));?>
-					<hr>
-					<?= form_submit(array('name'=>'btnsubmit','id'=>'btnsubmit','class'=>'senden','value'=>'Загрузить'));?>
+				<?= form_hidden('album',$album); ?>
+				<img id="loading" src="<?= $baseurl; ?>images/loading.gif" style="display:none;float:left;"/>
+				<?= form_upload(array('name'=>'fileToUpload[]','id'=>'fileToUpload','class'=>'MultiFile'));?>
+				<hr>
+				<?= form_submit(array('name'=>'btnsubmit','id'=>'btnsubmit','class'=>'senden','value'=>'Загрузить'));?>
 				<?= form_close(); ?>
 				<button id="closemultiupload" class="senden">Отменить</button>
 				<div id="uploadOutput"></div>

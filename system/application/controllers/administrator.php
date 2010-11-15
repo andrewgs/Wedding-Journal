@@ -93,7 +93,7 @@ class Administrator extends Controller{
 					redirect($this->uri->uri_string());
 				endif;
 				if($user['usite'] != $this->uri->segment(1)):
-					redirect($this->uri->uri_string());
+					redirect($this->uri->uri_string());	
 				endif;
 				if($this->usersmodel->close_status($user['usite'])):
 					$this->usersmodel->open_user($user['uid']);
@@ -1039,7 +1039,7 @@ class Administrator extends Controller{
 				$_FILES['userfile']['name'] = preg_replace('/.+(.)(\.)+/',date("Ymdhis")."\$2", $_FILES['userfile']['name']);
 				$_POST['file'] = $_FILES['userfile']['name'];
 				$_POST['album'] = $pagevar['album'];
-				if(!$this->fileupload($this->admin['site'],480,640)):
+				if(!$this->fileupload('userfile',$this->admin['site'],480,640)):
 					$pagevar['errorcode'] = '0x0012';
 					$this->load->view('main/error',$pagevar);
 					return FALSE;
@@ -1056,8 +1056,38 @@ class Administrator extends Controller{
 		endif;
 		$this->load->view($pagevar['themeurl'].'/admin/uploadfiles',$pagevar);
 	} /* end function uploadfiles */
-	
-	function fileupload($user,$height,$wight){
+
+	function multiupload(){
+		
+		$files_count = sizeof($_FILES['fileToUpload']['name']);
+		for ($i = 0; $i < $files_count-1; $i++):
+			if($_FILES['fileToUpload']['error'][$i] == FALSE):
+				if($this->case_image($_FILES['fileToUpload']['tmp_name'][$i])):
+					$_FILES['fileToUpload']['name'][$i] = preg_replace('/.+(.)(\.)+/',date("Ymdhis-").$i."\$2",$_FILES['fileToUpload']['name'][$i]);
+					$filepath = getcwd().'/users/'.$this->admin['site'].'/images/'.$_FILES['fileToUpload']['name'][$i];
+					$this->load->library('image_lib');
+					$this->image_lib->clear();
+					$config['image_library'] 	= 'gd2';
+					$config['source_image']		= $_FILES['fileToUpload']['tmp_name'][$i]; 
+					$config['create_thumb'] 	= FALSE;
+					$config['maintain_ratio'] 	= TRUE;
+					$config['width']	 		= 640;
+					$config['height']			= 480;
+					$this->image_lib->initialize($config); 
+					$this->image_lib->resize();
+					copy($_FILES['fileToUpload']['tmp_name'][$i],$filepath);
+					$_POST['thumb'] = $this->resize_img($_FILES['fileToUpload']['tmp_name'][$i],186,186);
+					$_POST['file'] = $_FILES['fileToUpload']['name'][$i];
+					$this->imagesmodel->insert_record($_POST,$this->admin['uid']);
+					$this->albummodel->insert_photo($_POST['album']);
+					$this->logmodel->insert_record($this->admin['uid'],'Загружена фотография');
+					@unlink($_FILES['fileToUpload'][$i]);
+				endif;	
+			endif;		    
+		endfor;
+	} /* end function multiupload */
+
+	function fileupload($userfile,$user,$height,$wight){
 		
 		$path = getcwd().'/users/'.$user.'/images/';
 		$this->load->library('upload');
@@ -1066,7 +1096,7 @@ class Administrator extends Controller{
 		$config['remove_spaces'] 	= TRUE;
 		$config['overwrite'] 		= FALSE;
 		$this->upload->initialize($config);
-		if(!$this->upload->do_upload()):
+		if(!$this->upload->do_upload($userfile)):
 			$this->logmodel->insert_record($this->admin['uid'],$this->upload->display_errors());
 			return FALSE;
 		else:
