@@ -219,8 +219,10 @@ class General extends Controller{
 					'user'			=> $this->usrinfo,
 					'message'		=> $this->setmessage('','','',0)
 					);
-		if($event_id == 0 or empty($event_id))
+		if($event_id == 0 or empty($event_id)):
 			$event_id = $this->uri->segment(3);
+		endif;
+		$this->session->unset_userdata('commentlist');
 		if($this->input->post('commit')):
 			$this->form_validation->set_rules('user_name','"Ваше имя"','required|trim');
 			$this->form_validation->set_rules('user_email','"E-mail"','required|valid_email|trim');

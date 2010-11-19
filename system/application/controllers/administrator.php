@@ -27,6 +27,7 @@ class Administrator extends Controller{
 		$this->load->model('commentsmodel');
 		$this->load->model('logmodel');
 		$this->load->model('imagesmodel');
+		$this->load->model('unionmodel');
 		if(!$this->usersmodel->user_exist('usite',$this->uri->segment(1))):
 			die('Такой сайт не существует!');
 		endif;
@@ -59,8 +60,8 @@ class Administrator extends Controller{
 					'usite'			=> $this->admin['site'],
 					'message'		=> $this->setmessage('','','',0)
 					);
-		$this->session->set_userdata('backpage',$pagevar['usite'].'/admin');
 		$this->session->unset_userdata('commentlist');
+		$this->session->set_userdata('backpage',$pagevar['usite'].'/admin');
 		$flasherr = $this->session->flashdata('operation_error');
 		$flashmsg = $this->session->flashdata('operation_message');
 		$flashsaf = $this->session->flashdata('operation_saccessfull');
@@ -132,55 +133,6 @@ class Administrator extends Controller{
 		redirect($backpage);
 	} /* end function logoff*/
 	
-	function events(){
-		
-		$pagevar = array(
-					'description'	=> '',
-					'keywords' 		=> '',
-					'title'			=> 'Свадебный сайт',
-					'baseurl' 		=> base_url(),
-					'themeurl' 		=> $this->admin['themeurl'],
-					'usite'			=> $this->admin['site'],
-					'message'		=> $this->setmessage('','','',0),
-					'events'		=> array(),
-					'pages'			=> '',
-					'count'			=> 0
-					);
-		$this->session->set_userdata('backpage',$pagevar['usite'].'/admin/events');
-		$this->session->unset_userdata('commentlist');
-		$pagevar['count'] = $this->eventsmodel->count_records();
-		
-		$config['base_url'] 		= $pagevar['baseurl'].$pagevar['usite'].'/admin/events';	 		
-       	$config['total_rows'] 		= $pagevar['count'];							 	
-       	$config['per_page'] 		= 5;   								
-       	$config['num_links'] 		= 2;   	 							
-       	$config['uri_segment'] 		= 4;								
-		$config['first_link'] 		= 'В начало';
-		$config['last_link'] 		= 'В конец';
-		$config['next_link'] 		= 'Далее &raquo;';
-		$config['prev_link'] 		= '&laquo; Назад';
-		$config['cur_tag_open'] 	= '<b>';
-		$config['cur_tag_close'] 	= '</b>';
-		$from = intval($this->uri->segment(4));
-		if(isset($from) and !empty($from))
-			$this->session->set_userdata('backpage',$pagevar['usite'].'/admin/events/'.$from);
-		$pagevar['events'] = $this->eventsmodel->events_limit($this->admin['uid'],5,$from);
-		if (!count($pagevar['events'])) redirect($pagevar['usite'].'/admin/event-new');
-		for($i = 0;$i < count($pagevar['events']);$i++)
-			$pagevar['events'][$i]['evnt_date'] = $this->operation_date($pagevar['events'][$i]['evnt_date']);
-		
-		$this->pagination->initialize($config);
-		$pagevar['pages'] = $this->pagination->create_links();
-		
-		$flasherr = $this->session->flashdata('operation_error');
-		$flashmsg = $this->session->flashdata('operation_message');
-		$flashsaf = $this->session->flashdata('operation_saccessfull');
-		if($flasherr && $flashmsg && $flashsaf)
-			$pagevar['message'] = $this->setmessage($flasherr,$flashsaf,$flashmsg,1);
-		
-		$this->load->view($pagevar['themeurl'].'/admin/admin-events',$pagevar);		
-	} /* end function events */
-	
 	function eventnew(){
 	
 		$pagevar = array(
@@ -197,7 +149,6 @@ class Administrator extends Controller{
 					'valid'			=> TRUE,
 					'edit'			=> FALSE
 					);
-		$this->session->unset_userdata('commentlist');
 		if($this->input->post('btnsubmit')):
 			$this->form_validation->set_rules('title','"Оглавление"','required');
 			$this->form_validation->set_rules('text','"Содержимое"','required');
@@ -241,7 +192,6 @@ class Administrator extends Controller{
 					);
 		if($event_id == 0 or empty($event_id))
 			$event_id = $this->uri->segment(3);
-		$this->session->unset_userdata('commentlist');
 		if($this->input->post('btnsubmit')):
 			$this->form_validation->set_rules('title','"Оглавление"','required');
 			$this->form_validation->set_rules('text','"Содержимое"','required');
@@ -306,8 +256,9 @@ class Administrator extends Controller{
 			$event_id 	= $this->uri->segment(3);
 		endif;
 		$pagevar['backpath'] = $pagevar['usite'].'/event/'.$event_id.'#comment_'.$comment_id;
-		if(isset($pagevar['commentlist']) and !empty($pagevar['commentlist'])) 
-			$pagevar['backpath'] = $pagevar['commentlist'].'#comment_'.$comment_id;
+		if(isset($pagevar['commentlist']) and !empty($pagevar['commentlist'])):
+			$pagevar['backpath'] = $pagevar['commentlist'];
+		endif;
 		if($this->input->post('btnsubmit')):
 			$this->form_validation->set_rules('user_name','"Имя"','required');
 			$this->form_validation->set_rules('user_email','"E-mail"','required|valid_email');
@@ -368,7 +319,6 @@ class Administrator extends Controller{
 					'valid'			=> TRUE,
 					'edit'			=> FALSE	
 					);
-		$this->session->unset_userdata('commentlist');
 		if($this->input->post('btnsubmit')):
 			$this->form_validation->set_rules('name','"Имя друга"','required');
 			$this->form_validation->set_rules('profession','"Профессия"','required');
@@ -554,7 +504,6 @@ class Administrator extends Controller{
 					'valid'			=> TRUE,
 					'edit'			=> FALSE	
 					);
-		$this->session->unset_userdata('commentlist');
 		if($this->input->post('btnsubmit')):
 			$this->form_validation->set_rules('title','"Название альбома"','required');
 			$this->form_validation->set_rules('photo_title','"Подпись"','required');
@@ -598,7 +547,6 @@ class Administrator extends Controller{
 		if($album_id == 0 or empty($album_id)):
 			$album_id = $this->uri->segment(3);
 		endif;
-		$this->session->unset_userdata('commentlist');
 		$pagevar['album'] = $this->albummodel->album_record($album_id);
 		if($this->input->post('btnsubmit')):
 			$this->form_validation->set_rules('title','"Название альбома"','required');
@@ -1114,5 +1062,58 @@ class Administrator extends Controller{
 		endif;
 		return TRUE;
 	} /* end function fileupload */
+
+	function commentslist($countday = 21){
+		
+		$pagevar = array(
+					'description'	=> '',
+					'keywords' 		=> '',
+					'title'			=> 'Администрирование | Список комментариев за период',
+					'baseurl' 		=> base_url(),
+					'admin'			=> TRUE,
+					'themeurl' 		=> $this->admin['themeurl'],
+					'usite'			=> $this->admin['site'],
+					'message'		=> $this->setmessage('','','',0),
+					'backpath' 		=> $this->admin['site'].'/admin',
+					'formaction'	=> $this->uri->uri_string(),
+					'message'		=> $this->setmessage('','','',0),
+					'pages'			=> '',
+					'count'			=> 0,
+					'comments'		=> array()
+					);
+		$this->session->set_userdata('commentlist',$pagevar['usite'].'/admin/comments');
+		$pagevar['count'] = $this->unionmodel->count_record($countday,$this->admin['uid']);
+		$config['base_url'] 		= base_url().$pagevar['usite'].'/admin/comments';	
+       	$config['total_rows'] 		= $pagevar['count'];
+		$config['per_page'] 		= 10;
+       	$config['num_links'] 		= 2;
+       	$config['uri_segment'] 		= 4;
+		$config['first_link'] 		= 'В начало';
+		$config['last_link'] 		= 'В конец';
+		$config['next_link'] 		= 'Далее &raquo;';
+		$config['prev_link'] 		= '&laquo; Назад';
+		$config['cur_tag_open'] 	= '<b>';
+		$config['cur_tag_close']	= '</b>';
+		$from = intval($this->uri->segment(4));
+		if(isset($from) and !empty($from)):
+			$this->session->set_userdata('commentlist',$pagevar['usite'].'/admin/comments/'.$from);
+		endif;
+		$pagevar['comments'] = $this->unionmodel->select_comments($countday,5,$from,$this->admin['uid']);
+		for($i = 0;$i < count($pagevar['comments']);$i++):
+			$pagevar['comments'][$i]['evnt_date'] = $this->operation_date($pagevar['comments'][$i]['evnt_date']);
+			$pagevar['comments'][$i]['cmnt_usr_date'] = $this->operation_date_slash($pagevar['comments'][$i]['cmnt_usr_date']);
+		endfor;
+		$this->pagination->initialize($config);
+		$pagevar['pages'] = $this->pagination->create_links();
+		
+		$flasherr = $this->session->flashdata('operation_error');
+		$flashmsg = $this->session->flashdata('operation_message');
+		$flashsaf = $this->session->flashdata('operation_saccessfull');
+		if($flasherr && $flashmsg && $flashsaf)
+			$pagevar['message'] = $this->setmessage($flasherr,$flashsaf,$flashmsg,1);
+		
+		$this->load->view($pagevar['themeurl'].'/admin/comments',$pagevar);
+	}
+	
 } /* end class*/
 ?>

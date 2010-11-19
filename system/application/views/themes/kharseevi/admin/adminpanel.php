@@ -25,16 +25,16 @@
 					</div>
 					<div class="clear"></div>
 					<div id="internal_nav" class="grid_4 suffix_2">
-						<a href="<?= $baseurl.$usite.'/admin/comments'; ?>">Cписок комментариев &nbsp;&rarr;</a>
-					</div>
-					<div class="clear"></div>
-					<div id="internal_nav" class="grid_4 suffix_2">
 						<a href="<?= $baseurl.$usite.'/photo-albums'; ?>">Управление альбомами &nbsp;&rarr;</a>
 					</div>
 					<div class="clear"></div>
 					<div id="internal_nav" class="grid_4 suffix_2">
 						<a href="<?= $baseurl.$usite.'/friends'; ?>">Карточки друзей &nbsp;&rarr;</a>
 					</div>
+					<div id="internal_nav" class="grid_4 suffix_2">
+						<a href="<?= $baseurl.$usite.'/admin/comments'; ?>">Cписок комментариев &nbsp;&rarr;</a>
+					</div>
+					<div class="clear"></div>
 				</div>
 				<div class="grid_6">
 					<div id="internal_nav" class="grid_4 suffix_2">

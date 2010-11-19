@@ -48,7 +48,7 @@
 				</div>
 				<?php if($admin):?>
 					<div id="internal_nav" class="grid_4">
-						<a href="<?= $this->uri->uri_string().'/upload'; ?>" style="text-align:center">Добавить фотографии</a>
+						<a href="<?= $baseurl.$usite.'/photo-albums/photo-gallery/'.$album.'/upload'; ?>" style="text-align:center">Добавить фотографии</a>
 					</div>
 				<?php endif; ?>
 			</div>

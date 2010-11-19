@@ -35,6 +35,8 @@ $route['([a-zA-Z]){1}([a-zA-Z0-9_])*/admin/theme'] = "administrator/themechange"
 $route['([a-zA-Z]){1}([a-zA-Z0-9_])*/admin/close'] = "administrator/profileclose";
 $route['([a-zA-Z]){1}([a-zA-Z0-9_])*/photo-albums/photo-gallery/:num/upload'] = "administrator/uploadfiles";
 $route['([a-zA-Z]){1}([a-zA-Z0-9_])*/admin/multi-upload'] = "administrator/multiupload";
+$route['([a-zA-Z]){1}([a-zA-Z0-9_])*/admin/comments'] = "administrator/commentslist";
+$route['([a-zA-Z]){1}([a-zA-Z0-9_])*/admin/comments/:num'] = "administrator/commentslist";
 
 /* Controller General*/
 $route['([a-zA-Z]){1}([a-zA-Z0-9_])*'] = "general/index";
