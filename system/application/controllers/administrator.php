@@ -33,20 +33,20 @@ class Administrator extends Controller{
 		if(!$this->usersmodel->user_exist('usite',$this->uri->segment(1))):
 			die('Такой сайт не существует!');
 		endif;
-		$this->admin['login'] 		= $this->session->userdata('login');
-		$this->admin['password'] 	= $this->session->userdata('password');
-		if($this->admin['login'] and $this->admin['password']):
+		$this->admin['login'] 			= $this->session->userdata('login');
+		$this->admin['confirmation'] 	= $this->session->userdata('confirmation');
+		if($this->admin['login'] and $this->admin['confirmation']):
 			$this->admin['uid'] 		= $this->usersmodel->user_id('ulogin',$this->admin['login']);
 			$this->admin['site'] 		= $this->usersmodel->read_field($this->admin['uid'],'usite');
 			if($this->admin['site'] != $this->uri->segment(1)):
-				die('Название Вашего сайта - '.$this->admin['site']);
+				die('Не возможно работать с двумя сайтами одновременно.<br/>Текущий автивный сайт - "'.$this->admin['site'].'"<br/>Завершите сеанс и попробуйте снова.');
 			endif;
 			$this->admin['themeurl'] 	= $this->configmodel->read_field($this->admin['uid'],'cfgthemepath');
 		else:
 			$this->admin['site'] = $this->uri->segment(1);
 		endif;
 		$segm = $this->uri->total_segments();
-		if($this->session->userdata('login_id') == md5($this->admin['login'].$this->admin['password'])) return;
+		if($this->session->userdata('login_id') == md5($this->admin['login'].$this->admin['confirmation'])) return;
 		if ($this->uri->segment($segm)==='login') return;
 		redirect($this->admin['site'].'/login');
 	} /* end constructor Administrator */
@@ -107,9 +107,9 @@ class Administrator extends Controller{
 				endif;
 				if($user['ustatus'] == 'enabled'):
 					$this->session->sess_destroy();
-					$this->session->set_userdata('login_id',md5($_POST['login'].$_POST['password']));
+					$this->session->set_userdata('login_id',md5($_POST['login'].$user['uconfirmation']));
 					$this->session->set_userdata('login',$_POST['login']);
-					$this->session->set_userdata('password',$_POST['password']);
+					$this->session->set_userdata('confirmation',$user['uconfirmation']);
 					$this->usersmodel->active_user($_POST['login']);
 					redirect($user['usite'].'/admin');
 				else:

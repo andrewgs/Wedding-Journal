@@ -67,9 +67,9 @@ class Main extends Controller{
 				endif;
 				if($user['ustatus'] == 'enabled'):
 					$this->session->sess_destroy();
-					$this->session->set_userdata('login_id',md5($_POST['login'].$_POST['password']));
+					$this->session->set_userdata('login_id',md5($_POST['login'].$user['uconfirmation']));
 					$this->session->set_userdata('login',$_POST['login']);
-					$this->session->set_userdata('password',$_POST['password']);
+					$this->session->set_userdata('confirmation',$user['uconfirmation']);
 					$this->usersmodel->active_user($_POST['login']);
 					redirect($user['usite'].'/admin');
 				else:

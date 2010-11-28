@@ -29,9 +29,9 @@ class General extends Controller{
 		if(!$this->usersmodel->user_exist('usite',$this->uri->segment(1))):
 			die('Такой сайт не существует!');
 		endif;
-		$login 		= $this->session->userdata('login');
-		$password 	= $this->session->userdata('password');
-		if($this->session->userdata('login_id') == md5($login.$password)):
+		$login 			= $this->session->userdata('login');
+		$confirmation 	= $this->session->userdata('confirmation');
+		if($this->session->userdata('login_id') == md5($login.$confirmation)):
 			$userinfo = $this->usersmodel->read_record($login);
 			$this->usrinfo['firstname']		= $userinfo['uname'];
 			$this->usrinfo['secondname'] 	= $userinfo['usubname'];
