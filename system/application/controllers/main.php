@@ -326,6 +326,11 @@ class Main extends Controller{
 		$friend = $this->friendsmodel->insert_record(array('name'=>'Мой друг','profession'=>'Студент','social'=>2,'image'=>$image,'note'=>'Описание друга'),$uid);
 		$this->socialmodel->insert_record(array('friend_id'=>$friend,'social'=>'ВКОНТАКТЕ','href'=>'http://vkontakte.ru'));
 		$this->socialmodel->insert_record(array('friend_id'=>$friend,'social'=>'ОДНОКЛАССНИКИ','href'=>'http://odnoklasniki.ru/'));
+		/* cоздание страницы "О нас" по-умолчанию */
+		$this->load->model('othertextmodel');
+		$this->load->model('otherimagemodel');
+		$this->othertextmodel->insert_record('О нас...','about',$uid);
+		$this->otherimagemodel->insert_record(array('file'=>'','title'=>'О нас'),$uid,'about');
 		return '0x0000';
 	} /* end function defaultobjects */
 	

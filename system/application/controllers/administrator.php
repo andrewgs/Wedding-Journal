@@ -28,6 +28,8 @@ class Administrator extends Controller{
 		$this->load->model('logmodel');
 		$this->load->model('imagesmodel');
 		$this->load->model('unionmodel');
+		$this->load->model('othertextmodel');
+		$this->load->model('otherimagemodel');
 		if(!$this->usersmodel->user_exist('usite',$this->uri->segment(1))):
 			die('Такой сайт не существует!');
 		endif;
@@ -987,7 +989,7 @@ class Administrator extends Controller{
 				$_FILES['userfile']['name'] = preg_replace('/.+(.)(\.)+/',date("Ymdhis")."\$2", $_FILES['userfile']['name']);
 				$_POST['file'] = $_FILES['userfile']['name'];
 				$_POST['album'] = $pagevar['album'];
-				if(!$this->fileupload('userfile',$this->admin['site'],480,640)):
+				if(!$this->fileupload('userfile',$this->admin['site'],480,640,FALSE,TRUE)):
 					$pagevar['errorcode'] = '0x0012';
 					$this->load->view('main/error',$pagevar);
 					return FALSE;
@@ -1035,14 +1037,14 @@ class Administrator extends Controller{
 		endfor;
 	} /* end function multiupload */
 
-	function fileupload($userfile,$user,$height,$wight){
+	function fileupload($userfile,$user,$height,$wight,$overwrite,$ration){
 		
 		$path = getcwd().'/users/'.$user.'/images/';
 		$this->load->library('upload');
 		$config['upload_path'] 		= $path;
 		$config['allowed_types'] 	= 'gif|jpg|png';
 		$config['remove_spaces'] 	= TRUE;
-		$config['overwrite'] 		= FALSE;
+		$config['overwrite'] 		= $overwrite;
 		$this->upload->initialize($config);
 		if(!$this->upload->do_upload($userfile)):
 			$this->logmodel->insert_record($this->admin['uid'],$this->upload->display_errors());
@@ -1054,7 +1056,7 @@ class Administrator extends Controller{
 			$conf['image_library'] 	= 'gd2';
 			$conf['source_image']	= $file['full_path']; 
 			$conf['create_thumb'] 	= FALSE;
-			$conf['maintain_ratio'] = TRUE;
+			$conf['maintain_ratio'] = $ration;
 			$conf['width']	 		= $wight;
 			$conf['height']			= $height;
 			$this->image_lib->initialize($conf); 
@@ -1113,7 +1115,73 @@ class Administrator extends Controller{
 			$pagevar['message'] = $this->setmessage($flasherr,$flashsaf,$flashmsg,1);
 		
 		$this->load->view($pagevar['themeurl'].'/admin/comments',$pagevar);
-	}
+	} /* end function commentslist */
+	
+	function photochange(){
+		
+		$pagevar = array(
+					'description'	=> '',
+					'keywords' 		=> '',
+					'title'			=> 'Администрирование | Замена фотографии',
+					'baseurl' 		=> base_url(),
+					'admin'			=> TRUE,
+					'themeurl' 		=> $this->admin['themeurl'],
+					'usite'			=> $this->admin['site'],
+					'message'		=> $this->setmessage('','','',0),
+					'backpath' 		=> $this->session->userdata('backpage'),
+					'formaction'	=> $this->uri->uri_string(),
+					'type'			=> $this->uri->segment(2),
+					'text'			=> '',
+					'image'			=> array(),
+					'errortext'		=> 'Произошла ошибка при загрузке фотографии',
+					'errorcode'		=> '0x0000',
+					'ratio'			=> ''
+					);
+		if($this->input->post('btnsubmit')):
+			if($_FILES['userfile']['error'] != 4):
+				$this->form_validation->set_rules('userfile','"Фото"','callback_userfile_check');
+				$this->form_validation->set_error_delimiters('<div class="message">','</div>');
+				if (!$this->form_validation->run()):
+					$_POST['btnsubmit'] = NULL;
+					$this->photochange();
+					return FALSE;
+				endif;
+				$_FILES['userfile']['name'] = preg_replace('/.+(.)(\.)+/','about-us'."\$2", $_FILES['userfile']['name']);
+				$_POST['file'] = $_FILES['userfile']['name'];
+				if(!$this->fileupload('userfile',$this->admin['site'],603,907,TRUE,FALSE)):
+					$pagevar['errorcode'] = '0x0013';
+					$this->load->view('main/error',$pagevar);
+					return FALSE;
+				endif;
+				$this->otherimagemodel->update_record($_POST,$pagevar['type'],$this->admin['uid']);
+			else:
+				$this->otherimagemodel->update_title($_POST['title'],$pagevar['type'],$this->admin['uid']);
+			endif;
+			switch ($pagevar['type']):
+			
+				case 'about' : 	$this->othertextmodel->update_record(nl2br($_POST['text']),$pagevar['type'],$this->admin['uid']);
+								break;
+			
+			endswitch;
+			$this->logmodel->insert_record($this->admin['uid'],'Изменение информациии "О нас"');
+			$this->session->set_flashdata('operation_error','none');
+			$this->session->set_flashdata('operation_message','none');
+			$this->session->set_flashdata('operation_saccessfull','Операция выполнена успешно');
+			redirect($pagevar['backpath']);
+		endif;
+		switch ($pagevar['type']):
+			
+			case 'about' : 	$pagevar['text'] = strip_tags($this->othertextmodel->read_text($pagevar['type'],$this->admin['uid']));
+							$pagevar['image'] = $this->otherimagemodel->read_record($pagevar['type'],$this->admin['uid']);
+							$pagevar['ratio']= '(Размер 907х603)';
+							if(empty($pagevar['text']) and empty($pagevar['image']['oisrc'])) $pagevar['edit'] = FALSE;
+							break;
+			
+		endswitch;
+//		print_r($pagevar['image']['oisrc']);
+		$this->load->view($pagevar['themeurl'].'/admin/photo-change',$pagevar);
+		
+	} /* end function photochange */
 	
 } /* end class*/
 ?>

@@ -29,16 +29,21 @@
 	<?php $this->load->view($themeurl.'/header'); ?>
 		<div id="content">
 			<div class="container_12">
+				<?php if($admin): ?>
+					<div id="internal_nav" class="grid_4">
+						<a href="<?= $baseurl.$usite.'/about/photo-change'; ?>">Сменить фотографию &nbsp;&rarr;</a>
+					</div>
+				<div class="clear"></div>
+				<?php $this->load->view('message');?>
+				<?php endif; ?>
+				<?php if(!empty($image['oisrc'])): ?>
 				<div id="about-us" class="grid_12">
+					<img src="<?= $baseurl.'users/'.$usite.'/images/'.$image['oisrc']; ?>" alt="" title="<?= $image['oititle']; ?>">
 					<div id="text-about">
-						<span>Мы молоды и гостеприимны, любим путешествовать, </span><br/>
-						<span>смотреть кино, ходить в театр, кушать суши и </span><br/>
-						<span>ночевать на крыше. </span><br/>
-						<span>Любовь – это бесконечное чудо и ничем другим</span><br/>
-						<span>его не объяснишь. </span>
+						<span><?= $text; ?></span>
 					</div>				
-
-				</div>				
+				</div>
+				<?php endif; ?>			
 			</div>
 			<div class="clear"></div>
 		</div>

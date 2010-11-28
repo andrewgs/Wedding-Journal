@@ -21,6 +21,8 @@ class General extends Controller{
 		$this->load->model('socialmodel');
 		$this->load->model('commentsmodel');
 		$this->load->model('imagesmodel');
+		$this->load->model('othertextmodel');
+		$this->load->model('otherimagemodel');
 		if($this->usersmodel->close_status($this->uri->segment(1))):
 			die('Cайт закрыт!');
 		endif;
@@ -330,8 +332,14 @@ class General extends Controller{
 					'themeurl' 		=> $cfg['cfgthemepath'],
 					'admin'			=> $this->usrinfo['status'],
 					'usite'			=> $usersite,
+					'message'		=> $this->setmessage('','','',0),
+					'type'			=> $this->uri->segment(2),
+					'text'			=> '',
+					'image'			=> array()
 					);
-		$this->session->set_userdata('backpage',$pagevar['usite'].'/about');	
+		$this->session->set_userdata('backpage',$pagevar['usite'].'/about');
+		$pagevar['text'] = $this->othertextmodel->read_text($pagevar['type'],$userid);
+		$pagevar['image'] = $this->otherimagemodel->read_record($pagevar['type'],$userid);	
 		$this->load->view($pagevar['themeurl'].'/about',$pagevar);
 	} /* end function about */
 	
