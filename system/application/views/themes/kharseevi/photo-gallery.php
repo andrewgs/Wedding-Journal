@@ -13,7 +13,7 @@
 	<link rel="stylesheet" href="<?= $baseurl.$themeurl; ?>/css/reset.css" type="text/css" /> 
 	<link rel="stylesheet" href="<?= $baseurl.$themeurl; ?>/css/style.css" type="text/css" />
 	<link rel="stylesheet" href="<?= $baseurl; ?>css/pirobox.css" type="text/css" />
-	<script type="text/javascript" src="<?= $baseurl; ?>javascript/jquery-1.3.1.min.js"></script>	
+	<script type="text/javascript" src="<?= $baseurl; ?>javascript/jquery.min.js"></script>	
 	<script type="text/javascript" src="<?= $baseurl; ?>javascript/pirobox.min.js"></script>
 	<script type="text/javascript" src="<?= $baseurl; ?>javascript/jquery.confirm.js"></script>
 		
@@ -35,6 +35,13 @@
 				close_all : '.piro_close,.piro_overlay' 
 			});
 			$('a.delete').confirm();
+			$('a.slideshow').confirm({
+				msg:'Изменить?',
+  				buttons: {
+    				wrapper:'<button></button>',
+    				separator:''
+  				}  
+			});
 		});
 	</script>  	
 </head>
@@ -69,6 +76,17 @@
 							<div class="images-text"> 
 								<div class="image-title"><?= $images[$i]['img_title']; ?></div>
 							</div>
+							<div class="album-controls">
+								<?php $text = 'Удалить'; ?>
+								<?php $str_uri = $baseurl.$usite.'/photo-albums/photo-destory/'.$images[$i]['img_id']; ?>
+								<?php $attr = array('class'=>'delete'); ?>
+								<?= anchor($str_uri,$text,$attr); ?>
+								<?php $text = 'На главной - '.$images[$i]['img_slideshow']; ?>
+								<?php $str_uri = $baseurl.$usite.'/photo-albums/photo-slideshow/'.$images[$i]['img_id']; ?>
+								<?php $attr = array('class'=>'slideshow'); ?>
+								<?= anchor($str_uri,$text,$attr); ?>
+							</div>
+							<div class="clear"></div>
 						</div>
 					<?php endfor; ?>
 					</div>

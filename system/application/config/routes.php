@@ -38,6 +38,8 @@ $route['([a-zA-Z]){1}([a-zA-Z0-9_])*/photo-albums/photo-gallery/:num/upload'] = 
 $route['([a-zA-Z]){1}([a-zA-Z0-9_])*/admin/multi-upload'] = "administrator/multiupload";
 $route['([a-zA-Z]){1}([a-zA-Z0-9_])*/admin/comments'] = "administrator/commentslist";
 $route['([a-zA-Z]){1}([a-zA-Z0-9_])*/admin/comments/:num'] = "administrator/commentslist";
+$route['([a-zA-Z]){1}([a-zA-Z0-9_])*/photo-albums/photo-destory/:num'] = "administrator/photodestroy";
+$route['([a-zA-Z]){1}([a-zA-Z0-9_])*/photo-albums/photo-slideshow/:num'] = "administrator/photoslideshow";
 
 /* Controller General*/
 $route['([a-zA-Z]){1}([a-zA-Z0-9_])*'] = "general/index";

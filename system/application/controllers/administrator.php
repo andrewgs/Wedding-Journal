@@ -1183,5 +1183,55 @@ class Administrator extends Controller{
 		
 	} /* end function photochange */
 	
+	function photodestroy(){
+		
+		$img_id = $this->uri->segment(4);
+		$image = $this->imagesmodel->exist_image($img_id,$this->admin['uid']);
+		if(!$image) redirect('page404');
+		$backpath = $this->admin['site'].'/photo-albums/photo-gallery/'.$image['img_album'];
+		$this->imagesmodel->image_delete($img_id,$this->admin['uid']);
+		$this->albummodel->delete_photo($image['img_album']);
+		$filepath = getcwd().'/users/'.$this->admin['site'].'/images/'.$image['img_src'];
+		if($this->filedelete($filepath)):
+			$this->session->set_flashdata('operation_error','none');
+			$this->session->set_flashdata('operation_message','Фотография - '.$image['img_src']);
+			$this->session->set_flashdata('operation_saccessfull','Фотография удалена успешно');
+		else:
+			$this->session->set_flashdata('operation_error','Файл отсутствует на диске');
+			$this->session->set_flashdata('operation_message','none');
+			$this->session->set_flashdata('operation_saccessfull','Фотография удалена c ошибкой');
+		endif;
+		redirect($backpath);
+	} /* end function photodestroy */
+	
+	function filedelete($file){
+		
+		if(is_file($file)):
+			@unlink($file);
+			return TRUE;
+		else:
+			return FALSE;
+		endif;
+	} /* end function filedelete */
+	
+	function photoslideshow(){
+		
+		$img_id = $this->uri->segment(4);
+		$image = $this->imagesmodel->exist_image($img_id,$this->admin['uid']);
+		if(!$image) redirect('page404');
+		$backpath = $this->admin['site'].'/photo-albums/photo-gallery/'.$image['img_album'];
+		$status = $this->imagesmodel->slideshow_status($img_id,$this->admin['uid'],abs($image['img_slideshow']-1));
+		if($status):
+			$this->session->set_flashdata('operation_error','none');
+			$this->session->set_flashdata('operation_message','Фотография - '.$image['img_src']);
+			$this->session->set_flashdata('operation_saccessfull','Фотография добавлена на главную страницу');
+		else:
+			$this->session->set_flashdata('operation_error','none');
+			$this->session->set_flashdata('operation_message','Фотография - '.$image['img_src']);
+			$this->session->set_flashdata('operation_saccessfull','Фотография убрана с главной страницу');
+		endif;
+		redirect($backpath);
+	} /* end function photoslideshow */
+							  
 } /* end class*/
 ?>

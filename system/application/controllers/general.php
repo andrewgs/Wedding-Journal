@@ -59,10 +59,12 @@ class General extends Controller{
 					'themeurl' 		=> $cfg['cfgthemepath'],
 					'admin'			=> $this->usrinfo['status'],
 					'usite'			=> $usersite,
-					'events'		=> array()
+					'events'		=> array(),
+					'images'		=> array()
 					);
 		$this->session->set_userdata('backpage',$pagevar['usite']);
 		$pagevar['events'] = $this->eventsmodel->new_events($userid,3);
+		$pagevar['images'] = $this->imagesmodel->slideshow_images($userid,TRUE);
 		for($i = 0;$i < count($pagevar['events']); $i++):
 			$pagevar['events'][$i]['evnt_date'] = $this->operation_date($pagevar['events'][$i]['evnt_date']);
 			$text = $pagevar['events'][$i]['evnt_text'];			
@@ -138,6 +140,12 @@ class General extends Controller{
 			$pagevar['message'] = $this->setmessage($flasherr,$flashsaf,$flashmsg,1);
 		endif;
 		$pagevar['images'] = $this->imagesmodel->get_images($pagevar['album'],$userid);
+		for($i = 0; $i < count($pagevar['images']); $i++):
+			if($pagevar['images'][$i]['img_slideshow']) 
+				$pagevar['images'][$i]['img_slideshow'] = 'Да';
+			else 
+				$pagevar['images'][$i]['img_slideshow'] = 'Нет';
+		endfor;
 		$this->load->view($pagevar['themeurl'].'/photo-gallery',$pagevar);
 	} /* end function photo */
 	
