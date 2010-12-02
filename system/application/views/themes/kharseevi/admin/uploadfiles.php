@@ -23,7 +23,7 @@
 	<script type="text/javascript">
 		$(document).ready(function(){
 			﻿$('.MultiFile').MultiFile({ 
-					accept:'jpg|gif|png',max:5,STRING:{ 
+					accept:'jpg|jpeg|gif|png',max:5,STRING:{ 
 					remove		:'<img src="<?= $baseurl; ?>images/cancel.png" height="16" width="16" alt="cancel"/>',
 					file		:'$file', 
 					selected	:'Выбраны: $file', 

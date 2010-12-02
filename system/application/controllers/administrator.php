@@ -20,6 +20,7 @@ class Administrator extends Controller{
 	function Administrator(){
 	
 		parent::Controller();
+		session_start();
 		$this->load->model('eventsmodel');
 		$this->load->model('albummodel');
 		$this->load->model('friendsmodel');
@@ -31,17 +32,18 @@ class Administrator extends Controller{
 		$this->load->model('othertextmodel');
 		$this->load->model('otherimagemodel');
 		if(!$this->usersmodel->user_exist('usite',$this->uri->segment(1))):
-			die('Такой сайт не существует!');
+			redirect('not-existing');
 		endif;
-		$this->admin['login'] 			= $this->session->userdata('login');
-		$this->admin['confirmation'] 	= $this->session->userdata('confirmation');
+		$this->admin['login'] = $this->session->userdata('login');
+		$this->admin['confirmation'] = $this->session->userdata('confirmation');
 		if($this->admin['login'] and $this->admin['confirmation']):
-			$this->admin['uid'] 		= $this->usersmodel->user_id('ulogin',$this->admin['login']);
-			$this->admin['site'] 		= $this->usersmodel->read_field($this->admin['uid'],'usite');
+			$this->admin['uid'] = $this->usersmodel->user_id('ulogin',$this->admin['login']);
+			$this->admin['site'] = $this->usersmodel->read_field($this->admin['uid'],'usite');
+			$_SESSION['usersite'] = $this->admin['site'];
 			if($this->admin['site'] != $this->uri->segment(1)):
 				die('Не возможно работать с двумя сайтами одновременно.<br/>Текущий автивный сайт - "'.$this->admin['site'].'"<br/>Завершите сеанс и попробуйте снова.');
 			endif;
-			$this->admin['themeurl'] 	= $this->configmodel->read_field($this->admin['uid'],'cfgthemepath');
+			$this->admin['themeurl'] = $this->configmodel->read_field($this->admin['uid'],'cfgthemepath');
 		else:
 			$this->admin['site'] = $this->uri->segment(1);
 		endif;
@@ -132,6 +134,7 @@ class Administrator extends Controller{
 		endif;
 		$this->usersmodel->deactive_user($this->session->userdata('login'));
 		$this->session->sess_destroy();
+		unset($_SESSION['usersite']);
 		redirect($backpage);
 	} /* end function logoff*/
 	
@@ -194,6 +197,8 @@ class Administrator extends Controller{
 					);
 		if($event_id == 0 or empty($event_id))
 			$event_id = $this->uri->segment(3);
+		$event = $this->eventsmodel->exist_event($event_id,$this->admin['uid']);
+		if(!$event) redirect('page403');
 		if($this->input->post('btnsubmit')):
 			$this->form_validation->set_rules('title','"Оглавление"','required');
 			$this->form_validation->set_rules('text','"Содержимое"','required');
@@ -219,6 +224,7 @@ class Administrator extends Controller{
 		if(count($pagevar['event']) > 0):
 			$pagevar['event']['evnt_date'] = $this->operation_date_slash($pagevar['event']['evnt_date']);
 		endif;
+//		print_r($_SESSION['ckfinder_baseUrl']); exit;
         $this->load->view($pagevar['themeurl'].'/admin/admin-event',$pagevar);
 	} /* end function eventedit */			
 	
@@ -226,12 +232,14 @@ class Administrator extends Controller{
 		
 		$backpath = $this->session->userdata('backpage');
 		$event_id = $this->uri->segment(3);
-		$event = $this->eventsmodel->event_record($event_id);
+		$event = $this->eventsmodel->exist_event($event_id,$this->admin['uid']);
+		if(!$event) redirect('page403');
+		$evnttitle = $this->eventsmodel->event_title($event_id,$this->admin['uid']);
 		$this->eventsmodel->delete_record($event_id);
 		$this->commentsmodel->delete_records($event_id);
 		$this->logmodel->insert_record($this->admin['uid'],'Удалена запись');
 		$this->session->set_flashdata('operation_error','none');
-		$this->session->set_flashdata('operation_message','Название удаленной записи - '.$event['evnt_title']);
+		$this->session->set_flashdata('operation_message','Название удаленной записи - '.$evnttitle);
 		$this->session->set_flashdata('operation_saccessfull','Запись удалена успешно');
 		redirect($backpath);
 	} /* end function eventdestroy */
@@ -257,6 +265,8 @@ class Administrator extends Controller{
 			$comment_id = $this->uri->segment(4);
 			$event_id 	= $this->uri->segment(3);
 		endif;
+		$comment = $this->commentsmodel->exist_comment($comment_id,$event_id);
+		if(!$comment) redirect('page403');
 		$pagevar['backpath'] = $pagevar['usite'].'/event/'.$event_id.'#comment_'.$comment_id;
 		if(isset($pagevar['commentlist']) and !empty($pagevar['commentlist'])):
 			$pagevar['backpath'] = $pagevar['commentlist'];
@@ -292,6 +302,8 @@ class Administrator extends Controller{
 		
 		$event_id = $this->uri->segment(3);
 		$comment_id = $this->uri->segment(4);
+		$comment = $this->commentsmodel->exist_comment($comment_id,$event_id);
+		if(!$comment) redirect('page403');
 		$backpath = $this->admin['site'].'/event/'.$event_id;
 		$commentlist = $this->session->userdata('commentlist');
 		if(isset($commentlist) and !empty($commentlist)) 
@@ -404,7 +416,9 @@ class Administrator extends Controller{
 					);
 		if($friend_id == 0 or empty($friend_id))
 			$friend_id = $this->uri->segment(3);
-		$pagevar['friend'] = $this->friendsmodel->friend_record($friend_id);
+		$friend = $this->friendsmodel->exist_friend($friend_id,$this->admin['uid']);
+		if(!$friend) redirect('page403');
+		$pagevar['friend'] = $this->friendsmodel->friend_record($friend_id,$this->admin['uid']);
 		$pagevar['socials'][0] = array('id'=>'','social'=>'','href'=>'');
 		$pagevar['socials'][1] = array('id'=>'','social'=>'','href'=>'');
 		$socials = $this->socialmodel->friend_social($friend_id);
@@ -480,12 +494,14 @@ class Administrator extends Controller{
 		
 		$backpath = $this->session->userdata('backpage');
 		$friend_id = $this->uri->segment(3);
-		$friend = $this->friendsmodel->friend_record($friend_id);
+		$friend = $this->friendsmodel->exist_friend($friend_id,$this->admin['uid']);
+		if(!$friend) redirect('page403');
+		$frname = $this->friendsmodel->friend_name($friend_id,$this->admin['uid']);
 		$this->friendsmodel->delete_record($friend_id);
 		$this->socialmodel->delete_records($friend_id);
 		$this->logmodel->insert_record($this->admin['uid'],'Удалена карточка друга');
 		$this->session->set_flashdata('operation_error','none');
-		$this->session->set_flashdata('operation_message','Удаленна карточка - '.$friend['fr_name']);
+		$this->session->set_flashdata('operation_message','Удаленна карточка - '.$frname);
 		$this->session->set_flashdata('operation_saccessfull','Карточка удалена успешно');
 		redirect($backpath);
 	} /* end function frienddestroy */
@@ -549,7 +565,9 @@ class Administrator extends Controller{
 		if($album_id == 0 or empty($album_id)):
 			$album_id = $this->uri->segment(3);
 		endif;
-		$pagevar['album'] = $this->albummodel->album_record($album_id);
+		$album = $this->albummodel->exist_album($album_id,$this->admin['uid']);
+		if(!$album) redirect('page403');
+		$pagevar['album'] = $this->albummodel->album_record($album_id,$this->admin['uid']);
 		if($this->input->post('btnsubmit')):
 			$this->form_validation->set_rules('title','"Название альбома"','required');
 			$this->form_validation->set_rules('photo_title','"Подпись"','required');
@@ -581,11 +599,27 @@ class Administrator extends Controller{
 			
 		$backpath = $this->session->userdata('backpage');
 		$album_id = $this->uri->segment(3);
-		$album = $this->albummodel->album_record($album_id);
+		$album = $this->albummodel->exist_album($album_id,$this->admin['uid']);
+		if(!$album) redirect('page403');
+		$albtitle = $this->albummodel->album_title($album_id,$this->admin['uid']);
+		$images = $this->imagesmodel->get_names($album_id,$this->admin['uid']);
+		for($i = 0;$i < count($images);$i++):
+			$filepath = getcwd().'/users/'.$this->admin['site'].'/images/'.$images[$i]['src'];
+			if(!$this->filedelete($filepath)):
+				$this->logmodel->insert_record($this->admin['uid'],'Ошибка удаления файла - '.$images[$i]['src']);
+			endif;
+			$filepath = getcwd().'/users/'.$this->admin['site'].'/_thumbs/Images/'.$images[$i]['src'];
+			if(is_file($filepath)):
+				if(!$this->filedelete($filepath)):
+					$this->logmodel->insert_record($this->admin['uid'],'Ошибка удаления миниатюры - '.$images[$i]['src']);
+				endif;	
+			endif;
+		endfor;
+		$this->imagesmodel->images_delete($album_id,$this->admin['uid']);
 		$this->albummodel->delete_record($album_id);
 		$this->logmodel->insert_record($this->admin['uid'],'Удален альбом');
 		$this->session->set_flashdata('operation_error','none');
-		$this->session->set_flashdata('operation_message','Название удаленного альбома - '.$album['alb_title']);
+		$this->session->set_flashdata('operation_message','Название удаленного альбома - '.$albtitle);
 		$this->session->set_flashdata('operation_saccessfull','Альбом удален успешно');
 		redirect($backpath);
 	} /* end function albumdestroy */
@@ -674,7 +708,8 @@ class Administrator extends Controller{
 	} /* end function case_image */
 		 
 	function resize_image($image,$wgt,$hgt,$ratio){
-			
+	
+		$this->load->library('image_lib');
 		$this->image_lib->clear();
 		$config['image_library'] 	= 'gd2';
 		$config['source_image']		= $image; 
@@ -888,6 +923,10 @@ class Administrator extends Controller{
 					);
 		if($this->input->post('btsubmit')):			
 			$_POST['btsubmit'] = NULL;
+			if(!$this->input->post('theme')):
+				$this->themechange();
+				return FALSE;
+			endif;
 			$themes = $this->themesmodel->read_record($_POST['theme']);
 			if($themes['thstatus'] != 'free'):
 				die('денег хватает только на водку!');
@@ -976,6 +1015,9 @@ class Administrator extends Controller{
 					'errortext'		=> 'Произошла ошибка при загрузке фотографий.',
 					'errorcode'		=> '0x0000'
 					);
+		$alb_id = $this->uri->segment(4);
+		$album = $this->albummodel->exist_album($alb_id,$this->admin['uid']);
+		if(!$album) redirect('page403');
 		$pagevar['backpath'] = $this->admin['site'].'/photo-albums/photo-gallery/'.$pagevar['album'];
 		if($this->input->post('btnsubmit')):
 			$this->form_validation->set_rules('imagetitle','"Описание"','required');
@@ -1009,6 +1051,9 @@ class Administrator extends Controller{
 
 	function multiupload(){
 		
+		$album = $this->albummodel->exist_album($_POST['album'],$this->admin['uid']);
+		if(!$album) exit;
+		$imgtitle = $this->albummodel->album_title($_POST['album'],$this->admin['uid']);
 		$files_count = sizeof($_FILES['fileToUpload']['name']);
 		for ($i = 0; $i < $files_count-1; $i++):
 			if($_FILES['fileToUpload']['error'][$i] == FALSE):
@@ -1028,6 +1073,7 @@ class Administrator extends Controller{
 					copy($_FILES['fileToUpload']['tmp_name'][$i],$filepath);
 					$_POST['thumb'] = $this->resize_img($_FILES['fileToUpload']['tmp_name'][$i],186,186);
 					$_POST['file'] = $_FILES['fileToUpload']['name'][$i];
+					$_POST['imagetitle'] = $imgtitle;
 					$this->imagesmodel->insert_record($_POST,$this->admin['uid']);
 					$this->albummodel->insert_photo($_POST['album']);
 					$this->logmodel->insert_record($this->admin['uid'],'Загружена фотография');
@@ -1042,7 +1088,7 @@ class Administrator extends Controller{
 		$path = getcwd().'/users/'.$user.'/images/';
 		$this->load->library('upload');
 		$config['upload_path'] 		= $path;
-		$config['allowed_types'] 	= 'gif|jpg|png';
+		$config['allowed_types'] 	= 'gif|jpg|jpeg|png';
 		$config['remove_spaces'] 	= TRUE;
 		$config['overwrite'] 		= $overwrite;
 		$this->upload->initialize($config);
@@ -1146,12 +1192,23 @@ class Administrator extends Controller{
 					$this->photochange();
 					return FALSE;
 				endif;
-				$_FILES['userfile']['name'] = preg_replace('/.+(.)(\.)+/','about-us'."\$2", $_FILES['userfile']['name']);
+				$_FILES['userfile']['name'] = preg_replace('/.+(.)(\.)+/',date("Ymdhis")."\$2", $_FILES['userfile']['name']);
 				$_POST['file'] = $_FILES['userfile']['name'];
 				if(!$this->fileupload('userfile',$this->admin['site'],603,907,TRUE,FALSE)):
 					$pagevar['errorcode'] = '0x0013';
 					$this->load->view('main/error',$pagevar);
 					return FALSE;
+				endif;
+				$oldimage = $this->otherimagemodel->get_name($pagevar['type'],$this->admin['uid']);
+				$filepath = getcwd().'/users/'.$this->admin['site'].'/images/'.$oldimage;
+				if(!$this->filedelete($filepath)):
+					$this->logmodel->insert_record($this->admin['uid'],'Ошибка удаления файла - '.$oldimage);
+				endif;
+				$filepath = getcwd().'/users/'.$this->admin['site'].'/_thumbs/Images/'.$oldimage;
+				if(is_file($filepath)):
+					if(!$this->filedelete($filepath)):
+						$this->logmodel->insert_record($this->admin['uid'],'Ошибка удаления миниатюры - '.$oldimage);
+					endif;	
 				endif;
 				$this->otherimagemodel->update_record($_POST,$pagevar['type'],$this->admin['uid']);
 			else:
@@ -1187,12 +1244,13 @@ class Administrator extends Controller{
 		
 		$img_id = $this->uri->segment(4);
 		$image = $this->imagesmodel->exist_image($img_id,$this->admin['uid']);
-		if(!$image) redirect('page404');
+		if(!$image) redirect('page403');
 		$backpath = $this->admin['site'].'/photo-albums/photo-gallery/'.$image['img_album'];
 		$this->imagesmodel->image_delete($img_id,$this->admin['uid']);
 		$this->albummodel->delete_photo($image['img_album']);
 		$filepath = getcwd().'/users/'.$this->admin['site'].'/images/'.$image['img_src'];
 		if($this->filedelete($filepath)):
+			$this->logmodel->insert_record($this->admin['uid'],'Фотография удалена');
 			$this->session->set_flashdata('operation_error','none');
 			$this->session->set_flashdata('operation_message','Фотография - '.$image['img_src']);
 			$this->session->set_flashdata('operation_saccessfull','Фотография удалена успешно');
@@ -1200,6 +1258,12 @@ class Administrator extends Controller{
 			$this->session->set_flashdata('operation_error','Файл отсутствует на диске');
 			$this->session->set_flashdata('operation_message','none');
 			$this->session->set_flashdata('operation_saccessfull','Фотография удалена c ошибкой');
+		endif;
+		$filepath = getcwd().'/users/'.$this->admin['site'].'/_thumbs/Images/'.$image['img_src'];
+		if(is_file($filepath)):
+			if(!$this->filedelete($filepath)):
+				$this->logmodel->insert_record($this->admin['uid'],'Ошибка удаления миниатюры - '.$image['img_src']);
+			endif;	
 		endif;
 		redirect($backpath);
 	} /* end function photodestroy */
@@ -1218,7 +1282,7 @@ class Administrator extends Controller{
 		
 		$img_id = $this->uri->segment(4);
 		$image = $this->imagesmodel->exist_image($img_id,$this->admin['uid']);
-		if(!$image) redirect('page404');
+		if(!$image) redirect('page403');
 		$backpath = $this->admin['site'].'/photo-albums/photo-gallery/'.$image['img_album'];
 		$status = $this->imagesmodel->slideshow_status($img_id,$this->admin['uid'],abs($image['img_slideshow']-1));
 		if($status):

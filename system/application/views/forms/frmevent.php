@@ -54,7 +54,7 @@ endif; ?>
 					'name' 	=> 'btnsubmit',
 					'id'   	=> 'btnsubmit',
 					'class' => 'senden',
-					'value'	=> 'Добавить запись'
+					'value'	=> 'Сохранить'
 				);
 			echo form_submit($attr);?>
 	<?php echo form_close(); ?>

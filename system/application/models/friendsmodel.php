@@ -22,9 +22,10 @@
 			return $query->result_array();
 		}
 		
-		function friend_record($id){
+		function friend_record($id,$uid){
 		
 			$this->db->where('fr_id',$id);
+			$this->db->where('fr_uid',$uid);
 			$query = $this->db->get('friends',1);
 			$data = $query->result_array();
 			if(isset($data[0])) return $data[0];
@@ -81,6 +82,25 @@
 			$this->db->set('fr_social',0,FALSE);
 			$this->db->where('fr_id',$id);
 			$this->db->update('friends');
+		}
+
+		function exist_friend($id,$uid){
+			
+			$this->db->where('fr_id',$id);
+			$this->db->where('fr_uid',$uid);
+			$query = $this->db->get('friends',1);
+			$data = $query->result_array();
+			if(isset($data[0])) return $data[0];
+			return FALSE;
+		}
+
+		function friend_name($id,$uid){
+			
+			$this->db->where('fr_id',$id);
+			$this->db->where('fr_uid',$uid);
+			$query = $this->db->get('friends');
+			$data = $query->result_array();
+			return $data[0]['fr_name'];
 		}
 	}
 ?>

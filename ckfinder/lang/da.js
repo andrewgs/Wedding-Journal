@@ -22,29 +22,29 @@
  */
 CKFinder.lang['da'] =
 {
-	appTitle : 'CKFinder', // MISSING
+	appTitle : 'CKFinder',
 
 	// Common messages and labels.
 	common :
 	{
 		// Put the voice-only part of the label in the span.
-		unavailable		: '%1<span class="cke_accessibility">, unavailable</span>', // MISSING
-		confirmCancel	: 'Some of the options have been changed. Are you sure to close the dialog?', // MISSING
-		ok				: 'OK', // MISSING
-		cancel			: 'Cancel', // MISSING
-		confirmationTitle	: 'Confirmation', // MISSING
-		messageTitle	: 'Information', // MISSING
-		inputTitle		: 'Question', // MISSING
-		undo			: 'Undo', // MISSING
-		redo			: 'Redo', // MISSING
-		skip			: 'Skip', // MISSING
-		skipAll			: 'Skip all', // MISSING
-		makeDecision	: 'What action should be taken?', // MISSING
-		rememberDecision: 'Remember my decision'  // MISSING
+		unavailable		: '%1<span class="cke_accessibility">, ikke tilgængelig</span>',
+		confirmCancel	: 'Nogle af indstillingerne er blevet ændret. Er du sikker på at lukke dialogen?',
+		ok				: 'OK',
+		cancel			: 'Annuller',
+		confirmationTitle	: 'Bekræftelse',
+		messageTitle	: 'Information',
+		inputTitle		: 'Spørgsmål',
+		undo			: 'Fortryd',
+		redo			: 'Annuller fortryd',
+		skip			: 'Skip',
+		skipAll			: 'Skip alle',
+		makeDecision	: 'Hvad skal der foretages?',
+		rememberDecision: 'Husk denne indstilling'
 	},
 
 
-	dir : 'ltr', // MISSING
+	dir : 'ltr',
 	HelpLang : 'en',
 	LangCode : 'da',
 
@@ -63,7 +63,7 @@ CKFinder.lang['da'] =
 	//		MM   : Minute (padding zero)
 	//		a    : Firt char of AM/PM
 	//		aa   : AM/PM
-	DateTime : 'dd/mm/yyyy HH:MM',
+	DateTime : 'dd-mm-yyyy HH:MM',
 	DateAmPm : ['AM', 'PM'],
 
 	// Folders
@@ -80,25 +80,25 @@ CKFinder.lang['da'] =
 	FileRenameExt	: 'Er du sikker på, at du vil ændre filtypen? Filen kan muligvis ikke bruges bagefter.',
 	FileRenaming	: '(Omdøber...)',
 	FileDelete		: 'Er du sikker på, at du vil slette filen "%1" ?',
-	FilesLoading	: 'Loading...', // MISSING
-	FilesEmpty		: 'Empty folder', // MISSING
-	FilesMoved		: 'File %1 moved into %2:%3', // MISSING
-	FilesCopied		: 'File %1 copied into %2:%3', // MISSING
+	FilesLoading	: 'Indlæser...',
+	FilesEmpty		: 'Tom mappe',
+	FilesMoved		: 'Filen %1 flyttet til %2:%3',
+	FilesCopied		: 'Filen %1 kopieret til %2:%3',
 
 	// Basket
-	BasketFolder		: 'Basket', // MISSING
-	BasketClear			: 'Clear Basket', // MISSING
-	BasketRemove		: 'Remove from basket', // MISSING
-	BasketOpenFolder	: 'Open parent folder', // MISSING
-	BasketTruncateConfirm : 'Do you really want to remove all files from the basket?', // MISSING
-	BasketRemoveConfirm	: 'Do you really want to remove the file "%1" from the basket?', // MISSING
-	BasketEmpty			: 'No files in the basket, drag\'n\'drop some.', // MISSING
-	BasketCopyFilesHere	: 'Copy Files from Basket', // MISSING
-	BasketMoveFilesHere	: 'Move Files from Basket', // MISSING
+	BasketFolder		: 'Kurv',
+	BasketClear			: 'Tøm kurv',
+	BasketRemove		: 'Fjern fra kurv',
+	BasketOpenFolder	: 'Åben overordnet mappe',
+	BasketTruncateConfirm : 'Er du sikker på at du vil tømme kurven?',
+	BasketRemoveConfirm	: 'Er du sikker på at du vil slette filen "%1" fra kurven?',
+	BasketEmpty			: 'Ingen filer i kurven, brug musen til at trække filer til kurven.',
+	BasketCopyFilesHere	: 'Kopier Filer fra kurven',
+	BasketMoveFilesHere	: 'Flyt Filer fra kurven',
 
-	BasketPasteErrorOther	: 'File %s error: %e', // MISSING
-	BasketPasteMoveSuccess	: 'The following files were moved: %s', // MISSING
-	BasketPasteCopySuccess	: 'The following files were copied: %s', // MISSING
+	BasketPasteErrorOther	: 'Fil fejl: %e',
+	BasketPasteMoveSuccess	: 'Følgende filer blev flyttet: %s',
+	BasketPasteCopySuccess	: 'Følgende filer blev kopieret: %s',
 
 	// Toolbar Buttons (some used elsewhere)
 	Upload		: 'Upload',
@@ -118,17 +118,17 @@ CKFinder.lang['da'] =
 	Rename			: 'Omdøb',
 	Delete			: 'Slet',
 
-	CopyDragDrop	: 'Copy file here', // MISSING
-	MoveDragDrop	: 'Move file here', // MISSING
+	CopyDragDrop	: 'Kopier hertil',
+	MoveDragDrop	: 'Flyt hertil',
 
 	// Dialogs
-	RenameDlgTitle		: 'Rename', // MISSING
-	NewNameDlgTitle		: 'New name', // MISSING
-	FileExistsDlgTitle	: 'File already exists', // MISSING
-	SysErrorDlgTitle : 'System error', // MISSING
+	RenameDlgTitle		: 'Omdøb',
+	NewNameDlgTitle		: 'Nyt navn',
+	FileExistsDlgTitle	: 'Filen eksisterer allerede',
+	SysErrorDlgTitle : 'System fejl',
 
-	FileOverwrite	: 'Overwrite', // MISSING
-	FileAutorename	: 'Auto-rename', // MISSING
+	FileOverwrite	: 'Overskriv',
+	FileAutorename	: 'Auto-omdøb',
 
 	// Generic
 	OkBtn		: 'OK',
@@ -139,14 +139,14 @@ CKFinder.lang['da'] =
 	UploadTitle			: 'Upload ny fil',
 	UploadSelectLbl		: 'Vælg den fil, som du vil uploade',
 	UploadProgressLbl	: '(Uploader, vent venligst...)',
-	UploadBtn			: 'Upload valgt fil',
-	UploadBtnCancel		: 'Cancel', // MISSING
+	UploadBtn			: 'Upload filen',
+	UploadBtnCancel		: 'Annuller',
 
 	UploadNoFileMsg		: 'Vælg en fil på din computer',
-	UploadNoFolder		: 'Please select folder before uploading.', // MISSING
-	UploadNoPerms		: 'File upload not allowed.', // MISSING
-	UploadUnknError		: 'Error sending the file.', // MISSING
-	UploadExtIncorrect	: 'File extension not allowed in this folder.', // MISSING
+	UploadNoFolder		: 'Venligst vælg en mappe før upload startes.',
+	UploadNoPerms		: 'Upload er ikke tilladt.',
+	UploadUnknError		: 'Fejl ved upload.',
+	UploadExtIncorrect	: 'Denne filtype er ikke tilladt i denne mappe.',
 
 	// Settings Panel
 	SetTitle		: 'Indstillinger',
@@ -187,7 +187,7 @@ CKFinder.lang['da'] =
 	115 : 'En fil eller mappe med det samme navn eksisterer allerede.',
 	116 : 'Mappen blev ikke fundet. Opdatér listen eller prøv igen.',
 	117 : 'Filen blev ikke fundet. Opdatér listen eller prøv igen.',
-	118 : 'Source and target paths are equal.', // MISSING
+	118 : 'Originalplacering og destination er ens',
 	201 : 'En fil med det samme filnavn eksisterer allerede. Den uploadede fil er blevet omdøbt til "%1"',
 	202 : 'Ugyldig fil.',
 	203 : 'Ugyldig fil. Filstørrelsen er for stor.',
@@ -195,8 +195,8 @@ CKFinder.lang['da'] =
 	205 : 'Der er ikke en midlertidig mappe til upload til rådighed på serveren.',
 	206 : 'Upload annulleret af sikkerhedsmæssige årsager. Filen indeholder HTML-lignende data.',
 	207 : 'Den uploadede fil er blevet omdøbt til "%1"',
-	300 : 'Moving file(s) failed.', // MISSING
-	301 : 'Copying file(s) failed.', // MISSING
+	300 : 'Flytning af fil(er) fejlede.',
+	301 : 'Kopiering af fil(er) fejlede.',
 	500 : 'Filbrowseren er deaktiveret af sikkerhedsmæssige årsager. Kontakt systemadministratoren eller kontrollér CKFinders konfigurationsfil.',
 	501 : 'Understøttelse af thumbnails er deaktiveret.'
 	},
@@ -205,7 +205,7 @@ CKFinder.lang['da'] =
 	ErrorMsg :
 	{
 		FileEmpty		: 'Filnavnet må ikke være tomt',
-		FileExists		: 'File %s already exists', // MISSING
+		FileExists		: 'Fil %erne eksisterer allerede',
 		FolderEmpty		: 'Mappenavnet må ikke være tomt',
 
 		FileInvChar		: 'Filnavnet må ikke indeholde et af følgende tegn: \n\\ / : * ? " < > |',
@@ -217,32 +217,32 @@ CKFinder.lang['da'] =
 	// Imageresize plugin
 	Imageresize :
 	{
-		dialogTitle		: 'Resize %s', // MISSING
-		sizeTooBig		: 'Cannot set image height or width to a value bigger than the original size (%size).', // MISSING
-		resizeSuccess	: 'Image resized successfully.', // MISSING
-		thumbnailNew	: 'Create new thumbnail', // MISSING
-		thumbnailSmall	: 'Small (%s)', // MISSING
-		thumbnailMedium	: 'Medium (%s)', // MISSING
-		thumbnailLarge	: 'Large (%s)', // MISSING
-		newSize			: 'Set new size', // MISSING
-		width			: 'Width', // MISSING
-		height			: 'Height', // MISSING
-		invalidHeight	: 'Invalid height.', // MISSING
-		invalidWidth	: 'Invalid width.', // MISSING
-		invalidName		: 'Invalid file name.', // MISSING
-		newImage		: 'Create new image', // MISSING
-		noExtensionChange : 'The file extension cannot be changed.', // MISSING
-		imageSmall		: 'Source image is too small',  // MISSING
-		contextMenuName	: 'Resize' // MISSING
+		dialogTitle		: 'Rediger størrelse %s',
+		sizeTooBig		: 'Kan ikke ændre billedets højde eller bredde til en værdi større end dets originale størrelse (%size).',
+		resizeSuccess	: 'Størrelsen er nu ændret.',
+		thumbnailNew	: 'Opret ny thumbnail',
+		thumbnailSmall	: 'Lille (%s)',
+		thumbnailMedium	: 'Mellem (%s)',
+		thumbnailLarge	: 'Stor (%s)',
+		newSize			: 'Rediger størrelse',
+		width			: 'Bredde',
+		height			: 'Højde',
+		invalidHeight	: 'Ugyldig højde.',
+		invalidWidth	: 'Ugyldig bredde.',
+		invalidName		: 'Ugyldigt filenavn.',
+		newImage		: 'Opret nyt billede.',
+		noExtensionChange : 'Filtypen kan ikke ændres.',
+		imageSmall		: 'Originalfilen er for lille',
+		contextMenuName	: 'Rediger størrelse'
 	},
 
 	// Fileeditor plugin
 	Fileeditor :
 	{
-		save			: 'Save', // MISSING
-		fileOpenError	: 'Unable to open file.', // MISSING
-		fileSaveSuccess	: 'File saved successfully.', // MISSING
-		contextMenuName	: 'Edit', // MISSING
-		loadingFile		: 'Loading file, please wait...' // MISSING
+		save			: 'Gem',
+		fileOpenError	: 'Filen kan ikke åbnes.',
+		fileSaveSuccess	: 'Filen er nu gemt.',
+		contextMenuName	: 'Rediger',
+		loadingFile		: 'Henter fil, vent venligst...'
 	}
 };

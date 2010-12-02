@@ -137,7 +137,7 @@ CKFinder.lang['fr'] =
 
 	// Upload Panel
 	UploadTitle			: 'Envoyer un nouveau fichier',
-	UploadSelectLbl		: 'Sélectionner le fichier à téléverser',
+	UploadSelectLbl		: 'Sélectionner le fichier à télécharger',
 	UploadProgressLbl	: '(Envoi en cours, veuillez patienter...)',
 	UploadBtn			: 'Envoyer le fichier sélectionné',
 	UploadBtnCancel		: 'Annuler',

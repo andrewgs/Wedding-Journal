@@ -40,7 +40,7 @@ CKFinder.lang['pt-br'] =
 		skip			: 'Skip', // MISSING
 		skipAll			: 'Skip all', // MISSING
 		makeDecision	: 'What action should be taken?', // MISSING
-		rememberDecision: 'Remember my decision'  // MISSING
+		rememberDecision: 'Remember my decision' // MISSING
 	},
 
 

@@ -13,6 +13,9 @@ $route['login']	= "main/authorization";
 $route['capcha'] = "main/capcha";
 $route['activation/([a-zA-Z0-9])*'] = "main/activation";
 $route['restore'] = "main/passrestore";
+$route['page403'] = "main/page403";
+$route['not-existing'] = "main/notexisting";
+$route['closed-site'] = "main/closesite";
 
 /* Controller Administrator*/
 $route[':any/login'] = "administrator/login";

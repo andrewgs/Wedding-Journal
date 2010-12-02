@@ -13,12 +13,25 @@
 			parent::Model();
 		}
 		
-		/*function get_events_all_records(){
+		function exist_event($id,$uid){
 		
-			$this->db->order_by('evnt_date desc,evnt_id desc');
+			$this->db->where('evnt_id',$id);
+			$this->db->where('evnt_uid',$uid);
+			$query = $this->db->get('events',1);
+			$data = $query->result_array();
+			if(isset($data[0])) return $data[0];
+			return FALSE;
+		}
+		
+		function event_title($id,$uid){
+			
+			$this->db->where('evnt_id',$id);
+			$this->db->where('evnt_uid',$uid);
 			$query = $this->db->get('events');
-			return $query->result();
-		}*/
+			$data = $query->result_array();
+			return $data[0]['evnt_title'];
+		}
+		
 		function events_limit($uid,$count,$from){
 		
 			$this->db->where('evnt_uid',$uid);

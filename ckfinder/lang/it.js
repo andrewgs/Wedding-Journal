@@ -40,7 +40,7 @@ CKFinder.lang['it'] =
 		skip			: 'Skip', // MISSING
 		skipAll			: 'Skip all', // MISSING
 		makeDecision	: 'What action should be taken?', // MISSING
-		rememberDecision: 'Remember my decision'  // MISSING
+		rememberDecision: 'Remember my decision' // MISSING
 	},
 
 
@@ -232,7 +232,7 @@ CKFinder.lang['it'] =
 		invalidName		: 'Invalid file name.', // MISSING
 		newImage		: 'Crea nuova immagine',
 		noExtensionChange : 'L\'estensione del file non può essere cambiata.',
-		imageSmall		: 'Source image is too small',  // MISSING
+		imageSmall		: 'Source image is too small', // MISSING
 		contextMenuName	: 'Ridimensiona'
 	},
 

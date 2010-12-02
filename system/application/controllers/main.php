@@ -374,7 +374,43 @@ class Main extends Controller{
 					);
 					
 		$this->load->view('main/page404',$pagevar);
-	} /* end function index */
+	} /* end function page404 */
+						  
+	function page403(){
+	
+		$pagevar = array(
+					'description'	=> '',
+					'keywords' 		=> '',
+					'title'			=> 'Свадебный сайт',
+					'baseurl' 		=> base_url(),
+					);
+					
+		$this->load->view('main/page403',$pagevar);
+	} /* end function page404 */
+						  
+	function notexisting(){
+	
+		$pagevar = array(
+					'description'	=> '',
+					'keywords' 		=> '',
+					'title'			=> 'Свадебный сайт',
+					'baseurl' 		=> base_url(),
+					);
+					
+		$this->load->view('main/notexisting',$pagevar);
+	} /* end function notexisting */
+							  
+	function closesite(){
+	
+		$pagevar = array(
+					'description'	=> '',
+					'keywords' 		=> '',
+					'title'			=> 'Свадебный сайт',
+					'baseurl' 		=> base_url(),
+					);
+					
+		$this->load->view('main/closesite',$pagevar);
+	} /* end function notexisting */
 	
 	function sendmail($email,$msg,$subject,$from){
 		

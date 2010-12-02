@@ -63,7 +63,7 @@ endif; ?>
 				'name' 	=> 'btnsubmit',
 				'id'   	=> 'btnsubmit',
 				'class' => 'senden',
-				'value'	=> 'Создать запись'
+				'value'	=> 'Сохранить'
 			);
 		echo form_submit($attr);?>
 	</div>

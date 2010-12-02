@@ -58,7 +58,7 @@
 				<div class="grid_4">
 					<h2><?= $events[$i]['evnt_date']; ?></h2>
 					<?php $link = $usite.'/event/'.$events[$i]['evnt_id'].'#event_'.$events[$i]['evnt_id']; ?>
-					<p><?= $events[$i]['evnt_text'].anchor($link,' Читать далее '); ?></p>
+					<p><?= $events[$i]['evnt_text'].anchor($link,' Читать далее'); ?></p>
 				</div>
 			<?php endfor; ?>
 			</div>

@@ -39,7 +39,7 @@ CKFinder.lang['nb'] =
 		skip			: 'Skip', // MISSING
 		skipAll			: 'Skip all', // MISSING
 		makeDecision	: 'What action should be taken?', // MISSING
-		rememberDecision: 'Remember my decision'  // MISSING
+		rememberDecision: 'Remember my decision' // MISSING
 	},
 
 
@@ -231,7 +231,7 @@ CKFinder.lang['nb'] =
 		invalidName		: 'Invalid file name.', // MISSING
 		newImage		: 'Create new image', // MISSING
 		noExtensionChange : 'The file extension cannot be changed.', // MISSING
-		imageSmall		: 'Source image is too small',  // MISSING
+		imageSmall		: 'Source image is too small', // MISSING
 		contextMenuName	: 'Resize' // MISSING
 	},
 

@@ -24,10 +24,10 @@ class General extends Controller{
 		$this->load->model('othertextmodel');
 		$this->load->model('otherimagemodel');
 		if($this->usersmodel->close_status($this->uri->segment(1))):
-			die('Cайт закрыт!');
+			redirect('closed-site');
 		endif;
 		if(!$this->usersmodel->user_exist('usite',$this->uri->segment(1))):
-			die('Такой сайт не существует!');
+			redirect('not-existing');
 		endif;
 		$login 			= $this->session->userdata('login');
 		$confirmation 	= $this->session->userdata('confirmation');
@@ -45,12 +45,8 @@ class General extends Controller{
 	function index(){
 		
 		$usersite = $this->uri->segment(1);
-		if(!$this->usersmodel->user_exist('usite',$usersite)):
-			redirect('page404');
-		else:
-			$userid = $this->usersmodel->user_id('usite',$usersite);
-			$cfg = $this->configmodel->read_record($userid);
-		endif;
+		$userid = $this->usersmodel->user_id('usite',$usersite);
+		$cfg = $this->configmodel->read_record($userid);
 		$pagevar = array(
 					'description'	=> '',
 					'keywords' 		=> '',
@@ -67,12 +63,12 @@ class General extends Controller{
 		$pagevar['images'] = $this->imagesmodel->slideshow_images($userid,TRUE);
 		for($i = 0;$i < count($pagevar['events']); $i++):
 			$pagevar['events'][$i]['evnt_date'] = $this->operation_date($pagevar['events'][$i]['evnt_date']);
-			$text = $pagevar['events'][$i]['evnt_text'];			
+			$text = strip_tags($pagevar['events'][$i]['evnt_text']);
 			if(mb_strlen($text,'UTF-8') > 325):									
 				$text = mb_substr($text,0,325,'UTF-8');	
-				$pos = mb_strrpos($text,' ',0,'UTF-8');
+				$pos = mb_strrpos($text,'.',0,'UTF-8');
 				$text = mb_substr($text,0,$pos,'UTF-8');
-				$pagevar['events'][$i]['evnt_text'] =$text.' ...';
+				$pagevar['events'][$i]['evnt_text'] =$text.'. ';
 			endif;
 		endfor;
 		$this->load->view($pagevar['themeurl'].'/index',$pagevar);
@@ -81,12 +77,8 @@ class General extends Controller{
 	function albums(){
 	
 		$usersite = $this->uri->segment(1);
-		if(!$this->usersmodel->user_exist('usite',$usersite)):
-			redirect('page404');
-		else:
-			$userid = $this->usersmodel->user_id('usite',$usersite);
-			$cfg = $this->configmodel->read_record($userid);
-		endif;
+		$userid = $this->usersmodel->user_id('usite',$usersite);
+		$cfg = $this->configmodel->read_record($userid);
 		$pagevar = array(
 					'description'	=> '',
 					'keywords' 		=> '',
@@ -100,7 +92,6 @@ class General extends Controller{
 					);
 		$this->session->set_userdata('backpage',$pagevar['usite'].'/photo-albums');
 		$pagevar['albums'] = $this->albummodel->albums_records($userid);
-		
 		$flasherr = $this->session->flashdata('operation_error');
 		$flashmsg = $this->session->flashdata('operation_message');
 		$flashsaf = $this->session->flashdata('operation_saccessfull');
@@ -113,12 +104,8 @@ class General extends Controller{
 	function photo(){
 		
 		$usersite = $this->uri->segment(1);
-		if(!$this->usersmodel->user_exist('usite',$usersite)):
-			redirect('page404');
-		else:
-			$userid = $this->usersmodel->user_id('usite',$usersite);
-			$cfg = $this->configmodel->read_record($userid);
-		endif;
+		$userid = $this->usersmodel->user_id('usite',$usersite);
+		$cfg = $this->configmodel->read_record($userid);
 		$pagevar = array(
 					'description'	=> '',
 					'keywords' 		=> '',
@@ -132,7 +119,9 @@ class General extends Controller{
 					'album'			=> $this->uri->segment(4),
 					'message'		=> $this->setmessage('','','',0),
 					);
-
+		$alb_id = $this->uri->segment(4);
+		$album = $this->albummodel->exist_album($alb_id,$userid);
+		if(!$album) redirect('page403');
 		$flasherr = $this->session->flashdata('operation_error');
 		$flashmsg = $this->session->flashdata('operation_message');
 		$flashsaf = $this->session->flashdata('operation_saccessfull');
@@ -152,12 +141,8 @@ class General extends Controller{
 	function events(){
 	
 		$usersite = $this->uri->segment(1);
-		if(!$this->usersmodel->user_exist('usite',$usersite)):
-			redirect('page404');
-		else:
-			$userid = $this->usersmodel->user_id('usite',$usersite);
-			$cfg = $this->configmodel->read_record($userid);
-		endif;
+		$userid = $this->usersmodel->user_id('usite',$usersite);
+		$cfg = $this->configmodel->read_record($userid);
 		$pagevar = array(
 					'description'	=> '',
 					'keywords' 		=> '',
@@ -207,12 +192,8 @@ class General extends Controller{
 	function event($event_id = 0){
 		
 		$usersite = $this->uri->segment(1);
-		if(!$this->usersmodel->user_exist('usite',$usersite)):
-			redirect('page404');
-		else:
-			$userid = $this->usersmodel->user_id('usite',$usersite);
-			$cfg = $this->configmodel->read_record($userid);
-		endif;
+		$userid = $this->usersmodel->user_id('usite',$usersite);
+		$cfg = $this->configmodel->read_record($userid);
 		$pagevar = array(
 					'description'	=> '',
 					'keywords' 		=> '',
@@ -232,6 +213,8 @@ class General extends Controller{
 		if($event_id == 0 or empty($event_id)):
 			$event_id = $this->uri->segment(3);
 		endif;
+		$event = $this->eventsmodel->exist_event($event_id,$userid);
+		if(!$event) redirect('page403');
 		$this->session->unset_userdata('commentlist');
 		if($this->input->post('commit')):
 			$this->form_validation->set_rules('user_name','"Ваше имя"','required|trim');
@@ -276,12 +259,8 @@ class General extends Controller{
 	function friends(){
 	
 		$usersite = $this->uri->segment(1);
-		if(!$this->usersmodel->user_exist('usite',$usersite)):
-			redirect('page404');
-		else:
-			$userid = $this->usersmodel->user_id('usite',$usersite);
-			$cfg = $this->configmodel->read_record($userid);
-		endif;
+		$userid = $this->usersmodel->user_id('usite',$usersite);
+		$cfg = $this->configmodel->read_record($userid);
 		$pagevar = array(
 					'description'	=> '',
 					'keywords' 		=> '',
@@ -326,12 +305,8 @@ class General extends Controller{
 	function about(){
 	
 		$usersite = $this->uri->segment(1);
-		if(!$this->usersmodel->user_exist('usite',$usersite)):
-			redirect('page404');
-		else:
-			$userid = $this->usersmodel->user_id('usite',$usersite);
-			$cfg = $this->configmodel->read_record($userid);
-		endif;
+		$userid = $this->usersmodel->user_id('usite',$usersite);
+		$cfg = $this->configmodel->read_record($userid);
 		$pagevar = array(
 					'description'	=> '',
 					'keywords' 		=> '',

@@ -31,9 +31,10 @@ class Albummodel extends Model{
 		return $data[0]['alb_photo'];
 	}
 	
-	function album_record($album_id){
+	function album_record($album_id,$uid){
 	
 		$this->db->where('alb_id',$album_id);
+		$this->db->where('alb_uid',$uid);
 		$query = $this->db->get('albums',1);
 		$data = $query->result_array();
 		if(isset($data[0])) return $data[0];
@@ -90,6 +91,25 @@ class Albummodel extends Model{
 		
 		$this->db->where('alb_id',$this->alb_id);
 		$this->db->update('albums',$this);	
+	}
+	
+	function exist_album($id,$uid){
+		
+		$this->db->where('alb_id',$id);
+		$this->db->where('alb_uid',$uid);
+		$query = $this->db->get('albums',1);
+		$data = $query->result_array();
+		if(isset($data[0])) return $data[0];
+		return FALSE;
+	}
+	
+	function album_title($id,$uid){
+		
+		$this->db->where('alb_id',$id);
+		$this->db->where('alb_uid',$uid);
+		$query = $this->db->get('albums');
+		$data = $query->result_array();
+		return $data[0]['alb_title'];
 	}
 }
 ?>

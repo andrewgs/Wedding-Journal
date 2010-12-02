@@ -43,6 +43,15 @@
 			return $query->result_array();
 		}
 		
+		function get_names($album,$uid){
+		
+			$this->db->select('img_id AS id,img_src AS src');
+			$this->db->where('img_album',$album);
+			$this->db->where('img_uid',$uid);
+			$query = $this->db->get('images');
+			return $query->result_array();
+		}
+		
 		function get_ones_image($type,$object){
 		
 			$this->db->order_by('img_id asc');
@@ -64,6 +73,13 @@
 		function image_delete($id,$uid){
 		
 			$this->db->where('img_id',$id);
+			$this->db->where('img_uid',$uid);
+			$this->db->delete('images');
+		}
+
+		function images_delete($album,$uid){
+		
+			$this->db->where('img_album',$album);
 			$this->db->where('img_uid',$uid);
 			$this->db->delete('images');
 		}

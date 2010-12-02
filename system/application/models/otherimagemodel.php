@@ -47,5 +47,14 @@
 			$this->db->where('oitype',$type);
 			$this->db->update('otherimage');
 		}
+
+		function get_name($type,$uid){
+		
+			$this->db->where('oitype',$type);
+			$this->db->where('oiuid',$uid);
+			$query = $this->db->get('otherimage',1);
+			$data = $query->result_array();
+			return $data[0]['oisrc'];
+		}
 	}
 ?>

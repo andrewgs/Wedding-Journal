@@ -21,6 +21,16 @@
 			$query = $this->db->get('comments');
 			return $query->result_array();			
 		}
+	
+		function exist_comment($id,$event_id){
+		
+			$this->db->where('cmnt_id',$id);
+			$this->db->where('cmnt_evnt_id',$event_id);
+			$query = $this->db->get('comments',1);
+			$data = $query->result_array();
+			if(isset($data[0])) return $data[0];
+			return FALSE;
+		}
 		
 		function comment_record($id){
 			
@@ -38,7 +48,7 @@
 			$this->cmnt_usr_email 	= $data['user_email'];
 			$this->cmnt_web 		= $data['homepage'];
 			$this->cmnt_usr_date 	= date("Y-m-d"); 
-			$this->cmnt_text 		= strip_tags($data['cmnt_text'],'<p> <br>');
+			$this->cmnt_text 		= strip_tags($data['cmnt_text'],'<p> <br> <img>');
 			$this->db->insert('comments',$this);
 		}
 		

@@ -35,8 +35,8 @@ function CheckAuthentication()
 
 // LicenseKey : Paste your license key here. If left blank, CKFinder will be
 // fully functional, in demo mode.
-$config['LicenseName'] = '';
-$config['LicenseKey'] = '';
+$config['LicenseName'] = $_SERVER['HTTP_HOST'];
+$config['LicenseKey'] = 'C1234567A89BC';
 
 /*
  Uncomment lines below to enable PHP error reporting and displaying PHP errors.
@@ -60,7 +60,8 @@ Examples:
 
 ATTENTION: The trailing slash is required.
 */
-$baseUrl = 'http://localhost/samoilovi.ru/ckfinder/userfiles/';
+session_start();
+$baseUrl = '/users/'.$_SESSION['usersite'].'/';
 
 /*
 $baseDir : the path to the local directory (in the server) which points to the
