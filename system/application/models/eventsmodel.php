@@ -85,16 +85,19 @@
 			return NULL;
 		}
 		
-		function insert_comments($id){
+		function insert_comments($id,$uid){
+		
 			$this->db->set('evnt_cnt_cmnt','evnt_cnt_cmnt+1',FALSE);
 			$this->db->where('evnt_id',$id);
+			$this->db->where('evnt_uid',$uid);
 			$this->db->update('events');
 		}
 		
-		function delete_comments($id){
+		function delete_comments($id,$uid){
 		
 			$this->db->set('evnt_cnt_cmnt','evnt_cnt_cmnt-1',FALSE);
 			$this->db->where('evnt_id',$id);
+			$this->db->where('evnt_uid',$uid);
 			$this->db->update('events');
 		}
 		

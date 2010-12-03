@@ -1,21 +1,11 @@
 <?php
 class Administrator extends Controller{
 
-	var $admin = array(
-				'uid'		=> 0,
-				'login' 	=> '',
-				'password' 	=> '',
-				'site' 		=> '',
-				'themeurl' 	=> ''
-			);
+	var $admin = array('uid'=>0,'login'=>'','password'=>'','site'=>'','themeurl'=>'');
 			
-	var $months = array("01"=>"января", 	"02"=>"февраля",
-						"03"=>"марта",		"04"=>"апреля",
-						"05"=>"мая",		"06"=>"июня",
-						"07"=>"июля",		"08"=>"августа",
-						"09"=>"сентября", 	"10"=>"октября",
-						"11"=>"ноября",		"12"=>"декабря"
-					);	
+	var $months = array("01"=>"января","02"=>"февраля","03"=>"марта","04"=>"апреля",
+						"05"=>"мая","06"=>"июня","07"=>"июля","08"=>"августа",
+						"09"=>"сентября","10"=>"октября","11"=>"ноября","12"=>"декабря");	
 						
 	function Administrator(){
 	
@@ -236,7 +226,7 @@ class Administrator extends Controller{
 		if(!$event) redirect('page403');
 		$evnttitle = $this->eventsmodel->event_title($event_id,$this->admin['uid']);
 		$this->eventsmodel->delete_record($event_id);
-		$this->commentsmodel->delete_records($event_id);
+		$this->commentsmodel->delete_records($this->admin['uid'],$event_id,0);
 		$this->logmodel->insert_record($this->admin['uid'],'Удалена запись');
 		$this->session->set_flashdata('operation_error','none');
 		$this->session->set_flashdata('operation_message','Название удаленной записи - '.$evnttitle);
@@ -244,7 +234,7 @@ class Administrator extends Controller{
 		redirect($backpath);
 	} /* end function eventdestroy */
 	
-	function commentedit($comment_id = 0,$event_id = 0,$error = FALSE){
+	function commentedit($comment_id = 0,$object_id = 0,$error = FALSE){
 		
 		$pagevar = array(
 					'description'	=> '',
@@ -262,12 +252,25 @@ class Administrator extends Controller{
 					'comment'		=> array()
 					);
 		if($comment_id == 0 or empty($comment_id)):
-			$comment_id = $this->uri->segment(4);
-			$event_id 	= $this->uri->segment(3);
+			$comment_id = $this->uri->segment(5);
+			$object_id 	= $this->uri->segment(4);
 		endif;
-		$comment = $this->commentsmodel->exist_comment($comment_id,$event_id);
-		if(!$comment) redirect('page403');
-		$pagevar['backpath'] = $pagevar['usite'].'/event/'.$event_id.'#comment_'.$comment_id;
+		switch ($this->uri->segment(2)):
+			case 'photo-albums': 	$comment = $this->commentsmodel->exist_comment($comment_id,0,$object_id);
+									if(!$comment) redirect('page403');
+									$img_id = $object_id; 
+									$event_id = 0;
+									$album = $this->imagesmodel->get_album($img_id,$this->admin['uid']);
+									$pagevar['backpath'] =$pagevar['usite'].'/photo-albums/photo-comments/'.$object_id.'#comment_'.$comment_id;
+									break;
+			case 'event'		:	$comment = $this->commentsmodel->exist_comment($comment_id,$object_id,0);
+									if(!$comment) redirect('page403');
+									$img_id = 0;
+									$event_id = $object_id;
+									$album = 0;
+									$pagevar['backpath'] = $pagevar['usite'].'/event/'.$object_id.'#comment_'.$comment_id;
+									break;
+		endswitch;
 		if(isset($pagevar['commentlist']) and !empty($pagevar['commentlist'])):
 			$pagevar['backpath'] = $pagevar['commentlist'];
 		endif;
@@ -280,13 +283,13 @@ class Administrator extends Controller{
 			$this->form_validation->set_error_delimiters('<div class="message">','</div>');
 			if (!$this->form_validation->run()):
 				$_POST['btnsubmit'] = NULL;
-				$this->commentedit($_POST['id'],$_POST['event_id'],TRUE);
+				$this->commentedit($_POST['id'],$_POST['object_id'],TRUE);
 				return FALSE;
 			else:
 				$pattern = "/(\d+)\/(\w+)\/(\d+)/i";
 				$replacement = "\$3-\$2-\$1";
 				$_POST['user_date'] = preg_replace($pattern, $replacement, $_POST['user_date']);
-				$this->commentsmodel->update_record($_POST);
+				$this->commentsmodel->update_record($comment_id,$this->admin['uid'],$event_id,$album,$img_id,$_POST);
 				$this->session->set_flashdata('operation_error','none');
 				$this->session->set_flashdata('operation_message','Комментарий от "'.$_POST['user_name'].'"');
 				$this->session->set_flashdata('operation_saccessfull','Комментарий изменен');
@@ -300,19 +303,27 @@ class Administrator extends Controller{
 	
 	function commentdestroy(){
 		
-		$event_id = $this->uri->segment(3);
-		$comment_id = $this->uri->segment(4);
-		$comment = $this->commentsmodel->exist_comment($comment_id,$event_id);
-		if(!$comment) redirect('page403');
-		$backpath = $this->admin['site'].'/event/'.$event_id;
+		$object_id = $this->uri->segment(4);
+		$comment_id = $this->uri->segment(5);
+		switch ($this->uri->segment(2)):
+			case 'photo-albums'	: 	$comment = $this->commentsmodel->exist_comment($comment_id,0,$object_id);
+									if(!$comment) redirect('page403');
+									$backpath = $this->admin['site'].'/photo-albums/photo-comments/'.$object_id;
+									$this->imagesmodel->delete_comments($object_id,$this->admin['uid']);
+									break;
+			case 'event'		:	$comment = $this->commentsmodel->exist_comment($comment_id,$object_id,0);
+									if(!$comment) redirect('page403');
+									$backpath = $this->admin['site'].'/event/'.$object_id;
+									$this->eventsmodel->delete_comments($object_id,$this->admin['uid']);
+									break;
+		endswitch;
 		$commentlist = $this->session->userdata('commentlist');
 		if(isset($commentlist) and !empty($commentlist)) 
 			$backpath = $commentlist;
-		$comment = $this->commentsmodel->comment_record($comment_id);
-		$this->eventsmodel->delete_comments($event_id);
-		$this->commentsmodel->delete_record($comment_id);
+		$uname = $this->commentsmodel->comment_name($comment_id,$this->admin['uid']);
+		$this->commentsmodel->delete_record($comment_id,$this->admin['uid']);
 		$this->session->set_flashdata('operation_error','none');
-		$this->session->set_flashdata('operation_message','Комментарий от "'.$comment['cmnt_usr_name'].'"');
+		$this->session->set_flashdata('operation_message','Комментарий от "'.$uname.'"');
 		$this->session->set_flashdata('operation_saccessfull','Комментарий удален успешно');
 		redirect($backpath);
 	} /* end function commentdestroy */
@@ -617,6 +628,7 @@ class Administrator extends Controller{
 		endfor;
 		$this->imagesmodel->images_delete($album_id,$this->admin['uid']);
 		$this->albummodel->delete_record($album_id);
+		$this->commentsmodel->delete_albums($this->admin['uid'],$album_id);
 		$this->logmodel->insert_record($this->admin['uid'],'Удален альбом');
 		$this->session->set_flashdata('operation_error','none');
 		$this->session->set_flashdata('operation_message','Название удаленного альбома - '.$albtitle);
@@ -1248,6 +1260,7 @@ class Administrator extends Controller{
 		$backpath = $this->admin['site'].'/photo-albums/photo-gallery/'.$image['img_album'];
 		$this->imagesmodel->image_delete($img_id,$this->admin['uid']);
 		$this->albummodel->delete_photo($image['img_album']);
+		$this->commentsmodel->delete_records($this->admin['uid'],0,$img_id);
 		$filepath = getcwd().'/users/'.$this->admin['site'].'/images/'.$image['img_src'];
 		if($this->filedelete($filepath)):
 			$this->logmodel->insert_record($this->admin['uid'],'Фотография удалена');

@@ -73,7 +73,7 @@
 							<div class="text">
 								<?= $events[$i]['evnt_text']; ?>
 								<div class="cnt_comments">
-									<?php $text = $events[$i]['evnt_cnt_cmnt'].' комментариев &raquo;'; ?>
+									<?php $text = 'Комментарии: '.$events[$i]['evnt_cnt_cmnt']; ?>
 									<?php $link = $usite.'/event/'.$events[$i]['evnt_id']; ?>
 									<?= anchor($link,$text); ?>
 									<?php if($admin): ?>

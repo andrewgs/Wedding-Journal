@@ -14,8 +14,6 @@ endif; ?>
 <?= form_open($formaction); ?>
 	<div class="post-header">
 		<div class="post-title">
-			<?= form_hidden('id',$comment['cmnt_id']); ?>
-			<?= form_hidden('event_id',$comment['cmnt_evnt_id']); ?>
 			<?= form_label('Имя: ','cmntlabel');
 			$attr = array(
 					'name' => 'user_name',

@@ -82,7 +82,7 @@ class General extends Controller{
 		$pagevar = array(
 					'description'	=> '',
 					'keywords' 		=> '',
-					'title'			=> 'Свадебный сайт',
+					'title'			=> 'Свадебный сайт | Фоторепортажи',
 					'baseurl' 		=> base_url(),
 					'themeurl' 		=> $cfg['cfgthemepath'],
 					'admin'			=> $this->usrinfo['status'],
@@ -137,6 +137,76 @@ class General extends Controller{
 		endfor;
 		$this->load->view($pagevar['themeurl'].'/photo-gallery',$pagevar);
 	} /* end function photo */
+	
+	function photocomments($img_id = 0){
+		
+		$usersite = $this->uri->segment(1);
+		$userid = $this->usersmodel->user_id('usite',$usersite);
+		$cfg = $this->configmodel->read_record($userid);
+		$pagevar = array(
+					'description'	=> '',
+					'keywords' 		=> '',
+					'title'			=> 'Свадебный сайт | Фоторепортажи | Фотографии | Комментарии',
+					'baseurl' 		=> base_url(),
+					'backpath' 		=> $usersite.'/photo-albums/photo-gallery/',
+					'themeurl' 		=> $cfg['cfgthemepath'],
+					'admin'			=> $this->usrinfo['status'],
+					'usite'			=> $usersite,
+					'formaction' 	=> $this->uri->uri_string(),
+					'album'			=> '',
+					'image'			=> array(),
+					'comments'		=> array(),
+					'count'			=> 0,
+					'user'			=> $this->usrinfo,
+					'message'		=> $this->setmessage('','','',0),
+					);
+		if($img_id == 0 or empty($img_id)):
+			$img_id = $this->uri->segment(4);
+		endif;
+		$image = $this->imagesmodel->exist_image($img_id,$userid);
+		if(!$image) redirect('page403');
+		$pagevar['image'] = $this->imagesmodel->read_record($img_id,$userid);
+		if($this->input->post('commit')):
+			$this->form_validation->set_rules('user_name','"Ваше имя"','required|trim');
+			$this->form_validation->set_rules('user_email','"E-mail"','required|valid_email|trim');
+			$this->form_validation->set_rules('cmnt_text','"Комментарий"','required|trim');
+			$this->form_validation->set_rules('homepage','"Веб-сайт"','trim');
+			$this->form_validation->set_error_delimiters('<div class="message">','</div>');
+			if(!$this->form_validation->run()):
+				$_POST['commit'] = NULL;
+				$this->photocomments($img_id);
+				return FALSE;
+			else:
+				if(isset($_POST['homepage']) and !empty($_POST['homepage']))
+					if(strncmp(strtolower($_POST['homepage']),'http://',7) != 0)
+						$_POST['homepage'] = 'http://'.$_POST['homepage'];
+				$this->imagesmodel->insert_comments($img_id,$userid);
+				$_POST['img_id'] = $img_id;
+				$this->commentsmodel->insert_record($userid,$_POST,0,$pagevar['image']['album'],$img_id);
+				$_POST['commit'] = NULL;
+				redirect($pagevar['formaction']);
+				return TRUE;
+			endif;
+		endif;
+		$pagevar['album'] = $this->albummodel->album_title($pagevar['image']['album'],$userid);
+		$pagevar['backpath'] .= $pagevar['image']['album'];
+		$pagevar['image']['src'] = $pagevar['baseurl'].'users/'.$usersite.'/images/'.$pagevar['image']['src'];
+		$info = getimagesize($pagevar['image']['src']);
+		$pagevar['image']['wight'] = round($info[0]/2);
+		$pagevar['image']['height'] = round($info[1]/2);
+		$pagevar['comments'] = $this->commentsmodel->comments_records($userid,0,$img_id);
+		for($i = 0;$i < count($pagevar['comments']);$i++):
+			$pagevar['comments'][$i]['cmnt_usr_date'] = $this->operation_date_slash($pagevar['comments'][$i]['cmnt_usr_date']);
+		endfor;
+		
+		$flasherr = $this->session->flashdata('operation_error');
+		$flashmsg = $this->session->flashdata('operation_message');
+		$flashsaf = $this->session->flashdata('operation_saccessfull');
+		if($flasherr && $flashmsg && $flashsaf)
+			$pagevar['message'] = $this->setmessage($flasherr,$flashsaf,$flashmsg,1);
+		
+		$this->load->view($pagevar['themeurl'].'/image',$pagevar);
+	} /* end function photocomments */
 	
 	function events(){
 	
@@ -224,14 +294,15 @@ class General extends Controller{
 			$this->form_validation->set_error_delimiters('<div class="message">','</div>');
 			if(!$this->form_validation->run()):
 				$_POST['commit'] = NULL;
-				$this->event($_POST['event_id'],TRUE);
+				$this->event($event_id);
 				return FALSE;
 			else:
 				if(isset($_POST['homepage']) and !empty($_POST['homepage']))
 					if(strncmp(strtolower($_POST['homepage']),'http://',7) != 0)
 						$_POST['homepage'] = 'http://'.$_POST['homepage'];
-				$this->eventsmodel->insert_comments($_POST['event_id']);			
-				$this->commentsmodel->insert_record($_POST);
+				$this->eventsmodel->insert_comments($event_id,$userid);
+				$_POST['event_id'] = $event_id;
+				$this->commentsmodel->insert_record($userid,$_POST,$event_id,0,0);
 				$_POST['commit'] = NULL;
 				redirect($pagevar['formaction']);
 				return TRUE;
@@ -241,7 +312,7 @@ class General extends Controller{
 		if(count($pagevar['event']) > 0):
 			$pagevar['event']['evnt_date'] = $this->operation_date($pagevar['event']['evnt_date']);
 		endif;
-		$pagevar['comments'] = $this->commentsmodel->comments_records($event_id);
+		$pagevar['comments'] = $this->commentsmodel->comments_records($userid,$event_id,0);
 		for($i = 0;$i < count($pagevar['comments']);$i++):
 			$pagevar['comments'][$i]['cmnt_usr_date'] = $this->operation_date_slash($pagevar['comments'][$i]['cmnt_usr_date']);
 		endfor;

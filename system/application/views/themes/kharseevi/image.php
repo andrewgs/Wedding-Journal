@@ -62,16 +62,13 @@
 						<div class="blog-content">
 							<div class="post-header">
 								<div class="post-title">
-									<a name="blog_<?= $event['evnt_id'];?>"></a>
-									<?= $event['evnt_title']; ?>
-								</div>
-								<div class="post-date">
-									<?= $event['evnt_date']; ?>
+									<a name="blog_<?= $image['id'];?>"></a>
+									<?= $album; ?>
 								</div>
 							</div>
 							<div class="text">
-								<?= $event['evnt_text']; ?>
-								<br />
+								<img src="<?= $image['src']; ?>" alt="" title="<?=$image['title'] ?>" height="<?=$image['height']; ?>" width="<?=$image['wight']; ?>" align="left">
+								<p><?= $image['title']; ?></p>
 							</div>
 						</div>
 						<div class="blog-r"> </div>
@@ -102,10 +99,10 @@
 					<?php if($admin): ?>
 						<div>
 							<?php $text = 'Редактировать'; ?>
-							<?php $link = $usite.'/event/comment-edit/'.$comments[$i]['cmnt_evnt_id'].'/'.$comments[$i]['cmnt_id']; ?>
+							<?php $link = $usite.'/photo-albums/comment-edit/'.$comments[$i]['cmnt_img_id'].'/'.$comments[$i]['cmnt_id']; ?>
 							<?= anchor($link,$text).' | '; ?>
 							<?php $text = 'Удалить'; ?>
-							<?php $link = $usite.'/event/comment-destroy/'.$comments[$i]['cmnt_evnt_id'].'/'.$comments[$i]['cmnt_id']; ?>
+							<?php $link = $usite.'/photo-albums/comment-destroy/'.$comments[$i]['cmnt_img_id'].'/'.$comments[$i]['cmnt_id']; ?>
 							<?php $attr = array('class'=>'delete'); ?>
 							<?= anchor($link,$text,$attr); ?>
 						</div>

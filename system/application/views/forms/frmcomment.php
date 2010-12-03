@@ -1,5 +1,4 @@
 <?= form_open($formaction); ?>
-	<?= form_hidden('event_id',$this->uri->segment(3)); ?>
 	<div id="edit-name-wrapper" class="form-item">
 		<?= form_label('Ваше имя: <span title="Это поле обязательно для заполнения." class="form-required">*</span>','edit-name');
 		$attr = array(

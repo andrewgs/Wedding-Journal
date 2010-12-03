@@ -8,6 +8,7 @@
 		var $img_album		= 0;
 		var $img_thumb		= 0;
 		var $img_slideshow 	= 1;
+		var $img_cmnt 		= 0;
 		 
 		function Imagesmodel(){			
 			
@@ -25,22 +26,48 @@
 			$this->db->insert('images', $this);
 		}
 		
-		function get_image_all_data($type,$object,$without){
-		
-			$this->db->order_by('img_type asc');
-			
-			$where = array('img_object' => $object,'img_type' => $type,'img_id !=' => $without);
-			$this->db->where($where);
-			$query = $this->db->get('images');
-			return $query->result();
-		}
-			
 		function get_images($album,$uid){
 		
 			$this->db->where('img_album',$album);
 			$this->db->where('img_uid',$uid);
 			$query = $this->db->get('images');
 			return $query->result_array();
+		}
+
+		function read_record($id,$uid){
+			
+			$this->db->select('img_id AS id,img_src AS src,img_title AS title,img_album AS album');
+			$this->db->where('img_id',$id);
+			$this->db->where('img_uid',$uid);
+			$query = $this->db->get('images',1);
+			$data = $query->result_array();
+			if(isset($data[0])) return $data[0];
+			return NULL;
+		}
+
+		function insert_comments($id,$uid){
+		
+			$this->db->set('img_cmnt','img_cmnt+1',FALSE);
+			$this->db->where('img_id',$id);
+			$this->db->where('img_uid',$uid);
+			$this->db->update('images');
+		}
+		
+		function delete_comments($id,$uid){
+		
+			$this->db->set('img_cmnt','img_cmnt-1',FALSE);
+			$this->db->where('img_id',$id);
+			$this->db->where('img_uid',$uid);
+			$this->db->update('images');
+		}
+		
+		function count_records($userid){
+		
+			$this->db->select('count(*) as cnt');
+			$this->db->where('img_uid',$userid);
+			$query = $this->db->get('images');
+			$data = $query->result_array();
+			return $data[0]['cnt'];
 		}
 		
 		function get_names($album,$uid){
@@ -52,14 +79,13 @@
 			return $query->result_array();
 		}
 		
-		function get_ones_image($type,$object){
+		function get_album($id,$uid){
 		
-			$this->db->order_by('img_id asc');
-			$this->db->where('img_type',$type);
-			$this->db->where('img_object',$object);
-			
-			$query = $this->db->get('images',1);
-			return $query->result();
+			$this->db->where('img_id',$id);
+			$this->db->where('img_uid',$uid);
+			$query = $this->db->get('images');
+			$data = $query->result_array();
+			return $data[0]['img_album'];
 		}
 		
 		function get_image($id){
@@ -83,12 +109,7 @@
 			$this->db->where('img_uid',$uid);
 			$this->db->delete('images');
 		}
-		
-		function image_type_delete($type,$object){
 			
-			$this->db->delete('images', array('img_object' => $object,'img_type' => $type));
-		}
-
 		function exist_image($id,$uid){
 			
 			$this->db->where('img_id',$id);

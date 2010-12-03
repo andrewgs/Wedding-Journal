@@ -77,16 +77,24 @@
 								<div class="image-title"><?= $images[$i]['img_title']; ?></div>
 							</div>
 							<div class="album-controls">
-								<?php $text = 'Удалить'; ?>
-								<?php $str_uri = $baseurl.$usite.'/photo-albums/photo-destory/'.$images[$i]['img_id']; ?>
-								<?php $attr = array('class'=>'delete'); ?>
-								<?= anchor($str_uri,$text,$attr); ?>
-								<?php $text = 'На главной - '.$images[$i]['img_slideshow']; ?>
-								<?php $str_uri = $baseurl.$usite.'/photo-albums/photo-slideshow/'.$images[$i]['img_id']; ?>
-								<?php $attr = array('class'=>'slideshow'); ?>
-								<?= anchor($str_uri,$text,$attr); ?>
+								<?php $text = 'Комментарии: '.$images[$i]['img_cmnt']; ?>
+								<?php $str_uri = $baseurl.$usite.'/photo-albums/photo-comments/'.$images[$i]['img_id']; ?>
+								<?= anchor($str_uri,$text); ?>
 							</div>
 							<div class="clear"></div>
+							<?php if($admin):?>
+								<div class="album-controls">
+									<?php $text = 'Удалить'; ?>
+									<?php $str_uri = $baseurl.$usite.'/photo-albums/photo-destory/'.$images[$i]['img_id']; ?>
+									<?php $attr = array('class'=>'delete'); ?>
+									<?= anchor($str_uri,$text,$attr); ?>
+									<?php $text = 'На главной - '.$images[$i]['img_slideshow']; ?>
+									<?php $str_uri = $baseurl.$usite.'/photo-albums/photo-slideshow/'.$images[$i]['img_id']; ?>
+									<?php $attr = array('class'=>'slideshow'); ?>
+									<?= anchor($str_uri,$text,$attr); ?>
+								</div>
+								<div class="clear"></div>
+							<?php endif; ?>
 						</div>
 					<?php endfor; ?>
 					</div>
