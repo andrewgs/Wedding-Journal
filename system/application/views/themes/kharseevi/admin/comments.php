@@ -26,7 +26,11 @@
 		<div id="content">
 			<?php $this->load->view('transitions/fullback');?>
 			<div class="container_12">
-				<?php $this->load->view('message');?>
+				<div class="grid_12>
+					<?php $this->load->view('forms/frmcommentslist'); ?>
+					<?php $this->load->view('message');?>
+				</div>
+				<div class="clear"></div>
 				<?php if(isset($pages) and !empty($pages)): ?>
 					<div class="grid_3 omega">
 						<div class='pagination'><?= $pages; ?></div>
@@ -34,30 +38,59 @@
 					<div class="clear"></div>
 				<?php endif; ?>
 			</div>	
-			<?php for($i = 0; $i < count($comments);$i++): ?>
+			<?php for($i = 0; $i < count($events);$i++): ?>
 			<div class="container_16">
 				<div class="comment grid_10">
 					<div class="post-date">
-						<?= $comments[$i]['evnt_title'];?>
+						<?= $events[$i]['evnt_title'];?>
 						&nbsp;&nbsp;
-						<?= $comments[$i]['evnt_date']; ?>
+						<?= $events[$i]['evnt_date']; ?>
 					</div>
 					<hr />
-					<p><span class="user" id="<?= $comments[$i]['cmnt_id']; ?>">
-					<?php if(!empty($comments[$i]['cmnt_web'])): ?>
-						<a title="" target="_blank" href="<?= $comments[$i]['cmnt_web']; ?>"><?= $comments[$i]['cmnt_usr_name']; ?></a>
+					<p><span class="user" id="<?= $events[$i]['cmnt_id']; ?>">
+					<?php if(!empty($events[$i]['cmnt_web'])): ?>
+						<a title="" target="_blank" href="<?= $events[$i]['cmnt_web']; ?>"><?= $events[$i]['cmnt_usr_name']; ?></a>
 					<?php else: ?>
-						<?= $comments[$i]['cmnt_usr_name']; ?>
+						<?= $events[$i]['cmnt_usr_name']; ?>
 					<?php endif; ?>
 					</span>	
-					<span class="dates">&nbsp;<?= $comments[$i]['cmnt_usr_date']; ?></span></p>
-					<p><?= $comments[$i]['cmnt_text']; ?> </p>
+					<span class="dates">&nbsp;<?= $events[$i]['cmnt_usr_date']; ?></span></p>
+					<p><?= $events[$i]['cmnt_text']; ?> </p>
 					<div>
 						<?php $text = 'Редактировать'; ?>
-						<?php $link = $usite.'/comment-edit/'.$comments[$i]['cmnt_evnt_id'].'/'.$comments[$i]['cmnt_id']; ?>
+						<?php $link = $usite.'/event/comment-edit/'.$events[$i]['cmnt_evnt_id'].'/'.$events[$i]['cmnt_id']; ?>
 						<?= anchor($link,$text).' | '; ?>
 						<?php $text = 'Удалить'; ?>
-						<?php $link = $usite.'/comment-destroy/'.$comments[$i]['cmnt_evnt_id'].'/'.$comments[$i]['cmnt_id']; ?>
+						<?php $link = $usite.'/event/comment-destroy/'.$events[$i]['cmnt_evnt_id'].'/'.$events[$i]['cmnt_id']; ?>
+						<?php $attr = array('class'=>'delete'); ?>
+						<?= anchor($link,$text,$attr); ?>
+					</div>
+				</div>
+				<div class="clear"></div>			
+			</div>
+		<?php endfor; ?>
+		<?php for($i = 0; $i < count($images);$i++): ?>
+			<div class="container_16">
+				<div class="comment grid_10">
+					<div class="post-date">
+						<img src="<?= $images[$i]['img_src']; ?>" alt="" title="" height="<?=$images[$i]['height']; ?>" width="<?=$images[$i]['wight']; ?>" align="buttom">
+					</div>
+					<hr />
+					<p><span class="user" id="<?= $images[$i]['cmnt_id']; ?>">
+					<?php if(!empty($images[$i]['cmnt_web'])): ?>
+						<a title="" target="_blank" href="<?= $images[$i]['cmnt_web']; ?>"><?= $images[$i]['cmnt_usr_name']; ?></a>
+					<?php else: ?>
+						<?= $images[$i]['cmnt_usr_name']; ?>
+					<?php endif; ?>
+					</span>	
+					<span class="dates">&nbsp;<?= $images[$i]['cmnt_usr_date']; ?></span></p>
+					<p><?= $images[$i]['cmnt_text']; ?> </p>
+					<div>
+						<?php $text = 'Редактировать'; ?>
+						<?php $link = $usite.'/photo-albums/comment-edit/'.$images[$i]['cmnt_img_id'].'/'.$images[$i]['cmnt_id']; ?>
+						<?= anchor($link,$text).' | '; ?>
+						<?php $text = 'Удалить'; ?>
+						<?php $link = $usite.'/photo-albums/comment-destroy/'.$images[$i]['cmnt_img_id'].'/'.$images[$i]['cmnt_id']; ?>
 						<?php $attr = array('class'=>'delete'); ?>
 						<?= anchor($link,$text,$attr); ?>
 					</div>

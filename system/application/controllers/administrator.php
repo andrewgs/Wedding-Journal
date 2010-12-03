@@ -55,6 +55,7 @@ class Administrator extends Controller{
 					'message'		=> $this->setmessage('','','',0)
 					);
 		$this->session->unset_userdata('commentlist');
+		$this->session->unset_userdata('cmntval');
 		$this->session->set_userdata('backpage',$pagevar['usite'].'/admin');
 		$flasherr = $this->session->flashdata('operation_error');
 		$flashmsg = $this->session->flashdata('operation_message');
@@ -1139,32 +1140,59 @@ class Administrator extends Controller{
 					'message'		=> $this->setmessage('','','',0),
 					'pages'			=> '',
 					'count'			=> 0,
-					'comments'		=> array()
+					'events'		=> array(),
+					'images'		=> array()
 					);
 		$this->session->set_userdata('commentlist',$pagevar['usite'].'/admin/comments');
-		$pagevar['count'] = $this->unionmodel->count_record($countday,$this->admin['uid']);
-		$config['base_url'] 		= base_url().$pagevar['usite'].'/admin/comments';	
-       	$config['total_rows'] 		= $pagevar['count'];
-		$config['per_page'] 		= 10;
-       	$config['num_links'] 		= 2;
-       	$config['uri_segment'] 		= 4;
-		$config['first_link'] 		= 'В начало';
-		$config['last_link'] 		= 'В конец';
-		$config['next_link'] 		= 'Далее &raquo;';
-		$config['prev_link'] 		= '&laquo; Назад';
-		$config['cur_tag_open'] 	= '<b>';
-		$config['cur_tag_close']	= '</b>';
-		$from = intval($this->uri->segment(4));
-		if(isset($from) and !empty($from)):
-			$this->session->set_userdata('commentlist',$pagevar['usite'].'/admin/comments/'.$from);
+		if($this->input->post('btnsubmit')):
+			$_POST['btnsubmit'] = NULL;
+			if(!isset($_POST['cmntval'])):
+				$this->session->unset_userdata('cmntval');
+				redirect($this->uri->uri_string());
+			endif;
+			$this->session->set_userdata('cmntval',$_POST['cmntval']);
 		endif;
-		$pagevar['comments'] = $this->unionmodel->select_comments($countday,5,$from,$this->admin['uid']);
-		for($i = 0;$i < count($pagevar['comments']);$i++):
-			$pagevar['comments'][$i]['evnt_date'] = $this->operation_date($pagevar['comments'][$i]['evnt_date']);
-			$pagevar['comments'][$i]['cmnt_usr_date'] = $this->operation_date_slash($pagevar['comments'][$i]['cmnt_usr_date']);
-		endfor;
-		$this->pagination->initialize($config);
-		$pagevar['pages'] = $this->pagination->create_links();
+		$cmntval = $this->session->userdata('cmntval');
+		if($cmntval):
+			if($cmntval == 1):
+				$pagevar['count'] = $this->unionmodel->count_events($countday,$this->admin['uid']);
+			else:
+				$pagevar['count'] = $this->unionmodel->count_images($countday,$this->admin['uid']);
+			endif;
+			$config['base_url'] 		= base_url().$pagevar['usite'].'/admin/comments';	
+	       	$config['total_rows'] 		= $pagevar['count'];
+			$config['per_page'] 		= 10;
+	       	$config['num_links'] 		= 2;
+	       	$config['uri_segment'] 		= 4;
+			$config['first_link'] 		= 'В начало';
+			$config['last_link'] 		= 'В конец';
+			$config['next_link'] 		= 'Далее &raquo;';
+			$config['prev_link'] 		= '&laquo; Назад';
+			$config['cur_tag_open'] 	= '<b>';
+			$config['cur_tag_close']	= '</b>';
+			$from = intval($this->uri->segment(4));
+			if(isset($from) and !empty($from)):
+				$this->session->set_userdata('commentlist',$pagevar['usite'].'/admin/comments/'.$from);
+			endif;
+			if($cmntval == 1):
+				$pagevar['events'] = $this->unionmodel->select_events($countday,10,$from,$this->admin['uid']);
+				for($i = 0;$i < count($pagevar['events']);$i++):
+					$pagevar['events'][$i]['evnt_date'] = $this->operation_date($pagevar['events'][$i]['evnt_date']);
+					$pagevar['events'][$i]['cmnt_usr_date'] = $this->operation_date_slash($pagevar['events'][$i]['cmnt_usr_date']);
+				endfor;
+			else:
+				$pagevar['images'] = $this->unionmodel->select_images($countday,10,$from,$this->admin['uid']);
+				for($i = 0;$i < count($pagevar['images']);$i++):
+					$pagevar['images'][$i]['img_src'] = $pagevar['baseurl'].'users/'.$this->admin['site'].'/images/'.$pagevar['images'][$i]['img_src'];
+					$info = getimagesize($pagevar['images'][$i]['img_src']);
+					$pagevar['images'][$i]['wight'] = round($info[0]/6);
+					$pagevar['images'][$i]['height'] = round($info[1]/6);
+					$pagevar['images'][$i]['cmnt_usr_date'] = $this->operation_date_slash($pagevar['images'][$i]['cmnt_usr_date']);
+				endfor;
+			endif;
+			$this->pagination->initialize($config);
+			$pagevar['pages'] = $this->pagination->create_links();
+		endif;
 		
 		$flasherr = $this->session->flashdata('operation_error');
 		$flashmsg = $this->session->flashdata('operation_message');
