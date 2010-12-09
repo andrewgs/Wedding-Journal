@@ -11,6 +11,7 @@ class Main extends Controller{
 		$pagevar = array(
 					'description'	=> '',
 					'keywords' 		=> '',
+					'author'		=> '',
 					'title'			=> 'Регистрация нового пользователя | Активация',
 					'baseurl' 		=> base_url(),
 					);
@@ -41,6 +42,7 @@ class Main extends Controller{
 		$pagevar = array(
 					'description'	=> '',
 					'keywords' 		=> '',
+					'author'		=> '',
 					'title'			=> 'Авторизация пользователя',
 					'baseurl' 		=> base_url(),
 					'text'			=> '',
@@ -70,7 +72,10 @@ class Main extends Controller{
 					$this->session->set_userdata('login_id',md5($_POST['login'].$user['uconfirmation']));
 					$this->session->set_userdata('login',$_POST['login']);
 					$this->session->set_userdata('confirmation',$user['uconfirmation']);
+					$this->session->set_userdata('userid',$user['uid']);
 					$this->usersmodel->active_user($_POST['login']);
+					$this->load->model('logmodel');
+					$this->logmodel->insert_record($user['uid'],'login');
 					redirect($user['usite'].'/admin');
 				else:
 					$pagevar['message'] = '<div class="join_error">Учетная запись не активирована!</div>';
@@ -89,6 +94,7 @@ class Main extends Controller{
 		$pagevar = array(
 					'description'	=> '',
 					'keywords' 		=> '',
+					'author'		=> '',
 					'title'			=> 'Регистрация нового пользователя | Выбор темы',
 					'baseurl' 		=> base_url(),
 					'backpath'		=> '',
@@ -136,6 +142,7 @@ class Main extends Controller{
 		$pagevar = array(
 					'description'	=> '',
 					'keywords' 		=> '',
+					'author'		=> '',
 					'title'			=> 'Восстановление пароля',
 					'baseurl' 		=> base_url(),
 					'text'			=> '',
@@ -215,6 +222,7 @@ class Main extends Controller{
 		$pagevar = array(
 					'description'	=> '',
 					'keywords' 		=> '',
+					'author'		=> '',
 					'title'			=> 'Произошла ошибка при выполнении скрипта',
 					'baseurl' 		=> base_url(),
 					'pathback'		=> '/',
@@ -229,6 +237,7 @@ class Main extends Controller{
 		$pagevar = array(
 					'description'	=> '',
 					'keywords' 		=> '',
+					'author'		=> '',
 					'title'			=> 'Регистрация нового пользователя | Завершение регистрации',
 					'baseurl' 		=> base_url(),
 					'site'			=> '',
@@ -339,6 +348,7 @@ class Main extends Controller{
 		$pagevar = array(
 					'description'	=> '',
 					'keywords' 		=> '',
+					'author'		=> '',
 					'title'			=> 'Свадебный сайт',
 					'baseurl' 		=> base_url(),
 					'formaction'	=> 'login'
@@ -369,42 +379,46 @@ class Main extends Controller{
 		$pagevar = array(
 					'description'	=> '',
 					'keywords' 		=> '',
+					'author'		=> '',
 					'title'			=> 'Свадебный сайт',
 					'baseurl' 		=> base_url(),
 					);
 					
 		$this->load->view('main/page404',$pagevar);
 	} /* end function page404 */
-						  
+  
 	function page403(){
 	
 		$pagevar = array(
 					'description'	=> '',
 					'keywords' 		=> '',
+					'author'		=> '',
 					'title'			=> 'Свадебный сайт',
 					'baseurl' 		=> base_url(),
 					);
 					
 		$this->load->view('main/page403',$pagevar);
 	} /* end function page404 */
-						  
+
 	function notexisting(){
 	
 		$pagevar = array(
 					'description'	=> '',
 					'keywords' 		=> '',
+					'author'		=> '',
 					'title'			=> 'Свадебный сайт',
 					'baseurl' 		=> base_url(),
 					);
 					
 		$this->load->view('main/notexisting',$pagevar);
 	} /* end function notexisting */
-							  
+
 	function closesite(){
 	
 		$pagevar = array(
 					'description'	=> '',
 					'keywords' 		=> '',
+					'author'		=> '',
 					'title'			=> 'Свадебный сайт',
 					'baseurl' 		=> base_url(),
 					);
@@ -434,6 +448,7 @@ class Main extends Controller{
 		$pagevar = array(
 					'description'	=> '',
 					'keywords' 		=> '',
+					'author'		=> '',
 					'title'			=> 'Регистрация нового пользователя | Анкета',
 					'baseurl' 		=> base_url(),
 					'pathback'		=> base_url(),

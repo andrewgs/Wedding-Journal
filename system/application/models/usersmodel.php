@@ -106,7 +106,7 @@
 			$this->db->where($field,$parameter);
 			$query = $this->db->get('users',1);
 			$data = $query->result_array();
-			if(count($data)>0) return TRUE;
+			if(count($data) > 0) return $data[0]['uid'];
 			return FALSE;
 		}
 		
@@ -169,6 +169,16 @@
 			$query = $this->db->get('users',1);
 			$data = $query->result_array();
 			if(count($data)>0) return TRUE;
+			return FALSE;
+		}
+
+		function weddingday($uid){
+		
+			$this->db->select('DATEDIFF(CURDATE(),users.uweddingdate) AS wedday',FALSE);
+			$this->db->where('uid',$uid);
+			$query = $this->db->get('users',1);
+			$data = $query->result_array();
+			if(isset($data[0])) return $data[0]['wedday'];
 			return FALSE;
 		}
 	}

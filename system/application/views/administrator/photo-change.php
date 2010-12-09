@@ -19,46 +19,25 @@
  	<script src="<?= $baseurl; ?>javascript/modernizr-1.6.min.js"></script>
 </head>
 <body>
-	<noscript>
-		<div id="noscript">
-			<p>Этот веб-сайт оптимизирован для современных, соответствующих стандартам веб-браузеров с включенным Javascript.<br>
-			Для лучшего качества отображения необходимо включить поддержку Javascript в вашем браузере.</p>
-			<!--
-			<p>This website is optimized for modern, standards-compliant web browsers with Javascript enabled.<br>
-			For a better viewing experience please enable Javascript in your browser.</p>
-			-->
-		</div>
-	</noscript>
 	<div id="main-wrap">
-	<?php $this->load->view($themeurl.'/header'); ?>
+		<?php $this->load->view($themeurl.'/header'); ?>
 		<div id="main">
-			<div class="container_12">
-				<?php if($admin): ?>
-					<div id="summaries" class="grid_4 suffix_2">
-						<span class="separated">
-							<a href="<?= $baseurl.$usite.'/about/photo-change'; ?>">Сменить фотографию &nbsp;&rarr;</a>
-						</span>
-					</div>
-				<div class="clear"></div>
-				<?php $this->load->view('message');?>
-				<?php endif; ?>
-				<?php if(!empty($image['oisrc'])): ?>
-					<div id="about-us" class="grid_12">
-						<img src="<?= $baseurl.'users/'.$usite.'/images/'.$image['oisrc']; ?>" alt="" title="<?= $image['oititle']; ?>">
-						<?php if(!empty($text)): ?>
-							<div id="text-about">
-								<span><?= $text; ?></span>
-							</div>				
+			<?php $this->load->view('transitions/fullback'); ?>
+			<div class="container_16">
+				<?= form_error('userfile'); ?>
+				<div id="blog" class="grid_16">
+					<div class="blog-content">
+						<?php if($type == 'about'): ?>
+							<?php $this->load->view('forms/frmabout'); ?>
 						<?php endif; ?>
 					</div>
-				<?php endif; ?>			
+					<div class="clear"></div>
+				</div>
 			</div>
-			<div class="clear"></div>
 		</div>
-		<div class="push"></div>	 
+		<div class="push"></div>
 	</div>
 	<?php $this->load->view($themeurl.'/footer'); ?>
-	
 	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.js"></script>
 	<script>
 		!window.jQuery && document.write(unescape('%3Cscript src="<?= $baseurl; ?>javascript/jquery-1.4.2.js"%3E%3C/script%3E'))
@@ -76,15 +55,5 @@
 	<script src="<?= $baseurl.$themeurl; ?>/javascript/profiling/config.js"></script>
 	<!-- end profiling code -->
 	<!-- change the UA-XXXXX-X to be your site's ID -->
-	<script>
-		var _gaq = [['_setAccount', 'UA-XXXXX-X'], ['_trackPageview']];
-		(function(d, t) {
-		var g = d.createElement(t),
-		    s = d.getElementsByTagName(t)[0];
-		g.async = true;
-		g.src = ('https:' == location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-		s.parentNode.insertBefore(g, s);
-		})(document, 'script');
-	</script>
 </body>
 </html>

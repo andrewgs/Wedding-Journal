@@ -1,4 +1,4 @@
-﻿<!doctype html>
+<!doctype html>
 <!--[if lt IE 7 ]> <html lang="en" class="no-js ie6"> <![endif]-->
 <!--[if IE 7 ]>    <html lang="en" class="no-js ie7"> <![endif]-->
 <!--[if IE 8 ]>    <html lang="en" class="no-js ie8"> <![endif]-->
@@ -29,63 +29,72 @@
 			-->
 		</div>
 	</noscript>
-	<div id="main-wrap">
-		<?php $this->load->view($themeurl.'/header'); ?>
-		<div id="main" class="mt10">
-			<?php if($admin): ?>
+   <div id="main-wrap">
+   		<?php $this->load->view($themeurl.'/header'); ?>
+		<div id="main">
 			<div class="container_12">
-				<div id="summaries" class="grid_4 suffix_2">
-					<span class="separated">
-						<a href="<?=$baseurl.$usite.'/album-new'; ?>">Создать новый альбом &nbsp;&rarr;</a>
-					</span>
+				<div id="internal_nav" class="grid_4">
+					<a href="<?= $baseurl.$backpath; ?>">&nbsp;&larr;&nbsp; Вернуться назад</a>
+				</div>
+				<div id="internal_nav" class="grid_4">
+					<a href="#comment" style="text-align:center">Оставить комментарий</a>
 				</div>
 				<div class="clear"></div>
 				<?php $this->load->view('message');?>
-			<?php endif; ?>
-			<div class="clear"></div>
-			<?php if(count($albums) > 0): ?>
-				<div id="photo-gallery" class="container_12">
-				<?php for($i = 0;$i < count($albums);$i++): ?>
-					<div class="grid_6 photo-album">
-						<div class="album-background">
-						<?php $text='<img class="album-main-photo" src="'.$baseurl.$usite.'/album/viewimage/'.$albums[$i]['alb_id'].'"
-									alt="'.$albums[$i]['alb_photo_title'].'"/>'; ?>
-						<?php $link = $usite.'/photo-albums/photo-gallery/'.$albums[$i]['alb_id']; ?>
-						<?= anchor($link,$text); ?>
-						</div>
-						<div class="album-content"> </div>
-						<div class="album-text"> 
-							<div class="album-title"><?= $albums[$i]['alb_title']; ?></div>
-							<div class="album-amt"><?= 'Кадров - '.$albums[$i]['alb_amt']; ?></div>
-							<div class="album-annotation"><?= $albums[$i]['alb_annotation']; ?></div>
-						</div>
-						<?php if($admin): ?>
-							<div class="album-controls">
-								<?php
-									$text 		= 'Редактировать';
-									$str_uri 	= $usite.'/album-edit/'.$albums[$i]['alb_id'];
-									echo anchor($str_uri,$text);
-									$text 		= 'Удалить';
-									$str_uri 	= $usite.'/album-destroy/'.$albums[$i]['alb_id'];
-									$attr 		= array('class'=>'delete');
-									echo anchor($str_uri,$text,$attr);
-								?>
-							</div>
-						<?php endif; ?>
-						<div class="clear"></div>
-					</div>
-				<?php endfor; ?>
-				<div class="clear"></div>
-				</div>
-			<?php endif; ?>
 			</div>
 			<div class="clear"></div>
+			<div class="container_16">
+				<?= form_error('user_name'); ?>
+				<?= form_error('user_email'); ?>
+				<?= form_error('cmnt_text'); ?>
+				<div class="grid_4 photo-album">
+					<div class="album-background images">
+						<img src="<?= $image['src']; ?>" alt="" title="<?=$image['title'] ?>" height="<?=$image['height']; ?>" width="<?=$image['wight']; ?>" align="left">
+					</div>
+				</div>
+				<div class="clear"></div>
+			</div>
+			<?php for($i = 0;$i < count($comments);$i++): ?>
+			<div class="container_16">
+				<div class="comment grid_12">
+					<a name="comment_<?= $comments[$i]['cmnt_id'];?>"></a>
+					<span class="user" id="<?= $comments[$i]['cmnt_id'];?>">
+					<?php if(!empty($comments[$i]['cmnt_web'])): ?>
+						<a title="" target="_blank" href="<?= $comments[$i]['cmnt_web'];?>"><?= $comments[$i]['cmnt_usr_name'];?></a>
+					<?php else: ?>
+						<?= $comments[$i]['cmnt_usr_name']; ?>	
+					<?php endif; ?>
+					</span>
+					<span class="dates"><?= $comments[$i]['cmnt_usr_date'];?></span>
+					<p><?= $comments[$i]['cmnt_text']; ?></p>
+					<div class="clear"></div>
+					<?php if($admin): ?>
+						<div>
+							<?php $text = 'Редактировать'; ?>
+							<?php $link = $usite.'/photo-albums/comment-edit/'.$comments[$i]['cmnt_img_id'].'/'.$comments[$i]['cmnt_id']; ?>
+							<?= anchor($link,$text).' | '; ?>
+							<?php $text = 'Удалить'; ?>
+							<?php $link = $usite.'/photo-albums/comment-destroy/'.$comments[$i]['cmnt_img_id'].'/'.$comments[$i]['cmnt_id']; ?>
+							<?php $attr = array('class'=>'delete'); ?>
+							<?= anchor($link,$text,$attr); ?>
+						</div>
+					<?php endif; ?>
+				</div>
+			</div>
+			<?php endfor; ?>
+			<div class="container_16">
+				<div id="comment-form-content" class="grid_10 form-content">
+				<a name="comment"></a>
+					<?php $this->load->view('forms/frmcomment');?>
+				</div>
+				<div class="clear"></div>
+			</div>
 		</div>
-		<div class="push"></div>	 
+		<div class="push"></div>
 	</div>
 	<?php $this->load->view($themeurl.'/footer'); ?>
-	
-	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.js"></script>
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.js"></script>
 	<script>
 		!window.jQuery && document.write(unescape('%3Cscript src="<?= $baseurl; ?>javascript/jquery-1.4.2.js"%3E%3C/script%3E'))
 	</script>

@@ -6,7 +6,7 @@ class Administrator extends Controller{
 	var $months = array("01"=>"января","02"=>"февраля","03"=>"марта","04"=>"апреля",
 						"05"=>"мая","06"=>"июня","07"=>"июля","08"=>"августа",
 						"09"=>"сентября","10"=>"октября","11"=>"ноября","12"=>"декабря");	
-						
+	
 	function Administrator(){
 	
 		parent::Controller();
@@ -48,6 +48,7 @@ class Administrator extends Controller{
 		$pagevar = array(
 					'description'	=> '',
 					'keywords' 		=> '',
+					'author'		=> '',
 					'title'			=> 'Панель администрирования',
 					'baseurl' 		=> base_url(),
 					'themeurl' 		=> $this->admin['themeurl'],
@@ -62,7 +63,7 @@ class Administrator extends Controller{
 		$flashsaf = $this->session->flashdata('operation_saccessfull');
 		if($flasherr && $flashmsg && $flashsaf)
 			$pagevar['message'] = $this->setmessage(trim($flasherr),trim($flashsaf),trim($flashmsg),1);
-		$this->load->view($pagevar['themeurl'].'/admin/adminpanel',$pagevar);
+		$this->load->view('administrator/adminpanel',$pagevar);
 	} /* end function index*/
 	
 	function login(){
@@ -70,6 +71,7 @@ class Administrator extends Controller{
 		$pagevar = array(
 					'description'	=> '',
 					'keywords' 		=> '',
+					'author'		=> '',
 					'title'			=> 'Администрирование | Авторизация пользователя',
 					'baseurl' 		=> base_url(),
 					'formaction'	=> $this->uri->uri_string(),
@@ -103,7 +105,9 @@ class Administrator extends Controller{
 					$this->session->set_userdata('login_id',md5($_POST['login'].$user['uconfirmation']));
 					$this->session->set_userdata('login',$_POST['login']);
 					$this->session->set_userdata('confirmation',$user['uconfirmation']);
+					$this->session->set_userdata('userid',$user['uid']);
 					$this->usersmodel->active_user($_POST['login']);
+					$this->logmodel->insert_record($user['uid'],'login');
 					redirect($user['usite'].'/admin');
 				else:
 					$pagevar['message'] = '<div class="join_error">Учетная запись не активирована!</div>';
@@ -124,6 +128,7 @@ class Administrator extends Controller{
 			$backpage = $this->admin['site'];
 		endif;
 		$this->usersmodel->deactive_user($this->session->userdata('login'));
+		$this->logmodel->insert_record($this->admin['uid'],'logoff');
 		$this->session->sess_destroy();
 		unset($_SESSION['usersite']);
 		redirect($backpage);
@@ -134,6 +139,7 @@ class Administrator extends Controller{
 		$pagevar = array(
 					'description'	=> '',
 					'keywords' 		=> '',
+					'author'		=> '',
 					'title'			=> 'Администрирование | Создание записи блога',
 					'baseurl' 		=> base_url(),
 					'admin'			=> TRUE,
@@ -166,7 +172,7 @@ class Administrator extends Controller{
 				redirect($pagevar['backpath']);
 			endif;
 		endif;
-		$this->load->view($pagevar['themeurl'].'/admin/admin-event',$pagevar);
+		$this->load->view('administrator/admin-event',$pagevar);
 	} /* end function eventsnew */
 	
 	function eventedit($event_id = 0,$error = FALSE){
@@ -174,6 +180,7 @@ class Administrator extends Controller{
 		$pagevar = array(
 					'description'	=> '',
 					'keywords' 		=> '',
+					'author'		=> '',
 					'title'			=> 'Администрирование | Редактирование записи блога',
 					'baseurl' 		=> base_url(),
 					'admin'			=> TRUE,
@@ -215,8 +222,7 @@ class Administrator extends Controller{
 		if(count($pagevar['event']) > 0):
 			$pagevar['event']['evnt_date'] = $this->operation_date_slash($pagevar['event']['evnt_date']);
 		endif;
-//		print_r($_SESSION['ckfinder_baseUrl']); exit;
-        $this->load->view($pagevar['themeurl'].'/admin/admin-event',$pagevar);
+        $this->load->view('administrator/admin-event',$pagevar);
 	} /* end function eventedit */			
 	
 	function eventdestroy(){
@@ -240,6 +246,7 @@ class Administrator extends Controller{
 		$pagevar = array(
 					'description'	=> '',
 					'keywords' 		=> '',
+					'author'		=> '',
 					'title'			=> 'Администрирование | Редактирование комментария',
 					'baseurl' 		=> base_url(),
 					'admin'			=> TRUE,
@@ -299,7 +306,7 @@ class Administrator extends Controller{
 		endif;
 		$pagevar['comment'] = $this->commentsmodel->comment_record($comment_id);
 		$pagevar['comment']['cmnt_usr_date'] = $this->operation_date_slash($pagevar['comment']['cmnt_usr_date']);
-		$this->load->view($pagevar['themeurl'].'/admin/admin-comment',$pagevar);
+		$this->load->view('administrator/admin-comment',$pagevar);
 	} /* end function commentedit */
 	
 	function commentdestroy(){
@@ -334,6 +341,7 @@ class Administrator extends Controller{
 		$pagevar = array(
 					'description'	=> '',
 					'keywords' 		=> '',
+					'author'		=> '',
 					'title'			=> 'Администрирование | Создание карточки друга',
 					'baseurl' 		=> base_url(),
 					'admin'			=> TRUE,
@@ -405,7 +413,7 @@ class Administrator extends Controller{
 		if($flasherr && $flashmsg && $flashsaf)
 			$msg = $this->setmessage($flasherr,$flashsaf,$flashmsg,1);
 				
-		$this->load->view($pagevar['themeurl'].'/admin/admin-friend',$pagevar);
+		$this->load->view('administrator/admin-friend',$pagevar);
 	} /* end function friendnew */
 	
 	function friendedit($friend_id = 0,$error = FALSE){
@@ -413,6 +421,7 @@ class Administrator extends Controller{
 		$pagevar = array(
 					'description'	=> '',
 					'keywords' 		=> '',
+					'author'		=> '',
 					'title'			=> 'Администрирование | Редактирование карточки друга',
 					'baseurl' 		=> base_url(),
 					'admin'			=> TRUE,
@@ -499,7 +508,7 @@ class Administrator extends Controller{
 			$pagevar['socials'][$i]['social'] 	= $socials[$i]['soc_name'];
 			$pagevar['socials'][$i]['href'] 	= $socials[$i]['soc_href'];
 		endfor;
-		$this->load->view($pagevar['themeurl'].'/admin/admin-friend',$pagevar);
+		$this->load->view('administrator/admin-friend',$pagevar);
 	} /* end function friendedit */
 	
 	function frienddestroy(){
@@ -523,6 +532,7 @@ class Administrator extends Controller{
 		$pagevar = array(
 					'description'	=> '',
 					'keywords' 		=> '',
+					'author'		=> '',
 					'title'			=> 'Администрирование | Создание нового фотоальбома',
 					'baseurl' 		=> base_url(),
 					'admin'			=> TRUE,
@@ -554,7 +564,7 @@ class Administrator extends Controller{
 				redirect($pagevar['backpath']);
 			endif;
 		endif;
-		$this->load->view($pagevar['themeurl'].'/admin/admin-album',$pagevar);
+		$this->load->view('administrator/admin-album',$pagevar);
 	} /* end function albumnew */
 	
 	function albumedit($album_id = 0,$error = FALSE){
@@ -562,6 +572,7 @@ class Administrator extends Controller{
 		$pagevar = array(
 					'description'	=> '',
 					'keywords' 		=> '',
+					'author'		=> '',
 					'title'			=> 'Администрирование | Редактирование альбома',
 					'baseurl' 		=> base_url(),
 					'admin'			=> TRUE,
@@ -604,7 +615,7 @@ class Administrator extends Controller{
 				redirect($pagevar['backpath']);
 			endif;
 		endif;
-        $this->load->view($pagevar['themeurl'].'/admin/admin-album',$pagevar);
+        $this->load->view('administrator/admin-album',$pagevar);
 	} /* end function albumedit */
 
 	function albumdestroy(){
@@ -642,7 +653,7 @@ class Administrator extends Controller{
 		$tmpName = $_FILES['userfile']['tmp_name'];
 		
 		if ($_FILES['userfile']['error'] == 4):
-			$this->form_validation->set_message('userfile_check','Не указана фотография!');
+			$this->form_validation->set_message('userfile_check','Не указана фотография.');
 			return FALSE;
 		endif;
 		if(!$this->case_image($tmpName)):
@@ -719,7 +730,7 @@ class Administrator extends Controller{
 			default	: return FALSE;	
 		endswitch;
 	} /* end function case_image */
-		 
+	 
 	function resize_image($image,$wgt,$hgt,$ratio){
 	
 		$this->load->library('image_lib');
@@ -782,6 +793,7 @@ class Administrator extends Controller{
 		$pagevar = array(
 					'description'	=> '',
 					'keywords'		=> '',
+					'author'		=> '',
 					'title'			=> 'Администрирование | Изменение личных данных',
 					'baseurl'		=> base_url(),
 					'themeurl'		=> $this->admin['themeurl'],
@@ -834,7 +846,7 @@ class Administrator extends Controller{
 		if(count($pagevar['user']) > 0):
 			$pagevar['user']['uweddingdate'] = $this->operation_date_slash($pagevar['user']['uweddingdate']);
 		endif;
-		$this->load->view($pagevar['themeurl'].'/admin/profile',$pagevar);
+		$this->load->view('administrator/profile',$pagevar);
 	} /* end function profile */
 
 	function passwordchange(){
@@ -842,6 +854,7 @@ class Administrator extends Controller{
 		$pagevar = array(
 					'description'	=> '',
 					'keywords'		=> '',
+					'author'		=> '',
 					'title'			=> 'Администрирование | Смена пароля администратора',
 					'baseurl'		=> base_url(),
 					'themeurl'		=> $this->admin['themeurl'],
@@ -859,7 +872,7 @@ class Administrator extends Controller{
 			$this->form_validation->set_message('matches','Пароли не совпадают');
 			if ($this->form_validation->run() == FALSE):
 				$pagevar['message'] = $this->setmessage('Не выполнены условия.','','Ошибка при изменении пароля',1);
-				$this->load->view($pagevar['themeurl'].'/admin/password',$pagevar);
+				$this->load->view('administrator/password',$pagevar);
 				return FALSE;
 			else:
 				$this->usersmodel->changepassword($_POST,$this->admin['uid']);
@@ -875,9 +888,9 @@ class Administrator extends Controller{
 		if(isset($flashmsg) and !empty($flashmsg)):
 			$pagevar['message'] = $this->setmessage('','',$flashmsg,1);
 		endif;
-        $this->load->view($pagevar['themeurl'].'/admin/password',$pagevar);
+        $this->load->view('administrator/password',$pagevar);
 	} /* end function passwordchange */
-									 
+	 
 	function oldpass_check($pass){
 		
 		$password = $this->usersmodel->read_field($this->admin['uid'],'upassword');
@@ -925,6 +938,7 @@ class Administrator extends Controller{
 		$pagevar = array(
 					'description'	=> '',
 					'keywords' 		=> '',
+					'author'		=> '',
 					'title'			=> 'Панель администрирования | Изменение темы',
 					'baseurl' 		=> base_url(),
 					'themeurl' 		=> $this->admin['themeurl'],
@@ -952,7 +966,7 @@ class Administrator extends Controller{
 			redirect($pagevar['usite'].'/admin');
 		endif;
 		$pagevar['themes'] = $this->themesmodel->read_records(TRUE);
-		$this->load->view($pagevar['themeurl'].'/admin/themechange',$pagevar);
+		$this->load->view('administrator/themechange',$pagevar);
 	} /* end function themechange */
 
 	function profileclose(){
@@ -960,6 +974,7 @@ class Administrator extends Controller{
 		$pagevar = array(
 					'description'	=> '',
 					'keywords'		=> '',
+					'author'		=> '',
 					'title'			=> 'Администрирование | Закрытие сайта',
 					'baseurl'		=> base_url(),
 					'themeurl'		=> $this->admin['themeurl'],
@@ -990,9 +1005,9 @@ class Administrator extends Controller{
 				redirect($this->uri->uri_string());
 			endif;
 		endif;
-		$this->load->view($pagevar['themeurl'].'/admin/close',$pagevar);
+		$this->load->view('administrator/close',$pagevar);
 	} /* end function profileclose */
-							   
+	   
 	function sendmail($email,$msg,$subject,$from){
 		
 		$config['smtp_host'] = 'localhost';
@@ -1009,12 +1024,13 @@ class Administrator extends Controller{
 		endif;
 		return TRUE;
 	} /* end function sendmail */
-													 
+	 
 	function uploadfiles(){
 		
 		$pagevar = array(
 					'description'	=> '',
 					'keywords' 		=> '',
+					'author'		=> '',
 					'title'			=> 'Администрирование | Редактирование альбома',
 					'baseurl' 		=> base_url(),
 					'admin'			=> TRUE,
@@ -1024,7 +1040,7 @@ class Administrator extends Controller{
 					'backpath' 		=> '',
 					'album' 		=> $this->uri->segment(4),
 					'formaction1'	=> $this->uri->uri_string(),
-					'formaction2'	=> $this->admin['site'].'/admin/multi-upload',
+					'formaction2'	=> $this->admin['site'].'administrator/multi-upload',
 					'errortext'		=> 'Произошла ошибка при загрузке фотографий.',
 					'errorcode'		=> '0x0000'
 					);
@@ -1059,7 +1075,7 @@ class Administrator extends Controller{
 				redirect($pagevar['backpath']);
 			endif;
 		endif;
-		$this->load->view($pagevar['themeurl'].'/admin/uploadfiles',$pagevar);
+		$this->load->view('administrator/uploadfiles',$pagevar);
 	} /* end function uploadfiles */
 
 	function multiupload(){
@@ -1129,6 +1145,7 @@ class Administrator extends Controller{
 		$pagevar = array(
 					'description'	=> '',
 					'keywords' 		=> '',
+					'author'		=> '',
 					'title'			=> 'Администрирование | Список комментариев за период',
 					'baseurl' 		=> base_url(),
 					'admin'			=> TRUE,
@@ -1143,7 +1160,7 @@ class Administrator extends Controller{
 					'events'		=> array(),
 					'images'		=> array()
 					);
-		$this->session->set_userdata('commentlist',$pagevar['usite'].'/admin/comments');
+		$this->session->set_userdata('commentlist',$pagevar['usite'].'administrator/comments');
 		if($this->input->post('btnsubmit')):
 			$_POST['btnsubmit'] = NULL;
 			if(!isset($_POST['cmntval'])):
@@ -1159,7 +1176,7 @@ class Administrator extends Controller{
 			else:
 				$pagevar['count'] = $this->unionmodel->count_images($countday,$this->admin['uid']);
 			endif;
-			$config['base_url'] 		= base_url().$pagevar['usite'].'/admin/comments';	
+			$config['base_url'] 		= base_url().$pagevar['usite'].'administrator/comments';	
 	       	$config['total_rows'] 		= $pagevar['count'];
 			$config['per_page'] 		= 10;
 	       	$config['num_links'] 		= 2;
@@ -1172,7 +1189,7 @@ class Administrator extends Controller{
 			$config['cur_tag_close']	= '</b>';
 			$from = intval($this->uri->segment(4));
 			if(isset($from) and !empty($from)):
-				$this->session->set_userdata('commentlist',$pagevar['usite'].'/admin/comments/'.$from);
+				$this->session->set_userdata('commentlist',$pagevar['usite'].'administrator/comments/'.$from);
 			endif;
 			if($cmntval == 1):
 				$pagevar['events'] = $this->unionmodel->select_events($countday,10,$from,$this->admin['uid']);
@@ -1200,7 +1217,7 @@ class Administrator extends Controller{
 		if($flasherr && $flashmsg && $flashsaf)
 			$pagevar['message'] = $this->setmessage($flasherr,$flashsaf,$flashmsg,1);
 		
-		$this->load->view($pagevar['themeurl'].'/admin/comments',$pagevar);
+		$this->load->view('administrator/comments',$pagevar);
 	} /* end function commentslist */
 	
 	function photochange(){
@@ -1208,6 +1225,7 @@ class Administrator extends Controller{
 		$pagevar = array(
 					'description'	=> '',
 					'keywords' 		=> '',
+					'author'		=> '',
 					'title'			=> 'Администрирование | Замена фотографии',
 					'baseurl' 		=> base_url(),
 					'admin'			=> TRUE,
@@ -1256,7 +1274,7 @@ class Administrator extends Controller{
 			endif;
 			switch ($pagevar['type']):
 			
-				case 'about' : 	$this->othertextmodel->update_record(nl2br($_POST['text']),$pagevar['type'],$this->admin['uid']);
+				case 'about' : 	$this->othertextmodel->update_record($_POST['text'],'',$pagevar['type'],$this->admin['uid']);
 								break;
 			
 			endswitch;
@@ -1268,15 +1286,14 @@ class Administrator extends Controller{
 		endif;
 		switch ($pagevar['type']):
 			
-			case 'about' : 	$pagevar['text'] = strip_tags($this->othertextmodel->read_text($pagevar['type'],$this->admin['uid']));
+			case 'about' : 	$pagevar['text'] = $this->othertextmodel->read_text($pagevar['type'],$this->admin['uid']);
 							$pagevar['image'] = $this->otherimagemodel->read_record($pagevar['type'],$this->admin['uid']);
 							$pagevar['ratio']= '(Размер 907х603)';
 							if(empty($pagevar['text']) and empty($pagevar['image']['oisrc'])) $pagevar['edit'] = FALSE;
 							break;
 			
 		endswitch;
-//		print_r($pagevar['image']['oisrc']);
-		$this->load->view($pagevar['themeurl'].'/admin/photo-change',$pagevar);
+		$this->load->view('administrator/photo-change',$pagevar);
 		
 	} /* end function photochange */
 	
@@ -1337,6 +1354,51 @@ class Administrator extends Controller{
 		endif;
 		redirect($backpath);
 	} /* end function photoslideshow */
-							  
+	
+	function textchange($error = FALSE){
+		
+		$pagevar = array(
+					'description'	=> '',
+					'keywords' 		=> '',
+					'author'		=> '',
+					'title'			=> 'Администрирование | Изменение текста',
+					'baseurl' 		=> base_url(),
+					'admin'			=> TRUE,
+					'valid'			=> $error,
+					'themeurl' 		=> $this->admin['themeurl'],
+					'usite'			=> $this->admin['site'],
+					'message'		=> $this->setmessage('','','',0),
+					'backpath' 		=> $this->session->userdata('backpage'),
+					'formaction'	=> $this->uri->uri_string(),
+					'type'			=> $this->uri->segment(2),
+					'pagetext'		=> array()
+					);
+		if($this->input->post('btnsubmit')):
+			$this->form_validation->set_rules('title','"Подпись"','required');
+			$this->form_validation->set_rules('text','"Содержание"','required');
+			$this->form_validation->set_error_delimiters('<div class="message">','</div>');
+			if (!$this->form_validation->run()):
+				$_POST['btnsubmit'] = NULL;
+				$this->textchange(TRUE);
+				return FALSE;
+			endif;
+			switch ($pagevar['type']):
+				case 'index' : 	$this->othertextmodel->update_record($_POST['text'],$_POST['title'],$pagevar['type'],$this->admin['uid']);
+								break;
+			endswitch;
+			$this->logmodel->insert_record($this->admin['uid'],'Изменение текста на главной странице');
+			$this->session->set_flashdata('operation_error','none');
+			$this->session->set_flashdata('operation_message','none');
+			$this->session->set_flashdata('operation_saccessfull','Операция выполнена успешно');
+			redirect($pagevar['backpath']);
+		endif;
+		switch ($pagevar['type']):
+			case 'index' : 	$pagevar['pagetext'] = $this->othertextmodel->read_record($pagevar['type'],$this->admin['uid']);
+							break;
+			
+		endswitch;
+		$this->load->view('administrator/text-change',$pagevar);
+	} /* end function textchange */
+	
 } /* end class*/
 ?>
