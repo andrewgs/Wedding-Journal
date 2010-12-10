@@ -21,7 +21,9 @@ class Administrator extends Controller{
 		$this->load->model('unionmodel');
 		$this->load->model('othertextmodel');
 		$this->load->model('otherimagemodel');
+		$this->session->set_userdata('errormessage',FALSE);
 		if(!$this->usersmodel->user_exist('usite',$this->uri->segment(1))):
+			$this->session->set_userdata('errormessage',TRUE);
 			redirect('not-existing');
 		endif;
 		$this->admin['login'] = $this->session->userdata('login');
@@ -36,6 +38,11 @@ class Administrator extends Controller{
 			$this->admin['themeurl'] = $this->configmodel->read_field($this->admin['uid'],'cfgthemepath');
 		else:
 			$this->admin['site'] = $this->uri->segment(1);
+		endif;
+		$userstatus = $this->usersmodel->read_status($this->admin['uid']);
+		if($userstatus == 'disabled'):
+			$this->session->set_userdata('errormessage',TRUE);
+			redirect('account-disabled');
 		endif;
 		$segm = $this->uri->total_segments();
 		if($this->session->userdata('login_id') == md5($this->admin['login'].$this->admin['confirmation'])) return;
@@ -196,7 +203,10 @@ class Administrator extends Controller{
 		if($event_id == 0 or empty($event_id))
 			$event_id = $this->uri->segment(3);
 		$event = $this->eventsmodel->exist_event($event_id,$this->admin['uid']);
-		if(!$event) redirect('page403');
+		if(!$event):
+			$this->session->set_userdata('errormessage',TRUE);
+			redirect('page403');
+		endif;
 		if($this->input->post('btnsubmit')):
 			$this->form_validation->set_rules('title','"Оглавление"','required');
 			$this->form_validation->set_rules('text','"Содержимое"','required');
@@ -230,7 +240,10 @@ class Administrator extends Controller{
 		$backpath = $this->session->userdata('backpage');
 		$event_id = $this->uri->segment(3);
 		$event = $this->eventsmodel->exist_event($event_id,$this->admin['uid']);
-		if(!$event) redirect('page403');
+		if(!$event):
+			$this->session->set_userdata('errormessage',TRUE);
+			redirect('page403');
+		endif;
 		$evnttitle = $this->eventsmodel->event_title($event_id,$this->admin['uid']);
 		$this->eventsmodel->delete_record($event_id);
 		$this->commentsmodel->delete_records($this->admin['uid'],$event_id,0);
@@ -265,14 +278,20 @@ class Administrator extends Controller{
 		endif;
 		switch ($this->uri->segment(2)):
 			case 'photo-albums': 	$comment = $this->commentsmodel->exist_comment($comment_id,0,$object_id);
-									if(!$comment) redirect('page403');
+									if(!$comment):
+										$this->session->set_userdata('errormessage',TRUE);
+										redirect('page403');
+									endif;
 									$img_id = $object_id; 
 									$event_id = 0;
 									$album = $this->imagesmodel->get_album($img_id,$this->admin['uid']);
 									$pagevar['backpath'] =$pagevar['usite'].'/photo-albums/photo-comments/'.$object_id.'#comment_'.$comment_id;
 									break;
 			case 'event'		:	$comment = $this->commentsmodel->exist_comment($comment_id,$object_id,0);
-									if(!$comment) redirect('page403');
+									if(!$comment):
+										$this->session->set_userdata('errormessage',TRUE);
+										redirect('page403');
+									endif;
 									$img_id = 0;
 									$event_id = $object_id;
 									$album = 0;
@@ -315,12 +334,18 @@ class Administrator extends Controller{
 		$comment_id = $this->uri->segment(5);
 		switch ($this->uri->segment(2)):
 			case 'photo-albums'	: 	$comment = $this->commentsmodel->exist_comment($comment_id,0,$object_id);
-									if(!$comment) redirect('page403');
+									if(!$comment):
+										$this->session->set_userdata('errormessage',TRUE);
+										redirect('page403');
+									endif;
 									$backpath = $this->admin['site'].'/photo-albums/photo-comments/'.$object_id;
 									$this->imagesmodel->delete_comments($object_id,$this->admin['uid']);
 									break;
 			case 'event'		:	$comment = $this->commentsmodel->exist_comment($comment_id,$object_id,0);
-									if(!$comment) redirect('page403');
+									if(!$comment):
+										$this->session->set_userdata('errormessage',TRUE);
+										redirect('page403');
+									endif;
 									$backpath = $this->admin['site'].'/event/'.$object_id;
 									$this->eventsmodel->delete_comments($object_id,$this->admin['uid']);
 									break;
@@ -438,7 +463,10 @@ class Administrator extends Controller{
 		if($friend_id == 0 or empty($friend_id))
 			$friend_id = $this->uri->segment(3);
 		$friend = $this->friendsmodel->exist_friend($friend_id,$this->admin['uid']);
-		if(!$friend) redirect('page403');
+		if(!$friend):
+			$this->session->set_userdata('errormessage',TRUE);
+			redirect('page403');
+		endif;;
 		$pagevar['friend'] = $this->friendsmodel->friend_record($friend_id,$this->admin['uid']);
 		$pagevar['socials'][0] = array('id'=>'','social'=>'','href'=>'');
 		$pagevar['socials'][1] = array('id'=>'','social'=>'','href'=>'');
@@ -516,7 +544,10 @@ class Administrator extends Controller{
 		$backpath = $this->session->userdata('backpage');
 		$friend_id = $this->uri->segment(3);
 		$friend = $this->friendsmodel->exist_friend($friend_id,$this->admin['uid']);
-		if(!$friend) redirect('page403');
+		if(!$friend):
+			$this->session->set_userdata('errormessage',TRUE);
+			redirect('page403');
+		endif;
 		$frname = $this->friendsmodel->friend_name($friend_id,$this->admin['uid']);
 		$this->friendsmodel->delete_record($friend_id);
 		$this->socialmodel->delete_records($friend_id);
@@ -589,7 +620,10 @@ class Administrator extends Controller{
 			$album_id = $this->uri->segment(3);
 		endif;
 		$album = $this->albummodel->exist_album($album_id,$this->admin['uid']);
-		if(!$album) redirect('page403');
+		if(!$album):
+			$this->session->set_userdata('errormessage',TRUE);
+			redirect('page403');
+		endif;
 		$pagevar['album'] = $this->albummodel->album_record($album_id,$this->admin['uid']);
 		if($this->input->post('btnsubmit')):
 			$this->form_validation->set_rules('title','"Название альбома"','required');
@@ -623,7 +657,10 @@ class Administrator extends Controller{
 		$backpath = $this->session->userdata('backpage');
 		$album_id = $this->uri->segment(3);
 		$album = $this->albummodel->exist_album($album_id,$this->admin['uid']);
-		if(!$album) redirect('page403');
+		if(!$album):
+			$this->session->set_userdata('errormessage',TRUE);
+			redirect('page403');
+		endif;
 		$albtitle = $this->albummodel->album_title($album_id,$this->admin['uid']);
 		$images = $this->imagesmodel->get_names($album_id,$this->admin['uid']);
 		for($i = 0;$i < count($images);$i++):
@@ -862,6 +899,8 @@ class Administrator extends Controller{
 					'message'		=> $this->setmessage('','','',0),
 					'backpath'		=> $this->session->userdata('backpage'),
 					'formaction'	=> $this->uri->uri_string(),
+					'errortext'		=> 'Произошла ошибка при закрытии профиля.',
+					'errorcode'		=> '0x0000'
 				);
 		if($this->input->post('btnsubmit')):
 			$this->form_validation->set_rules('oldpass','"Старый пароль"','required|callback_oldpass_check');
@@ -875,8 +914,16 @@ class Administrator extends Controller{
 				$this->load->view('administrator/password',$pagevar);
 				return FALSE;
 			else:
-				$this->usersmodel->changepassword($_POST,$this->admin['uid']);
-				$this->logmodel->insert_record($this->admin['uid'],'Пароль изменен');
+				$email = $this->usersmodel->read_field($this->admin['uid'],'uemail');
+				$message = "Weweds.ru\nВаш пароль был изменен.\n";
+				if($this->sendmail($email,$message,"Администрирование - смена пароля","admin@weweds.ru")):
+					$this->usersmodel->changepassword($_POST,$this->admin['uid']);
+					$this->logmodel->insert_record($this->admin['uid'],'Пароль изменен');
+				else:
+					$pagevar['errorcode'] = '0x0009';
+					$this->load->view('main/error',$pagevar);
+					return FALSE;
+				endif;
 				$this->session->set_flashdata('operation_error','none');
 				$this->session->set_flashdata('operation_message','none');
 				$this->session->set_flashdata('operation_saccessfull','Пароль изменен.');
@@ -988,9 +1035,9 @@ class Administrator extends Controller{
 			if($this->input->post('close')):
 				$email = $this->usersmodel->read_field($this->admin['uid'],'uemail');
 				$path = base_url().$pagevar['usite'].'/admin';
-				$message = "My-wedding.ru\nСайт ".$pagevar['usite']." закрыт.\nВвойдите в панель администрирования
+				$message = "Weweds.ru\nСайт ".$pagevar['usite']." закрыт.\nВвойдите в панель администрирования
 				<a href=".$path.">".$path."</a> для восстановления.\nСайт будет удален через 30 дней.";
-				if($this->sendmail($email,$message,"Закрытие сайта","admin@my-wedding.ru")):
+				if($this->sendmail($email,$message,"Закрытие сайта","admin@weweds.ru")):
 					$this->usersmodel->close_user($this->admin['uid']);
 					$this->logmodel->insert_record($this->admin['uid'],'Произведено выключение сайта');
 					$this->usersmodel->deactive_user($this->session->userdata('login'));
@@ -1046,7 +1093,10 @@ class Administrator extends Controller{
 					);
 		$alb_id = $this->uri->segment(4);
 		$album = $this->albummodel->exist_album($alb_id,$this->admin['uid']);
-		if(!$album) redirect('page403');
+		if(!$album):
+			$this->session->set_userdata('errormessage',TRUE);
+			redirect('page403');
+		endif;
 		$pagevar['backpath'] = $this->admin['site'].'/photo-albums/photo-gallery/'.$pagevar['album'];
 		if($this->input->post('btnsubmit')):
 			$this->form_validation->set_rules('imagetitle','"Описание"','required');
@@ -1301,7 +1351,10 @@ class Administrator extends Controller{
 		
 		$img_id = $this->uri->segment(4);
 		$image = $this->imagesmodel->exist_image($img_id,$this->admin['uid']);
-		if(!$image) redirect('page403');
+		if(!$image):
+			$this->session->set_userdata('errormessage',TRUE);
+			redirect('page403');
+		endif;
 		$backpath = $this->admin['site'].'/photo-albums/photo-gallery/'.$image['img_album'];
 		$this->imagesmodel->image_delete($img_id,$this->admin['uid']);
 		$this->albummodel->delete_photo($image['img_album']);
@@ -1340,7 +1393,10 @@ class Administrator extends Controller{
 		
 		$img_id = $this->uri->segment(4);
 		$image = $this->imagesmodel->exist_image($img_id,$this->admin['uid']);
-		if(!$image) redirect('page403');
+		if(!$image):
+			$this->session->set_userdata('errormessage',TRUE);
+			redirect('page403');
+		endif;
 		$backpath = $this->admin['site'].'/photo-albums/photo-gallery/'.$image['img_album'];
 		$status = $this->imagesmodel->slideshow_status($img_id,$this->admin['uid'],abs($image['img_slideshow']-1));
 		if($status):

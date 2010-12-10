@@ -34,12 +34,16 @@
 		<?php $this->load->view($themeurl.'/header'); ?>
 		<div id="main" class="mt10">
 			<div class="container_12">
-				<div id="internal_nav" class="grid_4">
-					<a href="<?= $baseurl.$backpath; ?>">&nbsp;&larr;&nbsp; Вернуться назад</a>
+				<div id="summaries" class="grid_4 suffix_2">
+					<span class="separated">
+						<a href="<?= $baseurl.$backpath; ?>">&nbsp;&larr;&nbsp; Вернуться назад</a>
+					</span>
 				</div>
 				<?php if($admin):?>
-					<div id="internal_nav" class="grid_4">
-						<a href="<?= $baseurl.$usite.'/photo-albums/photo-gallery/'.$album.'/upload'; ?>" style="text-align:center">Добавить фотографии</a>
+					<div id="summaries" class="grid_4 suffix_2">
+						<span class="separated">
+							<a href="<?= $baseurl.$usite.'/photo-albums/photo-gallery/'.$album.'/upload'; ?>" style="text-align:center">Добавить фотографии</a>
+						</span>
 					</div>
 				<?php endif; ?>
 			</div>

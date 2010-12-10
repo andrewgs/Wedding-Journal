@@ -29,14 +29,18 @@
 </head>
 <body>
 	<div id="main-wrap">
-		<?php $this->load->view($themeurl.'/admin/header-admin'); ?>
+		<?php $this->load->view('administrator/header-admin'); ?>
 		<div class="content">
 			<div class="container_12">
-				<div id="internal_nav" class="grid_4">
-					<a href="<?= $baseurl.$backpath; ?>">&nbsp;&larr;&nbsp; Вернуться назад</a>
+				<div id="summaries" class="grid_4 suffix_2">
+					<span class="separated">
+						<a href="<?= $baseurl.$backpath; ?>">&nbsp;&larr;&nbsp; Вернуться назад</a>
+					</span>
 				</div>
-				<div id="internal_nav" class="grid_4">
-					<a href="<?= $baseurl.$usite.'/admin/close'?>" style="text-align:center" class="delete">Удалить профиль</a>
+				<div id="summaries" class="grid_4 suffix_2">
+					<span class="separated">
+						<a href="<?= $baseurl.$usite.'/admin/close'?>" style="text-align:center" class="delete">Удалить профиль</a>
+					</span>
 				</div>
 			</div>
 			<div class="clear"></div>

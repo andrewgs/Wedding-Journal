@@ -162,8 +162,8 @@ class Main extends Controller{
 					$this->load->view('main/error',$pagevar);
 					return FALSE;
 				endif;
-				$message = "My-wedding.ru\nСистема восстановления паролей!\nНовый пароль - ".$password."\nВвойдите в систему под новым паролем.\nМожете измениете его через панель администратора.";
-				if($this->sendmail($_POST['email'],$message,"Восстановление пароля","admin@my-wedding.ru")):
+				$message = "Weweds.ru\nСистема восстановления паролей!\nНовый пароль - ".$password."\nВвойдите в систему под новым паролем.\nМожете измениете его через панель администратора.";
+				if($this->sendmail($_POST['email'],$message,"Восстановление пароля","admin@weweds.ru")):
 					$pagevar['text'] = '<b>На указанный E-mail выслано письмо c новым паролем</b>';
 					$this->load->view('main/message',$pagevar);
 					return TRUE;
@@ -338,7 +338,8 @@ class Main extends Controller{
 		/* cоздание страницы "О нас" по-умолчанию */
 		$this->load->model('othertextmodel');
 		$this->load->model('otherimagemodel');
-		$this->othertextmodel->insert_record('О нас...','about',$uid);
+		$this->othertextmodel->insert_record('О нас...','','about',$uid);
+		$this->othertextmodel->insert_record('Текст главной страници','Weweds.ru','index',$uid);
 		$this->otherimagemodel->insert_record(array('file'=>'','title'=>'О нас'),$uid,'about');
 		return '0x0000';
 	} /* end function defaultobjects */
@@ -383,7 +384,6 @@ class Main extends Controller{
 					'title'			=> 'Свадебный сайт',
 					'baseurl' 		=> base_url(),
 					);
-					
 		$this->load->view('main/page404',$pagevar);
 	} /* end function page404 */
   
@@ -396,7 +396,13 @@ class Main extends Controller{
 					'title'			=> 'Свадебный сайт',
 					'baseurl' 		=> base_url(),
 					);
-					
+		if(!$this->session->userdata('errormessage')):
+			$redirect = '';
+			$redirect = $this->session->userdata('backpage');
+			if(empty($redirect)) redirect('page404');
+			redirect($redirect);
+		endif;
+		$this->session->set_userdata('errormessage',FALSE);
 		$this->load->view('main/page403',$pagevar);
 	} /* end function page404 */
 
@@ -409,7 +415,13 @@ class Main extends Controller{
 					'title'			=> 'Свадебный сайт',
 					'baseurl' 		=> base_url(),
 					);
-					
+		if(!$this->session->userdata('errormessage')):
+			$redirect = '';
+			$redirect = $this->session->userdata('backpage');
+			if(empty($redirect)) redirect('page404');
+			redirect($redirect);
+		endif;
+		$this->session->set_userdata('errormessage',FALSE);
 		$this->load->view('main/notexisting',$pagevar);
 	} /* end function notexisting */
 
@@ -422,9 +434,35 @@ class Main extends Controller{
 					'title'			=> 'Свадебный сайт',
 					'baseurl' 		=> base_url(),
 					);
-					
+		if(!$this->session->userdata('errormessage')):
+			$redirect = '';
+			$redirect = $this->session->userdata('backpage');
+			if(empty($redirect)) redirect('page404');
+			redirect($redirect);
+		endif;
+		$this->session->set_userdata('errormessage',FALSE);	
 		$this->load->view('main/closesite',$pagevar);
 	} /* end function notexisting */
+
+	function accountstatus(){
+		
+		$pagevar = array(
+					'description'	=> '',
+					'keywords' 		=> '',
+					'author'		=> '',
+					'title'			=> 'Свадебный сайт',
+					'baseurl' 		=> base_url(),
+					'text' 			=> "Регистрация до конца не пройдена.<br />Сайт еще не функционирует. Проверьте почтовый ящик на наличие письма с подтверждением регистарации."
+					);
+		if(!$this->session->userdata('errormessage')):
+			$redirect = '';
+			$redirect = $this->session->userdata('backpage');
+			if(empty($redirect)) redirect('page404');
+			redirect($redirect);
+		endif;
+		$this->session->set_userdata('errormessage',FALSE);	
+		$this->load->view('main/accountstatus',$pagevar);
+	} /* end function accountstatus */
 	
 	function sendmail($email,$msg,$subject,$from){
 		
@@ -481,7 +519,7 @@ class Main extends Controller{
 				$user_id = $this->usersmodel->insert_record($_POST);
 				$message = 'Для активации аккаунта пройдите по следующей ссылке'."\n".'<a href="'.base_url().'activation/'.$_POST['confirm'].'" target="_blank">'.base_url().'activation/'.$_POST['confirm'].'</a>';
 				$message .= "\n".'или скопируйте ссылку в окно ввода адреса браузера и нажмите enter.';
-				if($this->sendmail($_POST['email'],$message,"Подтверждение регистарции на сайте","admin@my-wedding.ru")):
+				if($this->sendmail($_POST['email'],$message,"Подтверждение регистарции на сайте","admin@weweds.ru")):
 					$pagevar['text'] = '<b>Учетная запись создана.</b><br><b>На Ваш адрес "'.$_POST['email'].'" выслано письмо</b><br><b>Для активации учетной записи перейдите по ссылке указанной в письме</b><br><b>Спасибо за регистрацию на нашем сайте.</b><br>';
 					$this->load->view('main/message',$pagevar);
 					return TRUE;
@@ -497,6 +535,11 @@ class Main extends Controller{
 	function sitename_check($sitename){
 	
 		if(preg_match('/^admin/i',$sitename)):
+			$this->form_validation->set_message('sitename_check','Не допустимое название сайта');
+			return FALSE;
+		endif;
+		if($sitename == 'restore' || $sitename == 'page404' || $sitename == 'page403' || $sitename == 'activation' || $sitename == 'signup' ||
+			$sitename == 'login' || $sitename == 'capcha' || $sitename == 'logoff'):
 			$this->form_validation->set_message('sitename_check','Не допустимое название сайта');
 			return FALSE;
 		endif;

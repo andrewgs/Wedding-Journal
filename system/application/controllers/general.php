@@ -23,12 +23,20 @@ class General extends Controller{
 		$this->load->model('imagesmodel');
 		$this->load->model('othertextmodel');
 		$this->load->model('otherimagemodel');
+		$this->session->set_userdata('errormessage',FALSE);
 		if($this->usersmodel->close_status($this->uri->segment(1))):
+			$this->session->set_userdata('errormessage',TRUE);
 			redirect('closed-site');
 		endif;
 		$this->usrinfo['uid'] = $this->usersmodel->user_exist('usite',$this->uri->segment(1));
 		if(!$this->usrinfo['uid']):
+			$this->session->set_userdata('errormessage',TRUE);
 			redirect('not-existing');
+		endif;
+		$userstatus = $this->usersmodel->read_status($this->usrinfo['uid']);
+		if($userstatus == 'disabled'):
+			$this->session->set_userdata('errormessage',TRUE);
+			redirect('account-disabled');
 		endif;
 		$cookieuid = $this->session->userdata('userid');
 		if((isset($cookieuid) and !empty($cookieuid)) and ($cookieuid === $this->usrinfo['uid'])):
@@ -82,7 +90,6 @@ class General extends Controller{
 		$pagevar['days'] = $days[$index];
 		$pagevar['events'] = $this->eventsmodel->new_events($this->usrinfo['uid'],3);
 		$pagevar['images'] = $this->imagesmodel->slideshow_images($this->usrinfo['uid'],TRUE);
-//		print_r($pagevar['images']); exit;
 		for($i = 0;$i < count($pagevar['events']); $i++):
 			$pagevar['events'][$i]['evnt_date'] = $this->operation_date($pagevar['events'][$i]['evnt_date']);
 			$pagevar['events'][$i]['evnt_text'] = strip_tags($pagevar['events'][$i]['evnt_text']);
@@ -149,7 +156,10 @@ class General extends Controller{
 					);
 		$alb_id = $this->uri->segment(4);
 		$album = $this->albummodel->exist_album($alb_id,$this->usrinfo['uid']);
-		if(!$album) redirect('page403');
+		if(!$album):
+			$this->session->set_userdata('errormessage',TRUE);
+			redirect('page403');
+		endif;
 		$flasherr = $this->session->flashdata('operation_error');
 		$flashmsg = $this->session->flashdata('operation_message');
 		$flashsaf = $this->session->flashdata('operation_saccessfull');
@@ -192,7 +202,10 @@ class General extends Controller{
 			$img_id = $this->uri->segment(4);
 		endif;
 		$image = $this->imagesmodel->exist_image($img_id,$this->usrinfo['uid']);
-		if(!$image) redirect('page403');
+		if(!$image):
+			$this->session->set_userdata('errormessage',TRUE);
+			redirect('page403');
+		endif;
 		$pagevar['image'] = $this->imagesmodel->read_record($img_id,$this->usrinfo['uid']);
 		if($this->input->post('commit')):
 			$this->form_validation->set_rules('user_name','"Ваше имя"','required|trim');
@@ -310,7 +323,10 @@ class General extends Controller{
 			$event_id = $this->uri->segment(3);
 		endif;
 		$event = $this->eventsmodel->exist_event($event_id,$this->usrinfo['uid']);
-		if(!$event) redirect('page403');
+		if(!$event):
+			$this->session->set_userdata('errormessage',TRUE);
+			redirect('page403');
+		endif;
 		$this->session->unset_userdata('commentlist');
 		if($this->input->post('commit')):
 			$this->form_validation->set_rules('user_name','"Ваше имя"','required|trim');

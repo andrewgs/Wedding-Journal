@@ -10,26 +10,16 @@
 	<meta name="keywords" content="<?= $keywords; ?>"/>
 	<title><?= $title; ?></title>
 	<link rel="stylesheet" href="<?= $baseurl; ?>css/960.css" type="text/css" />
-	<link rel="stylesheet" href="<?= $baseurl.$themeurl; ?>/css/reset.css" type="text/css" /> 
-	<link rel="stylesheet" href="<?= $baseurl.$themeurl; ?>/css/style.css" type="text/css" />
-	<script type="text/javascript" src="<?= $baseurl; ?>javascript/jquery.min.js"></script>
-	<script type="text/javascript">
-		$(document).ready(function(){
-			
-		});
-	</script>
+	<link rel="stylesheet" href="<?= $baseurl; ?>css/signup.css" type="text/css" />
 </head>
 <body>
-	<div id="main-wrap">
-		<?php $this->load->view('administrator/header-admin'); ?>
-		<div id="content">
-			<?php $this->load->view('transitions/fullback'); ?>
-			<div class="container_16">
-				<?php $this->load->view('forms/frmtheme'); ?>
-			</div>
-		</div>
-		<div class="push"></div>
-	</div>
-	<?php $this->load->view($themeurl.'/footer'); ?>
+ 	<h1 align="center">
+		Запрошеный Вами сайт не найден.<br />
+	</h1>
+	<hr>
+	<h2>
+		<?= $text;?>
+	</h2>
+	<center><input name='back' type='button' value='Вернуться назад' onclick="javascript:history.back(1);"></center>
 </body>
 </html>

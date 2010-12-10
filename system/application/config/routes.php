@@ -16,6 +16,7 @@ $route['restore'] = "main/passrestore";
 $route['page403'] = "main/page403";
 $route['not-existing'] = "main/notexisting";
 $route['closed-site'] = "main/closesite";
+$route['account-disabled'] = "main/accountstatus";
 
 /* Controller Administrator*/
 $route[':any/login'] = "administrator/login";

@@ -27,7 +27,7 @@
 </head>
 <body>
 	<div id="main-wrap">
-		<?php $this->load->view($themeurl.'/admin/header-admin'); ?>
+		<?php $this->load->view('administrator/header-admin'); ?>
 		<div class="content">
 			<?php $this->load->view('transitions/fullback'); ?>
 			<div class="container_16">

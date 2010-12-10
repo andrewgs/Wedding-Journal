@@ -33,11 +33,15 @@
    		<?php $this->load->view($themeurl.'/header'); ?>
 		<div id="main">
 			<div class="container_12">
-				<div id="internal_nav" class="grid_4">
-					<a href="<?= $baseurl.$backpath; ?>">&nbsp;&larr;&nbsp; Вернуться назад</a>
+				<div id="summaries" class="grid_4 suffix_2">
+					<span class="separated">
+						<a href="<?= $baseurl.$backpath; ?>">&nbsp;&larr;&nbsp; Вернуться назад</a>
+					</span>
 				</div>
-				<div id="internal_nav" class="grid_4">
-					<a href="#comment" style="text-align:center">Оставить комментарий</a>
+				<div id="summaries" class="grid_4 suffix_2">
+					<span class="separated">
+						<a href="#comment" style="text-align:center">Оставить комментарий</a>
+					</span>
 				</div>
 				<div class="clear"></div>
 				<?php $this->load->view('message');?>

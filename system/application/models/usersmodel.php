@@ -181,5 +181,15 @@
 			if(isset($data[0])) return $data[0]['wedday'];
 			return FALSE;
 		}
+
+		function read_status($uid){
+			
+			$this->db->select('ustatus AS status');
+			$this->db->where('uid',$uid);
+			$query = $this->db->get('users',1);
+			$data = $query->result_array();
+			if(isset($data[0])) return $data[0]['status'];
+			return FALSE;
+		}
 	}
 ?>
